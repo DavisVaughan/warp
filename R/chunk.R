@@ -1,8 +1,8 @@
-uniquify <- function(x, by = "year") {
+warp_chunk <- function(x, by = "year") {
   by <- vec_assert(by, ptype = character(), size = 1L)
   by <- normalize_period(by)
 
-  .Call(timeslide_uniquify, x, by)
+  .Call(timeslide_warp_chunk, x, by)
 }
 
 normalize_period <- function(x) {

@@ -12,7 +12,7 @@
 
 // Functionality ------------------------------------------------
 
-SEXP uniquify(SEXP x, enum timeslide_unique_type type);
+SEXP warp_chunk(SEXP x, enum timeslide_unique_type type);
 SEXP breakpoints(SEXP x);
 
 // Compatibility ------------------------------------------------

@@ -1,5 +1,5 @@
 #' @export
 time_break <- function(x, by = "year") {
-  x <- uniquify(x, by)
+  x <- warp_chunk(x, by)
   breakpoints(x)
 }

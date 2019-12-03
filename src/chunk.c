@@ -3,34 +3,34 @@
 
 // -----------------------------------------------------------------------------
 
-SEXP uniquify(SEXP x, enum timeslide_unique_type type);
+SEXP warp_chunk(SEXP x, enum timeslide_unique_type type);
 
 // [[ register() ]]
-SEXP timeslide_uniquify(SEXP x, SEXP type) {
+SEXP timeslide_warp_chunk(SEXP x, SEXP type) {
   const int type_ = INTEGER_RO(type)[0];
   enum timeslide_unique_type unique_type = as_unique_type(type_);
-  return uniquify(x, unique_type);
+  return warp_chunk(x, unique_type);
 }
 
 // -----------------------------------------------------------------------------
 
-static SEXP uniquify_year(SEXP x);
-static SEXP uniquify_month(SEXP x);
-static SEXP uniquify_day(SEXP x);
+static SEXP warp_chunk_year(SEXP x);
+static SEXP warp_chunk_month(SEXP x);
+static SEXP warp_chunk_day(SEXP x);
 
 // [[ include("timeslide.h") ]]
-SEXP uniquify(SEXP x, enum timeslide_unique_type type) {
+SEXP warp_chunk(SEXP x, enum timeslide_unique_type type) {
   switch (type) {
-  case timeslide_unique_year: return uniquify_year(x);
-  case timeslide_unique_month: return uniquify_month(x);
-  case timeslide_unique_day: return uniquify_day(x);
+  case timeslide_unique_year: return warp_chunk_year(x);
+  case timeslide_unique_month: return warp_chunk_month(x);
+  case timeslide_unique_day: return warp_chunk_day(x);
   default: Rf_errorcall(R_NilValue, "Internal error: unknown `type`.");
   }
 }
 
 // -----------------------------------------------------------------------------
 
-static SEXP uniquify_year(SEXP x) {
+static SEXP warp_chunk_year(SEXP x) {
   SEXP time_df = PROTECT(time_get(x, strings_year));
   SEXP out = VECTOR_ELT(time_df, 0);
 
@@ -49,7 +49,7 @@ static SEXP uniquify_year(SEXP x) {
 
 // -----------------------------------------------------------------------------
 
-static SEXP uniquify_month(SEXP x) {
+static SEXP warp_chunk_month(SEXP x) {
   SEXP time_df = PROTECT(time_get(x, strings_year_month));
 
   SEXP year = VECTOR_ELT(time_df, 0);
@@ -76,14 +76,14 @@ static SEXP uniquify_month(SEXP x) {
 #define IS_LEAP_YEAR(y) ((((y) % 4) == 0 && ((y) % 100) != 0) || ((y) % 400) == 0)
 #define DAYS_IN_YEAR(year) (IS_LEAP_YEAR(year) ? 366 : 365)
 
-static SEXP int_date_uniquify_day(SEXP x) {
+static SEXP int_date_warp_chunk_day(SEXP x) {
   SEXP out = PROTECT(r_maybe_duplicate(x));
   SET_ATTRIB(out, R_NilValue);
   UNPROTECT(1);
   return out;
 }
 
-static SEXP dbl_date_uniquify_day(SEXP x) {
+static SEXP dbl_date_warp_chunk_day(SEXP x) {
   R_xlen_t x_size = Rf_xlength(x);
 
   double* p_x = REAL(x);
@@ -110,15 +110,15 @@ static SEXP dbl_date_uniquify_day(SEXP x) {
   return out;
 }
 
-static SEXP date_uniquify_day(SEXP x) {
+static SEXP date_warp_chunk_day(SEXP x) {
   switch (TYPEOF(x)) {
-  case INTSXP: return int_date_uniquify_day(x);
-  case REALSXP: return dbl_date_uniquify_day(x);
+  case INTSXP: return int_date_warp_chunk_day(x);
+  case REALSXP: return dbl_date_warp_chunk_day(x);
   default: Rf_errorcall(R_NilValue, "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
   }
 }
 
-static SEXP int_posixct_uniquify_day(SEXP x) {
+static SEXP int_posixct_warp_chunk_day(SEXP x) {
   R_xlen_t x_size = Rf_xlength(x);
 
   SEXP out = PROTECT(Rf_allocVector(INTSXP, x_size));
@@ -141,7 +141,7 @@ static SEXP int_posixct_uniquify_day(SEXP x) {
   return out;
 }
 
-static SEXP dbl_posixct_uniquify_day(SEXP x) {
+static SEXP dbl_posixct_warp_chunk_day(SEXP x) {
   R_xlen_t x_size = Rf_xlength(x);
 
   SEXP out = PROTECT(Rf_allocVector(INTSXP, x_size));
@@ -168,23 +168,23 @@ static SEXP dbl_posixct_uniquify_day(SEXP x) {
   return out;
 }
 
-static SEXP posixct_uniquify_day(SEXP x) {
+static SEXP posixct_warp_chunk_day(SEXP x) {
   switch (TYPEOF(x)) {
-  case INTSXP: return int_posixct_uniquify_day(x);
-  case REALSXP: return dbl_posixct_uniquify_day(x);
+  case INTSXP: return int_posixct_warp_chunk_day(x);
+  case REALSXP: return dbl_posixct_warp_chunk_day(x);
   default: Rf_errorcall(R_NilValue, "Unknown `POSIXct` type %s.", Rf_type2char(TYPEOF(x)));
   }
 }
 
-static SEXP posixlt_uniquify_day(SEXP x) {
+static SEXP posixlt_warp_chunk_day(SEXP x) {
   return x;
 }
 
-static SEXP uniquify_day(SEXP x) {
+static SEXP warp_chunk_day(SEXP x) {
   switch (time_class_type(x)) {
-  case timeslide_class_date: return date_uniquify_day(x);
-  case timeslide_class_posixct: return posixct_uniquify_day(x);
-  case timeslide_class_posixlt: return posixlt_uniquify_day(x);
+  case timeslide_class_date: return date_warp_chunk_day(x);
+  case timeslide_class_posixct: return posixct_warp_chunk_day(x);
+  case timeslide_class_posixlt: return posixlt_warp_chunk_day(x);
   default: Rf_errorcall(R_NilValue, "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
   }
 }
