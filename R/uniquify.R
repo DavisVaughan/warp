@@ -17,6 +17,10 @@ normalize_period <- function(x) {
     months =,
     monthly = 2L,
 
+    day = ,
+    days = ,
+    daily = 4L,
+
     stop("Unknown period specification.", call. = FALSE)
   )
 }

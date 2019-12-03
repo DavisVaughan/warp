@@ -15,11 +15,8 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 Imports: 
     slide,
-    timerip,
     vctrs,
     rlang
-LinkingTo: 
-    timerip
 RoxygenNote: 7.0.1
 URL: https://github.com/DavisVaughan/timeslide
 BugReports: https://github.com/DavisVaughan/timeslide/issues

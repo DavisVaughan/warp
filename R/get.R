@@ -1,4 +1,9 @@
-time_get <- function(x, components = NULL, week_start = 1L) {
+# Called from C
+
+time_get <- function(x, components = NULL) {
+  # Hard code for now
+  week_start <- 1L
+
   validate_supported_date_time_class(x)
   validate_components(components)
   validate_week_start(week_start)
