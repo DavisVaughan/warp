@@ -1,5 +1,5 @@
-#ifndef TIMESLIDE_UTILS_H
-#define TIMESLIDE_UTILS_H
+#ifndef TIMEWARP_UTILS_H
+#define TIMEWARP_UTILS_H
 
 #define R_NO_REMAP
 #include <R.h>
@@ -7,27 +7,27 @@
 #include <stdbool.h>
 #include <stdarg.h>
 
-enum timeslide_group_type {
-  timeslide_group_year,
-  timeslide_group_month,
-  timeslide_group_week,
-  timeslide_group_day,
-  timeslide_group_hour,
-  timeslide_group_minute,
-  timeslide_group_second,
-  timeslide_group_millisecond
+enum timewarp_group_type {
+  timewarp_group_year,
+  timewarp_group_month,
+  timewarp_group_week,
+  timewarp_group_day,
+  timewarp_group_hour,
+  timewarp_group_minute,
+  timewarp_group_second,
+  timewarp_group_millisecond
 };
 
-enum timeslide_class_type {
-  timeslide_class_date,
-  timeslide_class_posixct,
-  timeslide_class_posixlt,
-  timeslide_class_unknown
+enum timewarp_class_type {
+  timewarp_class_date,
+  timewarp_class_posixct,
+  timewarp_class_posixlt,
+  timewarp_class_unknown
 };
 
-enum timeslide_class_type time_class_type(SEXP x);
+enum timewarp_class_type time_class_type(SEXP x);
 
-enum timeslide_group_type as_group_type(SEXP by);
+enum timewarp_group_type as_group_type(SEXP by);
 
 void __attribute__((noreturn)) r_error(const char* where, const char* why, ...);
 SEXP r_maybe_duplicate(SEXP x);

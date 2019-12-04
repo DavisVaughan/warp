@@ -1,5 +1,5 @@
-#ifndef TIMESLIDE_H
-#define TIMESLIDE_H
+#ifndef TIMEWARP_H
+#define TIMEWARP_H
 
 #define R_NO_REMAP
 #include <R.h>
@@ -12,7 +12,7 @@
 
 // Functionality ------------------------------------------------
 
-SEXP warp_group(SEXP x, enum timeslide_group_type type, int every, SEXP origin);
+SEXP warp_group(SEXP x, enum timewarp_group_type type, int every, SEXP origin);
 SEXP breakpoints(SEXP x);
 
 SEXP as_datetime(SEXP x);

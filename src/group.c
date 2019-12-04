@@ -1,4 +1,4 @@
-#include "timeslide.h"
+#include "timewarp.h"
 #include "utils.h"
 
 // Helpers defined at the bottom of the file
@@ -10,11 +10,11 @@ double origin_to_seconds_from_epoch(SEXP origin);
 
 // -----------------------------------------------------------------------------
 
-SEXP warp_group(SEXP x, enum timeslide_group_type type, int every, SEXP origin);
+SEXP warp_group(SEXP x, enum timewarp_group_type type, int every, SEXP origin);
 
 // [[ register() ]]
-SEXP timeslide_warp_group(SEXP x, SEXP by, SEXP every, SEXP origin) {
-  enum timeslide_group_type type = as_group_type(by);
+SEXP timewarp_warp_group(SEXP x, SEXP by, SEXP every, SEXP origin) {
+  enum timewarp_group_type type = as_group_type(by);
   int every_ = pull_every(every);
   return warp_group(x, type, every_, origin);
 }
@@ -28,12 +28,12 @@ static SEXP warp_group_hour(SEXP x, int every, SEXP origin);
 static SEXP warp_group_minute(SEXP x, int every, SEXP origin);
 static SEXP warp_group_second(SEXP x, int every, SEXP origin);
 
-// [[ include("timeslide.h") ]]
-SEXP warp_group(SEXP x, enum timeslide_group_type type, int every, SEXP origin) {
+// [[ include("timewarp.h") ]]
+SEXP warp_group(SEXP x, enum timewarp_group_type type, int every, SEXP origin) {
   validate_origin(origin);
   validate_every(every);
 
-  if (time_class_type(x) == timeslide_class_unknown) {
+  if (time_class_type(x) == timewarp_class_unknown) {
     r_error("warp_group", "`x` must inherit from 'Date', 'POSIXct', or 'POSIXlt'.");
   }
 
@@ -43,12 +43,12 @@ SEXP warp_group(SEXP x, enum timeslide_group_type type, int every, SEXP origin) 
   SEXP out;
 
   switch (type) {
-  case timeslide_group_year: out = PROTECT(warp_group_year(x, every, origin)); break;
-  case timeslide_group_month: out = PROTECT(warp_group_month(x, every, origin)); break;
-  case timeslide_group_day: out = PROTECT(warp_group_day(x, every, origin)); break;
-  case timeslide_group_hour: out = PROTECT(warp_group_hour(x, every, origin)); break;
-  case timeslide_group_minute: out = PROTECT(warp_group_minute(x, every, origin)); break;
-  case timeslide_group_second: out = PROTECT(warp_group_second(x, every, origin)); break;
+  case timewarp_group_year: out = PROTECT(warp_group_year(x, every, origin)); break;
+  case timewarp_group_month: out = PROTECT(warp_group_month(x, every, origin)); break;
+  case timewarp_group_day: out = PROTECT(warp_group_day(x, every, origin)); break;
+  case timewarp_group_hour: out = PROTECT(warp_group_hour(x, every, origin)); break;
+  case timewarp_group_minute: out = PROTECT(warp_group_minute(x, every, origin)); break;
+  case timewarp_group_second: out = PROTECT(warp_group_second(x, every, origin)); break;
   default: r_error("warp_group", "Internal error: unknown `type`.");
   }
 
@@ -186,9 +186,9 @@ static SEXP posixlt_warp_group_day(SEXP x, int every, SEXP origin);
 
 static SEXP warp_group_day(SEXP x, int every, SEXP origin) {
   switch (time_class_type(x)) {
-  case timeslide_class_date: return date_warp_group_day(x, every, origin);
-  case timeslide_class_posixct: return posixct_warp_group_day(x, every, origin);
-  case timeslide_class_posixlt: return posixlt_warp_group_day(x, every, origin);
+  case timewarp_class_date: return date_warp_group_day(x, every, origin);
+  case timewarp_class_posixct: return posixct_warp_group_day(x, every, origin);
+  case timewarp_class_posixlt: return posixlt_warp_group_day(x, every, origin);
   default: r_error("warp_group_day", "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
   }
 }
@@ -454,9 +454,9 @@ static SEXP posixlt_warp_group_hour(SEXP x, int every, SEXP origin);
 
 static SEXP warp_group_hour(SEXP x, int every, SEXP origin) {
   switch (time_class_type(x)) {
-  case timeslide_class_date: return date_warp_group_hour(x, every, origin);
-  case timeslide_class_posixct: return posixct_warp_group_hour(x, every, origin);
-  case timeslide_class_posixlt: return posixlt_warp_group_hour(x, every, origin);
+  case timewarp_class_date: return date_warp_group_hour(x, every, origin);
+  case timewarp_class_posixct: return posixct_warp_group_hour(x, every, origin);
+  case timewarp_class_posixlt: return posixlt_warp_group_hour(x, every, origin);
   default: r_error("warp_group_hour", "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
   }
 }
@@ -726,9 +726,9 @@ static SEXP posixlt_warp_group_minute(SEXP x, int every, SEXP origin);
 
 static SEXP warp_group_minute(SEXP x, int every, SEXP origin) {
   switch (time_class_type(x)) {
-  case timeslide_class_date: return date_warp_group_minute(x, every, origin);
-  case timeslide_class_posixct: return posixct_warp_group_minute(x, every, origin);
-  case timeslide_class_posixlt: return posixlt_warp_group_minute(x, every, origin);
+  case timewarp_class_date: return date_warp_group_minute(x, every, origin);
+  case timewarp_class_posixct: return posixct_warp_group_minute(x, every, origin);
+  case timewarp_class_posixlt: return posixlt_warp_group_minute(x, every, origin);
   default: r_error("warp_group_minute", "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
   }
 }
@@ -998,9 +998,9 @@ static SEXP posixlt_warp_group_second(SEXP x, int every, SEXP origin);
 
 static SEXP warp_group_second(SEXP x, int every, SEXP origin) {
   switch (time_class_type(x)) {
-  case timeslide_class_date: return date_warp_group_second(x, every, origin);
-  case timeslide_class_posixct: return posixct_warp_group_second(x, every, origin);
-  case timeslide_class_posixlt: return posixlt_warp_group_second(x, every, origin);
+  case timewarp_class_date: return date_warp_group_second(x, every, origin);
+  case timewarp_class_posixct: return posixct_warp_group_second(x, every, origin);
+  case timewarp_class_posixlt: return posixlt_warp_group_second(x, every, origin);
   default: r_error("warp_group_second", "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
   }
 }
@@ -1288,7 +1288,7 @@ void validate_origin(SEXP origin) {
     r_error("validate_origin", "`origin` must have size 1, not %i.", n_origin);
   }
 
-  if (time_class_type(origin) == timeslide_class_unknown) {
+  if (time_class_type(origin) == timewarp_class_unknown) {
     r_error("validate_origin", "`origin` must inherit from 'Date', 'POSIXct', or 'POSIXlt'.");
   }
 }

@@ -1,4 +1,4 @@
-#include "timeslide.h"
+#include "timewarp.h"
 #include "utils.h"
 
 // [[ include("utils.h") ]]
@@ -8,13 +8,13 @@ const char* get_timezone(SEXP x) {
     return "UTC";
   }
 
-  enum timeslide_class_type type = time_class_type(x);
+  enum timewarp_class_type type = time_class_type(x);
 
-  if (type == timeslide_class_date) {
+  if (type == timewarp_class_date) {
     return "UTC";
   }
 
-  if (type == timeslide_class_unknown) {
+  if (type == timewarp_class_unknown) {
     Rf_errorcall(R_NilValue, "Internal error: `x` has unknown date time class.");
   }
 

@@ -1,3 +1,3 @@
 breakpoints <- function(x) {
-  .Call(timeslide_breakpoints, x)
+  .Call(timewarp_breakpoints, x)
 }

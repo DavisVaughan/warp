@@ -1,4 +1,4 @@
-#include "timeslide.h"
+#include "timewarp.h"
 #include "utils.h"
 
 // -----------------------------------------------------------------------------
@@ -6,7 +6,7 @@
 SEXP breakpoints(SEXP x);
 
 // [[ register() ]]
-SEXP timeslide_breakpoints(SEXP x) {
+SEXP timewarp_breakpoints(SEXP x) {
   return breakpoints(x);
 }
 
@@ -14,7 +14,7 @@ SEXP timeslide_breakpoints(SEXP x) {
 
 static SEXP new_breakpoints_df(R_len_t size);
 
-// [[ include("timeslide.h") ]]
+// [[ include("timewarp.h") ]]
 SEXP breakpoints(SEXP x) {
   if (TYPEOF(x) != INTSXP) {
     Rf_errorcall(R_NilValue, "`x` must be an integer vector.");

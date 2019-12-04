@@ -2,7 +2,7 @@
 
 // -----------------------------------------------------------------------------
 
-SEXP timeslide_ns_env = NULL;
+SEXP timewarp_ns_env = NULL;
 
 SEXP syms_x = NULL;
 SEXP syms_components = NULL;
@@ -30,28 +30,28 @@ inline void never_reached(const char* fn) {
   Rf_error("Internal error in `%s()`: Reached the unreachable.", fn);
 }
 
-enum timeslide_class_type time_class_type(SEXP x);
-static enum timeslide_class_type time_class_type_impl(SEXP klass);
-static const char* class_type_as_str(enum timeslide_class_type type);
+enum timewarp_class_type time_class_type(SEXP x);
+static enum timewarp_class_type time_class_type_impl(SEXP klass);
+static const char* class_type_as_str(enum timewarp_class_type type);
 
 // [[ register() ]]
-SEXP timeslide_class_type(SEXP x) {
+SEXP timewarp_class_type(SEXP x) {
   return Rf_mkString(class_type_as_str(time_class_type(x)));
 }
 
-enum timeslide_class_type time_class_type(SEXP x) {
+enum timewarp_class_type time_class_type(SEXP x) {
   if (!OBJECT(x)) {
-    return timeslide_class_unknown;
+    return timewarp_class_unknown;
   }
 
   SEXP klass = PROTECT(Rf_getAttrib(x, R_ClassSymbol));
-  enum timeslide_class_type type = time_class_type_impl(klass);
+  enum timewarp_class_type type = time_class_type_impl(klass);
 
   UNPROTECT(1);
   return type;
 }
 
-static enum timeslide_class_type time_class_type_impl(SEXP klass) {
+static enum timewarp_class_type time_class_type_impl(SEXP klass) {
   int n = Rf_length(klass);
   SEXP const* p_klass = STRING_PTR(klass);
 
@@ -60,26 +60,26 @@ static enum timeslide_class_type time_class_type_impl(SEXP klass) {
   SEXP last = *p_klass++;
 
   if (last == strings_date) {
-    return timeslide_class_date;
+    return timewarp_class_date;
   }
 
   if (last == strings_posixt) {
     if (butlast == strings_posixlt) {
-      return timeslide_class_posixlt;
+      return timewarp_class_posixlt;
     } else if (butlast == strings_posixct) {
-      return timeslide_class_posixct;
+      return timewarp_class_posixct;
     }
   }
 
-  return timeslide_class_unknown;
+  return timewarp_class_unknown;
 }
 
-static const char* class_type_as_str(enum timeslide_class_type type) {
+static const char* class_type_as_str(enum timewarp_class_type type) {
   switch (type) {
-  case timeslide_class_date: return "date";
-  case timeslide_class_posixct: return "posixct";
-  case timeslide_class_posixlt: return "posixlt";
-  case timeslide_class_unknown: return "unknown";
+  case timewarp_class_date: return "date";
+  case timewarp_class_posixct: return "posixct";
+  case timewarp_class_posixlt: return "posixlt";
+  case timewarp_class_unknown: return "unknown";
   }
   never_reached("class_type_as_str");
 }
@@ -91,7 +91,7 @@ static bool str_equal(const char* x, const char* y) {
 }
 
 // [[ include("utils.h") ]]
-enum timeslide_group_type as_group_type(SEXP by) {
+enum timewarp_group_type as_group_type(SEXP by) {
   if (TYPEOF(by) != STRSXP || Rf_length(by) != 1) {
     Rf_errorcall(R_NilValue, "`by` must be a single string.");
   }
@@ -99,35 +99,35 @@ enum timeslide_group_type as_group_type(SEXP by) {
   const char* type = CHAR(STRING_ELT(by, 0));
 
   if (str_equal(type, "year") || str_equal(type, "years") || str_equal(type, "yearly")) {
-    return timeslide_group_year;
+    return timewarp_group_year;
   }
 
   if (str_equal(type, "month") || str_equal(type, "months") || str_equal(type, "monthly")) {
-    return timeslide_group_month;
+    return timewarp_group_month;
   }
 
   if (str_equal(type, "week") || str_equal(type, "weeks") || str_equal(type, "weekly")) {
-    return timeslide_group_week;
+    return timewarp_group_week;
   }
 
   if (str_equal(type, "day") || str_equal(type, "days") || str_equal(type, "daily")) {
-    return timeslide_group_day;
+    return timewarp_group_day;
   }
 
   if (str_equal(type, "hour") || str_equal(type, "hours") || str_equal(type, "hourly")) {
-    return timeslide_group_hour;
+    return timewarp_group_hour;
   }
 
   if (str_equal(type, "minute") || str_equal(type, "minutes") || str_equal(type, "minutely")) {
-    return timeslide_group_minute;
+    return timewarp_group_minute;
   }
 
   if (str_equal(type, "second") || str_equal(type, "seconds") || str_equal(type, "secondly")) {
-    return timeslide_group_second;
+    return timewarp_group_second;
   }
 
   if (str_equal(type, "millisecond") || str_equal(type, "milliseconds")) {
-    return timeslide_group_millisecond;
+    return timewarp_group_millisecond;
   }
 
   Rf_errorcall(R_NilValue, "Unknown `by` value '%s'.", type);
@@ -269,7 +269,7 @@ static SEXP r_call(SEXP fn, SEXP* tags, SEXP* cars) {
   return Rf_lcons(fn, r_pairlist(tags, cars));
 }
 
-static SEXP timeslide_eval_mask_n_impl(SEXP fn, SEXP* syms, SEXP* args, SEXP mask) {
+static SEXP timewarp_eval_mask_n_impl(SEXP fn, SEXP* syms, SEXP* args, SEXP mask) {
   SEXP call = PROTECT(r_call(fn, syms, syms));
 
   while (*syms) {
@@ -283,37 +283,37 @@ static SEXP timeslide_eval_mask_n_impl(SEXP fn, SEXP* syms, SEXP* args, SEXP mas
   return out;
 }
 
-SEXP timeslide_dispatch_n(SEXP fn_sym, SEXP fn, SEXP* syms, SEXP* args) {
+SEXP timewarp_dispatch_n(SEXP fn_sym, SEXP fn, SEXP* syms, SEXP* args) {
   // Mask `fn` with `fn_sym`. We dispatch in the global environment.
   SEXP mask = PROTECT(r_new_environment(R_GlobalEnv, 4));
   Rf_defineVar(fn_sym, fn, mask);
 
-  SEXP out = timeslide_eval_mask_n_impl(fn_sym, syms, args, mask);
+  SEXP out = timewarp_eval_mask_n_impl(fn_sym, syms, args, mask);
 
   UNPROTECT(1);
   return out;
 }
 
-SEXP timeslide_dispatch2(SEXP fn_sym, SEXP fn,
+SEXP timewarp_dispatch2(SEXP fn_sym, SEXP fn,
                          SEXP x_sym, SEXP x,
                          SEXP y_sym, SEXP y) {
   SEXP syms[3] = { x_sym, y_sym, NULL };
   SEXP args[3] = { x, y, NULL };
-  return timeslide_dispatch_n(fn_sym, fn, syms, args);
+  return timewarp_dispatch_n(fn_sym, fn, syms, args);
 }
 
-SEXP timeslide_dispatch1(SEXP fn_sym, SEXP fn,
+SEXP timewarp_dispatch1(SEXP fn_sym, SEXP fn,
                          SEXP x_sym, SEXP x) {
   SEXP syms[2] = { x_sym, NULL };
   SEXP args[2] = { x, NULL };
-  return timeslide_dispatch_n(fn_sym, fn, syms, args);
+  return timewarp_dispatch_n(fn_sym, fn, syms, args);
 }
 
 // -----------------------------------------------------------------------------
 
 // [[ include("utils.h") ]]
 SEXP time_get(SEXP x, SEXP components) {
-  return timeslide_dispatch2(
+  return timewarp_dispatch2(
     syms_time_get, fns_time_get,
     syms_x, x,
     syms_components, components
@@ -322,7 +322,7 @@ SEXP time_get(SEXP x, SEXP components) {
 
 // [[ include("utils.h") ]]
 SEXP as_posixct_from_posixlt(SEXP x) {
-  return timeslide_dispatch1(
+  return timewarp_dispatch1(
     syms_as_posixct_from_posixlt, fns_as_posixct_from_posixlt,
     syms_x, x
   );
@@ -330,7 +330,7 @@ SEXP as_posixct_from_posixlt(SEXP x) {
 
 // [[ include("utils.h") ]]
 SEXP as_date(SEXP x) {
-  return timeslide_dispatch1(
+  return timewarp_dispatch1(
     syms_as_date, fns_as_date,
     syms_x, x
   );
@@ -338,8 +338,8 @@ SEXP as_date(SEXP x) {
 
 // -----------------------------------------------------------------------------
 
-void timeslide_init_utils(SEXP ns) {
-  timeslide_ns_env = ns;
+void timewarp_init_utils(SEXP ns) {
+  timewarp_ns_env = ns;
 
   syms_x = Rf_install("x");
   syms_components = Rf_install("components");
@@ -354,9 +354,9 @@ void timeslide_init_utils(SEXP ns) {
   syms_as_posixct_from_posixlt = Rf_install("as_posixct_from_posixlt");
   syms_as_date = Rf_install("as_date");
 
-  fns_time_get = r_env_get(timeslide_ns_env, syms_time_get);
-  fns_as_posixct_from_posixlt = r_env_get(timeslide_ns_env, syms_as_posixct_from_posixlt);
-  fns_as_date = r_env_get(timeslide_ns_env, syms_as_date);
+  fns_time_get = r_env_get(timewarp_ns_env, syms_time_get);
+  fns_as_posixct_from_posixlt = r_env_get(timewarp_ns_env, syms_as_posixct_from_posixlt);
+  fns_as_date = r_env_get(timewarp_ns_env, syms_as_date);
 
   strings_year = Rf_allocVector(STRSXP, 1);
   R_PreserveObject(strings_year);

@@ -4,30 +4,30 @@
 #include <R_ext/Rdynload.h>
 
 /* .Call calls */
-extern SEXP timeslide_warp_group(SEXP, SEXP, SEXP, SEXP);
-extern SEXP timeslide_breakpoints(SEXP);
-extern SEXP timeslide_class_type(SEXP);
+extern SEXP timewarp_warp_group(SEXP, SEXP, SEXP, SEXP);
+extern SEXP timewarp_breakpoints(SEXP);
+extern SEXP timewarp_class_type(SEXP);
 
 // Defined below
-SEXP timeslide_init_library(SEXP);
+SEXP timewarp_init_library(SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-  {"timeslide_warp_group",   (DL_FUNC) &timeslide_warp_group, 4},
-  {"timeslide_breakpoints",  (DL_FUNC) &timeslide_breakpoints, 1},
-  {"timeslide_class_type",   (DL_FUNC) &timeslide_class_type, 1},
-  {"timeslide_init_library", (DL_FUNC) &timeslide_init_library, 1},
+  {"timewarp_warp_group",   (DL_FUNC) &timewarp_warp_group, 4},
+  {"timewarp_breakpoints",  (DL_FUNC) &timewarp_breakpoints, 1},
+  {"timewarp_class_type",   (DL_FUNC) &timewarp_class_type, 1},
+  {"timewarp_init_library", (DL_FUNC) &timewarp_init_library, 1},
   {NULL, NULL, 0}
 };
 
-void R_init_timeslide(DllInfo *dll)
+void R_init_timewarp(DllInfo *dll)
 {
   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
 }
 
-void timeslide_init_utils(SEXP ns);
+void timewarp_init_utils(SEXP ns);
 
-SEXP timeslide_init_library(SEXP ns) {
-  timeslide_init_utils(ns);
+SEXP timewarp_init_library(SEXP ns) {
+  timewarp_init_utils(ns);
   return R_NilValue;
 }

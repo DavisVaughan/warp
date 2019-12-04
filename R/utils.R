@@ -1,5 +1,5 @@
 time_class_type <- function(x) {
-  .Call(timeslide_class_type, x)
+  .Call(timewarp_class_type, x)
 }
 
 # Callable from C
