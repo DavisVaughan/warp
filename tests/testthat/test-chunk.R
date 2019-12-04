@@ -48,6 +48,34 @@ test_that("can handle `NA` dates", {
   expect_identical(warp_chunk(x, "year"), NA_integer_)
 })
 
+test_that("can handle `every` with default origin", {
+  x <- as.Date(c(
+    "1967-01-01", "1968-01-01",
+    "1969-01-01", "1970-01-01",
+    "1971-01-01", "1972-01-01",
+    "1973-01-01"
+  ))
+
+  expect_equal(warp_chunk(x, every = 2L), c(-2L, -1L, -1L, 0L, 0L, 1L, 1L))
+  expect_equal(warp_chunk(x, every = 3L), c(-1L, -1L, -1L, 0L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, every = 4L), c(-1L, -1L, -1L, 0L, 0L, 0L, 0L))
+})
+
+test_that("can handle `every` with altered origin", {
+  x <- as.Date(c(
+    "1967-01-01", "1968-01-01",
+    "1969-01-01", "1970-01-01",
+    "1971-01-01", "1972-01-01",
+    "1973-01-01"
+  ))
+
+  origin <- as.Date("1971-01-01")
+
+  expect_equal(warp_chunk(x, every = 2L, origin = origin), c(-2L, -2L, -1L, -1L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, every = 3L, origin = origin), c(-2L, -1L, -1L, -1L, 0L, 0L, 0L))
+  expect_equal(warp_chunk(x, every = 4L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
+})
+
 # ------------------------------------------------------------------------------
 # warp_chunk(<POSIXct>, by = "year")
 
@@ -127,6 +155,49 @@ test_that("can handle `NA` dates", {
 
   x <- structure(NA_integer_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
   expect_identical(warp_chunk(x, "year"), NA_integer_)
+})
+
+test_that("can handle `every` with default origin", {
+  x <- as.POSIXct(c(
+    "1967-01-01", "1968-01-01",
+    "1969-01-01", "1970-01-01",
+    "1971-01-01", "1972-01-01",
+    "1973-01-01"
+  ), tz = "UTC")
+
+  expect_equal(warp_chunk(x, every = 2L), c(-2L, -1L, -1L, 0L, 0L, 1L, 1L))
+  expect_equal(warp_chunk(x, every = 3L), c(-1L, -1L, -1L, 0L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, every = 4L), c(-1L, -1L, -1L, 0L, 0L, 0L, 0L))
+})
+
+test_that("can handle `every` with altered origin", {
+  x <- as.POSIXct(c(
+    "1967-01-01", "1968-01-01",
+    "1969-01-01", "1970-01-01",
+    "1971-01-01", "1972-01-01",
+    "1973-01-01"
+  ), tz = "UTC")
+
+  origin <- as.Date("1971-01-01")
+
+  expect_equal(warp_chunk(x, every = 2L, origin = origin), c(-2L, -2L, -1L, -1L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, every = 3L, origin = origin), c(-2L, -1L, -1L, -1L, 0L, 0L, 0L))
+  expect_equal(warp_chunk(x, every = 4L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
+})
+
+test_that("can handle `every` with altered origin and altered timezone", {
+  x <- as.POSIXct(c(
+    "1967-01-01", "1968-01-01",
+    "1969-01-01", "1970-01-01",
+    "1971-01-01", "1972-01-01",
+    "1973-01-01"
+  ), tz = "America/New_York")
+
+  origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
+
+  expect_equal(warp_chunk(x, every = 2L, origin = origin), c(-2L, -2L, -1L, -1L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, every = 3L, origin = origin), c(-2L, -1L, -1L, -1L, 0L, 0L, 0L))
+  expect_equal(warp_chunk(x, every = 4L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
 })
 
 # ------------------------------------------------------------------------------
