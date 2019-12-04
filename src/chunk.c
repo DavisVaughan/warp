@@ -433,7 +433,7 @@ static SEXP dbl_posixct_warp_chunk_day(SEXP x, int every, SEXP origin) {
     int elt;
 
     if (x_elt < 0) {
-      elt = ((int64_t) x_elt - (86400 - 1)) / 86400; // TODO - do we need to `floor(x_elt)`?
+      elt = ((int64_t) floor(x_elt) - (86400 - 1)) / 86400;
     } else {
       elt = (int64_t) x_elt / 86400;
     }

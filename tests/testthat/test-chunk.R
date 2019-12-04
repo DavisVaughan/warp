@@ -735,6 +735,22 @@ test_that("can handle `every` with altered origin - numeric POSIXct", {
   expect_equal(warp_chunk(x, by = "day", every = 4L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
 })
 
+test_that("can handle fractional seconds before the epoch correctly", {
+  # Base R printing is wrong, because as.POSIXlt() is wrong
+  # https://bugs.r-project.org/bugzilla/show_bug.cgi?id=17667
+
+  # I don't care what base R prints this as, this is:
+  # "1969-12-31T23:59:59.5"
+  x <- .POSIXct(-0.5, "UTC")
+
+  # This is
+  # "1969-12-30T23:59:59.5"
+  y <- .POSIXct(-86400.5, "UTC")
+
+  expect_equal(warp_chunk(x, "day"), -1)
+  expect_equal(warp_chunk(y, "day"), -2)
+})
+
 # ------------------------------------------------------------------------------
 # warp_chunk(<POSIXlt>, by = "day")
 
