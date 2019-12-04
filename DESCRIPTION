@@ -1,5 +1,5 @@
 Package: timewarp
-Title: What the Package Does (One Line, Title Case)
+Title: Group and Manipulate Dates and Datetimes
 Version: 0.0.0.9000
 Authors@R: 
     c(person(given = "Davis",
