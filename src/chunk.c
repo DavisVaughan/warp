@@ -20,7 +20,14 @@ SEXP validate_origin(SEXP origin) {
     Rf_errorcall(R_NilValue, "`origin` must inherit from 'Date', 'POSIXct', or 'POSIXlt'.");
   }
 
-  return as_datetime(origin, type);
+  SEXP out = PROTECT(as_datetime(origin, type));
+
+  if (REAL(out)[0] == NA_REAL) {
+    Rf_errorcall(R_NilValue, "`origin` must be a valid date value, not `NA`.");
+  }
+
+  UNPROTECT(1);
+  return out;
 }
 
 // -----------------------------------------------------------------------------
