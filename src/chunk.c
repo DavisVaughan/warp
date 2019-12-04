@@ -26,6 +26,7 @@ static SEXP warp_chunk_month(SEXP x, int every, SEXP origin);
 static SEXP warp_chunk_day(SEXP x, int every, SEXP origin);
 static SEXP warp_chunk_hour(SEXP x, int every, SEXP origin);
 static SEXP warp_chunk_minute(SEXP x, int every, SEXP origin);
+static SEXP warp_chunk_second(SEXP x, int every, SEXP origin);
 
 // [[ include("timeslide.h") ]]
 SEXP warp_chunk(SEXP x, enum timeslide_chunk_type type, int every, SEXP origin) {
@@ -47,6 +48,7 @@ SEXP warp_chunk(SEXP x, enum timeslide_chunk_type type, int every, SEXP origin) 
   case timeslide_chunk_day: out = PROTECT(warp_chunk_day(x, every, origin)); break;
   case timeslide_chunk_hour: out = PROTECT(warp_chunk_hour(x, every, origin)); break;
   case timeslide_chunk_minute: out = PROTECT(warp_chunk_minute(x, every, origin)); break;
+  case timeslide_chunk_second: out = PROTECT(warp_chunk_second(x, every, origin)); break;
   default: r_error("warp_chunk", "Internal error: unknown `type`.");
   }
 
@@ -1006,6 +1008,269 @@ static SEXP dbl_posixct_warp_chunk_minute(SEXP x, int every, SEXP origin) {
 }
 
 #undef SECONDS_IN_MINUTE
+
+// -----------------------------------------------------------------------------
+
+static SEXP date_warp_chunk_second(SEXP x, int every, SEXP origin);
+static SEXP posixct_warp_chunk_second(SEXP x, int every, SEXP origin);
+static SEXP posixlt_warp_chunk_second(SEXP x, int every, SEXP origin);
+
+static SEXP warp_chunk_second(SEXP x, int every, SEXP origin) {
+  switch (time_class_type(x)) {
+  case timeslide_class_date: return date_warp_chunk_second(x, every, origin);
+  case timeslide_class_posixct: return posixct_warp_chunk_second(x, every, origin);
+  case timeslide_class_posixlt: return posixlt_warp_chunk_second(x, every, origin);
+  default: r_error("warp_chunk_second", "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
+  }
+}
+
+
+static SEXP int_date_warp_chunk_second(SEXP x, int every, SEXP origin);
+static SEXP dbl_date_warp_chunk_second(SEXP x, int every, SEXP origin);
+
+static SEXP date_warp_chunk_second(SEXP x, int every, SEXP origin) {
+  switch (TYPEOF(x)) {
+  case INTSXP: return int_date_warp_chunk_second(x, every, origin);
+  case REALSXP: return dbl_date_warp_chunk_second(x, every, origin);
+  default: r_error("date_warp_chunk_second", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
+  }
+}
+
+
+static SEXP int_posixct_warp_chunk_second(SEXP x, int every, SEXP origin);
+static SEXP dbl_posixct_warp_chunk_second(SEXP x, int every, SEXP origin);
+
+static SEXP posixct_warp_chunk_second(SEXP x, int every, SEXP origin) {
+  switch (TYPEOF(x)) {
+  case INTSXP: return int_posixct_warp_chunk_second(x, every, origin);
+  case REALSXP: return dbl_posixct_warp_chunk_second(x, every, origin);
+  default: r_error("posixct_warp_chunk_second", "Unknown `POSIXct` type %s.", Rf_type2char(TYPEOF(x)));
+  }
+}
+
+
+static SEXP posixlt_warp_chunk_second(SEXP x, int every, SEXP origin) {
+  x = PROTECT(as_datetime(x));
+  SEXP out = PROTECT(posixct_warp_chunk_second(x, every, origin));
+
+  UNPROTECT(2);
+  return out;
+}
+
+
+#define SECONDS_IN_DAY 86400
+
+static SEXP int_date_warp_chunk_second(SEXP x, int every, SEXP origin) {
+  R_xlen_t x_size = Rf_xlength(x);
+
+  int* p_x = INTEGER(x);
+
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, x_size));
+  double* p_out = REAL(out);
+
+  bool needs_every = (every != 1);
+
+  bool needs_offset = (origin != R_NilValue);
+  double origin_offset;
+
+  if (needs_offset) {
+    origin_offset = origin_to_days_from_epoch(origin) * SECONDS_IN_DAY;
+  }
+
+  for (R_xlen_t i = 0; i < x_size; ++i) {
+    int x_elt = p_x[i];
+
+    if (x_elt == NA_INTEGER) {
+      p_out[i] = NA_REAL;
+      continue;
+    }
+
+    // Convert to int64_t here to hold `elt * SECONDS_IN_DAY`
+    // Can't be double because we still need integer division later
+    int64_t elt = x_elt * SECONDS_IN_DAY;
+
+    if (needs_offset) {
+      elt -= origin_offset;
+    }
+
+    if (!needs_every) {
+      p_out[i] = elt;
+      continue;
+    }
+
+    if (elt < 0) {
+      elt = (elt - (every - 1)) / every;
+    } else {
+      elt = elt / every;
+    }
+
+    p_out[i] = elt;
+  }
+
+  UNPROTECT(1);
+  return out;
+}
+
+static SEXP dbl_date_warp_chunk_second(SEXP x, int every, SEXP origin) {
+  R_xlen_t x_size = Rf_xlength(x);
+
+  double* p_x = REAL(x);
+
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, x_size));
+  double* p_out = REAL(out);
+
+  bool needs_every = (every != 1);
+
+  bool needs_offset = (origin != R_NilValue);
+  double origin_offset;
+
+  if (needs_offset) {
+    origin_offset = origin_to_days_from_epoch(origin) * SECONDS_IN_DAY;
+  }
+
+  for (R_xlen_t i = 0; i < x_size; ++i) {
+    double x_elt = p_x[i];
+
+    if (!R_FINITE(x_elt)) {
+      p_out[i] = NA_REAL;
+      continue;
+    }
+
+    x_elt = x_elt * SECONDS_IN_DAY;
+
+    // `origin_offset` should be correct from `as_date()` in
+    // `origin_to_days_from_epoch()`, even if it had fractional parts
+    if (needs_offset) {
+      x_elt -= origin_offset;
+    }
+
+    // Always floor, whether negative or positive, to get rid of the
+    // fractional piece. `floor()` always goes the right way. Need
+    // int64_t for the integer division later
+    int64_t elt = floor(x_elt);
+
+    if (!needs_every) {
+      p_out[i] = elt;
+      continue;
+    }
+
+    if (elt < 0) {
+      elt = (elt - (every - 1)) / every;
+    } else {
+      elt = elt / every;
+    }
+
+    p_out[i] = elt;
+  }
+
+  UNPROTECT(1);
+  return out;
+}
+
+#undef SECONDS_IN_DAY
+
+static SEXP int_posixct_warp_chunk_second(SEXP x, int every, SEXP origin) {
+  R_xlen_t x_size = Rf_xlength(x);
+
+  bool needs_every = (every != 1);
+
+  bool needs_offset = (origin != R_NilValue);
+  double origin_offset;
+
+  if (needs_offset) {
+    origin_offset = origin_to_seconds_from_epoch(origin);
+  }
+
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, x_size));
+  double* p_out = REAL(out);
+
+  int* p_x = INTEGER(x);
+
+  for (R_xlen_t i = 0; i < x_size; ++i) {
+    // Starts as `int`, since that is what `x` is
+    int x_elt = p_x[i];
+
+    if (x_elt == NA_INTEGER) {
+      p_out[i] = NA_REAL;
+      continue;
+    }
+
+    // Convert to `int64_t` in case `elt -= origin_offset` goes OOB
+    int64_t elt = x_elt;
+
+    if (needs_offset) {
+      elt -= origin_offset;
+    }
+
+    if (!needs_every) {
+      p_out[i] = elt;
+      continue;
+    }
+
+    if (elt < 0) {
+      elt = (elt - (every - 1)) / every;
+    } else {
+      elt = elt / every;
+    }
+
+    p_out[i] = elt;
+  }
+
+  UNPROTECT(1);
+  return out;
+}
+
+static SEXP dbl_posixct_warp_chunk_second(SEXP x, int every, SEXP origin) {
+  R_xlen_t x_size = Rf_xlength(x);
+
+  bool needs_every = (every != 1);
+
+  bool needs_offset = (origin != R_NilValue);
+  double origin_offset;
+
+  if (needs_offset) {
+    origin_offset = origin_to_seconds_from_epoch(origin);
+  }
+
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, x_size));
+  double* p_out = REAL(out);
+
+  double* p_x = REAL(x);
+
+  for (R_xlen_t i = 0; i < x_size; ++i) {
+    double x_elt = p_x[i];
+
+    if (!R_FINITE(x_elt)) {
+      p_out[i] = NA_REAL;
+      continue;
+    }
+
+    if (needs_offset) {
+      x_elt -= origin_offset;
+    }
+
+    // Always floor() to get rid of fractional seconds, whether `x_elt` is
+    // negative or positive. Need int64_t here because of the integer
+    // division later
+    int64_t elt = floor(x_elt);
+
+    if (!needs_every) {
+      p_out[i] = elt;
+      continue;
+    }
+
+    if (elt < 0) {
+      elt = (elt - (every - 1)) / every;
+    } else {
+      elt = elt / every;
+    }
+
+    p_out[i] = elt;
+  }
+
+  UNPROTECT(1);
+  return out;
+}
 
 // -----------------------------------------------------------------------------
 
