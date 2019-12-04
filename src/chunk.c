@@ -173,7 +173,13 @@ static SEXP warp_chunk_month(SEXP x, int every, SEXP origin) {
     SEXP origin_time_df = PROTECT_N(time_get(origin, strings_year_month), &n_prot);
     origin_year = INTEGER(VECTOR_ELT(origin_time_df, 0))[0];
     origin_month = INTEGER(VECTOR_ELT(origin_time_df, 1))[0] - 1;
+
+    if (origin_year == NA_INTEGER) {
+      r_error("warp_chunk_month", "`origin` cannot be `NA`.");
+    }
   }
+
+  bool needs_every = (every != 1);
 
   SEXP time_df = PROTECT_N(time_get(x, strings_year_month), &n_prot);
 
@@ -189,12 +195,28 @@ static SEXP warp_chunk_month(SEXP x, int every, SEXP origin) {
   int* p_out = INTEGER(out);
 
   for (R_xlen_t i = 0; i < size; ++i) {
-    // Assume p_month[i] would also be NA
-    if (p_year[i] == NA_INTEGER) {
+    int elt_year = p_year[i];
+    int elt_month = p_month[i] - 1;
+
+    if (elt_year == NA_INTEGER) {
       p_out[i] = NA_INTEGER;
-    } else {
-      p_out[i] = (p_year[i] - origin_year) * 12 + (p_month[i] - 1 - origin_month);
+      continue;
     }
+
+    int elt = (elt_year - origin_year) * 12 + (elt_month - origin_month);
+
+    if (!needs_every) {
+      p_out[i] = elt;
+      continue;
+    }
+
+    if (elt < 0) {
+      elt = (elt - (every - 1)) / every;
+    } else {
+      elt = elt / every;
+    }
+
+    p_out[i] = elt;
   }
 
   UNPROTECT(n_prot);

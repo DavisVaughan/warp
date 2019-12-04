@@ -264,6 +264,34 @@ test_that("can use integer Dates", {
   expect_identical(warp_chunk(x, "month"), 1L)
 })
 
+test_that("can handle `every` with default origin", {
+  x <- as.Date(c(
+    "1969-10-01", "1969-11-01",
+    "1969-12-01", "1970-01-01",
+    "1970-02-01", "1970-03-01",
+    "1970-04-01"
+  ))
+
+  expect_equal(warp_chunk(x, by = "month", every = 2L), c(-2L, -1L, -1L, 0L, 0L, 1L, 1L))
+  expect_equal(warp_chunk(x, by = "month", every = 3L), c(-1L, -1L, -1L, 0L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, by = "month", every = 4L), c(-1L, -1L, -1L, 0L, 0L, 0L, 0L))
+})
+
+test_that("can handle `every` with altered origin", {
+  x <- as.Date(c(
+    "1969-10-01", "1969-11-01",
+    "1969-12-01", "1970-01-01",
+    "1970-02-01", "1970-03-01",
+    "1970-04-01"
+  ))
+
+  origin <- as.Date("1970-02-01")
+
+  expect_equal(warp_chunk(x, by = "month", every = 2L, origin = origin), c(-2L, -2L, -1L, -1L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, by = "month", every = 3L, origin = origin), c(-2L, -1L, -1L, -1L, 0L, 0L, 0L))
+  expect_equal(warp_chunk(x, by = "month", every = 4L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
+})
+
 # ------------------------------------------------------------------------------
 # warp_chunk(<POSIXct>, by = "month")
 
@@ -343,6 +371,49 @@ test_that("can handle `NA` dates", {
 
   x <- structure(NA_integer_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
   expect_identical(warp_chunk(x, "month"), NA_integer_)
+})
+
+test_that("can handle `every` with default origin", {
+  x <- as.POSIXct(c(
+    "1969-10-01", "1969-11-01",
+    "1969-12-01", "1970-01-01",
+    "1970-02-01", "1970-03-01",
+    "1970-04-01"
+  ), tz = "UTC")
+
+  expect_equal(warp_chunk(x, by = "month", every = 2L), c(-2L, -1L, -1L, 0L, 0L, 1L, 1L))
+  expect_equal(warp_chunk(x, by = "month", every = 3L), c(-1L, -1L, -1L, 0L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, by = "month", every = 4L), c(-1L, -1L, -1L, 0L, 0L, 0L, 0L))
+})
+
+test_that("can handle `every` with altered origin", {
+  x <- as.POSIXct(c(
+    "1969-10-01", "1969-11-01",
+    "1969-12-01", "1970-01-01",
+    "1970-02-01", "1970-03-01",
+    "1970-04-01"
+  ), tz = "UTC")
+
+  origin <- as.Date("1970-02-01")
+
+  expect_equal(warp_chunk(x, by = "month", every = 2L, origin = origin), c(-2L, -2L, -1L, -1L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, by = "month", every = 3L, origin = origin), c(-2L, -1L, -1L, -1L, 0L, 0L, 0L))
+  expect_equal(warp_chunk(x, by = "month", every = 4L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
+})
+
+test_that("can handle `every` with altered origin and altered timezone", {
+  x <- as.POSIXct(c(
+    "1969-10-01", "1969-11-01",
+    "1969-12-01", "1970-01-01",
+    "1970-02-01", "1970-03-01",
+    "1970-04-01"
+  ), tz = "America/New_York")
+
+  origin <- as.POSIXct("1970-02-01", tz = "America/New_York")
+
+  expect_equal(warp_chunk(x, by = "month", every = 2L, origin = origin), c(-2L, -2L, -1L, -1L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, by = "month", every = 3L, origin = origin), c(-2L, -1L, -1L, -1L, 0L, 0L, 0L))
+  expect_equal(warp_chunk(x, by = "month", every = 4L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
 })
 
 # ------------------------------------------------------------------------------
@@ -591,7 +662,9 @@ test_that("`x` is validated", {
 test_that("`origin` is validated", {
   expect_error(warp_chunk(new_date(0), origin = 1), "must inherit from")
   expect_error(warp_chunk(new_date(0), origin = new_date(c(0, 1))), "size 1, not 2")
-  expect_error(warp_chunk(new_date(0), origin = new_date(NA_real_)), "cannot be `NA`")
+
+  expect_error(warp_chunk(new_date(0), by = "year", origin = new_date(NA_real_)), "cannot be `NA`")
+  expect_error(warp_chunk(new_date(0), by = "month", origin = new_date(NA_real_)), "cannot be `NA`")
 })
 
 test_that("`every` is validated", {
