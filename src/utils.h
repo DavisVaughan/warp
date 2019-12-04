@@ -5,6 +5,7 @@
 #include <R.h>
 #include <Rinternals.h>
 #include <stdbool.h>
+#include <stdarg.h>
 
 enum timeslide_chunk_type {
   timeslide_chunk_year,
@@ -28,6 +29,7 @@ enum timeslide_class_type time_class_type(SEXP x);
 
 enum timeslide_chunk_type as_chunk_type(SEXP by);
 
+void __attribute__((noreturn)) r_error(const char* where, const char* why, ...);
 SEXP r_maybe_duplicate(SEXP x);
 
 SEXP time_get(SEXP x, SEXP components);

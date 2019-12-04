@@ -11,11 +11,11 @@ void validate_origin(SEXP origin) {
   R_len_t n_origin = Rf_length(origin);
 
   if (n_origin != 1) {
-    Rf_errorcall(R_NilValue, "`origin` must have size 1, not %i.", n_origin);
+    r_error("validate_origin", "`origin` must have size 1, not %i.", n_origin);
   }
 
   if (time_class_type(origin) == timeslide_class_unknown) {
-    Rf_errorcall(R_NilValue, "`origin` must inherit from 'Date', 'POSIXct', or 'POSIXlt'.");
+    r_error("validate_origin", "`origin` must inherit from 'Date', 'POSIXct', or 'POSIXlt'.");
   }
 }
 
@@ -25,7 +25,7 @@ double origin_to_days_from_epoch(SEXP origin) {
   double out = REAL(origin)[0];
 
   if (out == NA_REAL) {
-    Rf_errorcall(R_NilValue, "`origin` must not be `NA`.");
+    r_error("origin_to_days_from_epoch", "`origin` must not be `NA`.");
   }
 
   UNPROTECT(1);
@@ -38,7 +38,7 @@ double origin_to_seconds_from_epoch(SEXP origin) {
   double out = REAL(origin)[0];
 
   if (out == NA_REAL) {
-    Rf_errorcall(R_NilValue, "`origin` must not be `NA`.");
+    r_error("origin_to_seconds_from_epoch", "`origin` must not be `NA`.");
   }
 
   UNPROTECT(1);
@@ -74,7 +74,7 @@ SEXP warp_chunk(SEXP x, enum timeslide_chunk_type type, SEXP origin) {
   case timeslide_chunk_year: out = PROTECT(warp_chunk_year(x, origin)); break;
   case timeslide_chunk_month: out = PROTECT(warp_chunk_month(x, origin)); break;
   case timeslide_chunk_day: out = PROTECT(warp_chunk_day(x, origin)); break;
-  default: Rf_errorcall(R_NilValue, "Internal error: unknown `type`.");
+  default: r_error("warp_chunk", "Internal error: unknown `type`.");
   }
 
   UNPROTECT(2);
@@ -158,6 +158,7 @@ static SEXP warp_chunk_month(SEXP x, SEXP origin) {
 static SEXP int_date_warp_chunk_day(SEXP x, SEXP origin) {
   SEXP out = PROTECT(r_maybe_duplicate(x));
   SET_ATTRIB(out, R_NilValue);
+  SET_OBJECT(out, 0);
 
   if (origin == R_NilValue) {
     UNPROTECT(1);
@@ -170,6 +171,10 @@ static SEXP int_date_warp_chunk_day(SEXP x, SEXP origin) {
   double origin_offset = origin_to_days_from_epoch(origin);
 
   for (R_xlen_t i = 0; i < out_size; ++i) {
+    if (p_out[i] == NA_INTEGER) {
+      continue;
+    }
+
     p_out[i] -= origin_offset;
   }
 
@@ -223,7 +228,7 @@ static SEXP date_warp_chunk_day(SEXP x, SEXP origin) {
   switch (TYPEOF(x)) {
   case INTSXP: return int_date_warp_chunk_day(x, origin);
   case REALSXP: return dbl_date_warp_chunk_day(x, origin);
-  default: Rf_errorcall(R_NilValue, "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
+  default: r_error("date_warp_chunk_day", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
   }
 }
 
@@ -235,12 +240,6 @@ static SEXP int_posixct_warp_chunk_day(SEXP x, SEXP origin) {
 
   if (needs_offset) {
     origin_offset = origin_to_seconds_from_epoch(origin);
-
-    if (origin_offset < 0) {
-      origin_offset = floor(origin_offset) / 86400 - 1;
-    } else {
-      origin_offset = origin_offset / 86400;
-    }
   }
 
   SEXP out = PROTECT(Rf_allocVector(INTSXP, x_size));
@@ -257,7 +256,7 @@ static SEXP int_posixct_warp_chunk_day(SEXP x, SEXP origin) {
     }
 
     if (elt < 0) {
-      elt = elt / 86400 - 1;
+      elt = (elt - 86399) / 86400;
     } else {
       elt = elt / 86400;
     }
@@ -281,12 +280,6 @@ static SEXP dbl_posixct_warp_chunk_day(SEXP x, SEXP origin) {
 
   if (needs_offset) {
     origin_offset = origin_to_seconds_from_epoch(origin);
-
-    if (origin_offset < 0) {
-      origin_offset = floor(origin_offset) / 86400 - 1;
-    } else {
-      origin_offset = origin_offset / 86400;
-    }
   }
 
   SEXP out = PROTECT(Rf_allocVector(INTSXP, x_size));
@@ -302,16 +295,16 @@ static SEXP dbl_posixct_warp_chunk_day(SEXP x, SEXP origin) {
       continue;
     }
 
+    if (needs_offset) {
+      x_elt -= origin_offset;
+    }
+
     int out_elt;
 
     if (x_elt < 0) {
-      out_elt = ((int) floor(x_elt)) / 86400 - 1;
+      out_elt = (int64_t) (x_elt - 86399) / 86400;
     } else {
-      out_elt = ((int) x_elt) / 86400;
-    }
-
-    if (needs_offset) {
-      out_elt -= origin_offset;
+      out_elt = (int64_t) x_elt / 86400;
     }
 
     p_out[i] = out_elt;
@@ -325,7 +318,7 @@ static SEXP posixct_warp_chunk_day(SEXP x, SEXP origin) {
   switch (TYPEOF(x)) {
   case INTSXP: return int_posixct_warp_chunk_day(x, origin);
   case REALSXP: return dbl_posixct_warp_chunk_day(x, origin);
-  default: Rf_errorcall(R_NilValue, "Unknown `POSIXct` type %s.", Rf_type2char(TYPEOF(x)));
+  default: r_error("posixct_warp_chunk_day", "Unknown `POSIXct` type %s.", Rf_type2char(TYPEOF(x)));
   }
 }
 
@@ -342,6 +335,6 @@ static SEXP warp_chunk_day(SEXP x, SEXP origin) {
   case timeslide_class_date: return date_warp_chunk_day(x, origin);
   case timeslide_class_posixct: return posixct_warp_chunk_day(x, origin);
   case timeslide_class_posixlt: return posixlt_warp_chunk_day(x, origin);
-  default: Rf_errorcall(R_NilValue, "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
+  default: r_error("warp_chunk_day", "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
   }
 }

@@ -286,3 +286,226 @@ test_that("can warp_chunk() by month with POSIXlt", {
   x <- as.POSIXlt(x)
   expect_identical(warp_chunk(x, "month"), 12L)
 })
+
+# ------------------------------------------------------------------------------
+# warp_chunk(<Date>, by = "day")
+
+test_that("can warp_chunk() by day with Date", {
+  x <- as.Date("1970-01-01")
+  expect_identical(warp_chunk(x, "day"), 0L)
+
+  x <- as.Date("1970-01-02")
+  expect_identical(warp_chunk(x, "day"), 1L)
+
+  x <- as.Date("1971-01-01")
+  expect_identical(warp_chunk(x, "day"), 365L)
+})
+
+test_that("can warp_chunk() by day with 'negative' Dates", {
+  x <- as.Date("1969-12-31")
+  expect_identical(warp_chunk(x, "day"), -1L)
+
+  x <- as.Date("1969-12-30")
+  expect_identical(warp_chunk(x, "day"), -2L)
+})
+
+test_that("Date + UTC origin does not emit a warning", {
+  x <- as.Date("1971-01-01")
+  origin <- as.POSIXct("1971-01-01", tz = "UTC")
+
+  expect_identical(warp_chunk(x, "day", origin), 0L)
+})
+
+test_that("Date + non-UTC origin converts with a warning", {
+  x <- as.Date("1971-01-01")
+  x_with_tz <- structure(unclass(x) * 86400, tzone = "America/New_York", class = c("POSIXct", "POSIXt"))
+  origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
+
+  expect_identical(
+    expect_warning(
+      warp_chunk(x, "day", origin),
+      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
+    ),
+    warp_chunk(x_with_tz, "day", origin)
+  )
+})
+
+test_that("can use integer Dates", {
+  x <- structure(0L, class = "Date")
+  expect_identical(warp_chunk(x, "day"), 0L)
+})
+
+test_that("can handle `NA` dates", {
+  x <- structure(NA_real_, class = "Date")
+  expect_identical(warp_chunk(x, "day"), NA_integer_)
+
+  x <- structure(NA_integer_, class = "Date")
+  expect_identical(warp_chunk(x, "day"), NA_integer_)
+})
+
+# ------------------------------------------------------------------------------
+# warp_chunk(<POSIXct>, by = "day")
+
+test_that("can warp_chunk() by day with POSIXct", {
+  x <- as.POSIXct("1970-01-01", tz = "UTC")
+  expect_identical(warp_chunk(x, "day"), 0L)
+
+  x <- as.POSIXct("1970-01-02", tz = "UTC")
+  expect_identical(warp_chunk(x, "day"), 1L)
+
+  x <- as.POSIXct("1971-01-01", tz = "UTC")
+  expect_identical(warp_chunk(x, "day"), 365L)
+})
+
+# In terms of inclusion/exclusion, we define the cutoffs like:
+# [1969-12-30 00:00:00 -> 1969-12-31 00:00:00) = -2 days from epoch
+# [1969-12-31 00:00:00 -> 1970-01-01 00:00:00) = -1 days from epoch
+# [1970-01-01 00:00:00 -> 1970-01-02 00:00:00) = 0 days from epoch
+# [1970-01-02 00:00:00 -> 1970-01-03 00:00:00) = 1 days from epoch
+test_that("can warp_chunk() by day with 'negative' POSIXct", {
+  x <- as.POSIXct("1969-12-30 00:00:00", tz = "UTC")
+  expect_identical(warp_chunk(x, "day"), -2L)
+
+  x <- as.POSIXct("1969-12-30 23:59:59", tz = "UTC")
+  expect_identical(warp_chunk(x, "day"), -2L)
+
+  x <- as.POSIXct("1969-12-31 00:00:00", tz = "UTC")
+  expect_identical(warp_chunk(x, "day"), -1L)
+
+  x <- as.POSIXct("1969-12-31 23:59:59", tz = "UTC")
+  expect_identical(warp_chunk(x, "day"), -1L)
+
+  x <- as.POSIXct("1970-01-01 00:00:00", tz = "UTC")
+  expect_identical(warp_chunk(x, "day"), 0L)
+
+  x <- as.POSIXct("1970-01-01 23:59:59", tz = "UTC")
+  expect_identical(warp_chunk(x, "day"), 0L)
+
+  x <- as.POSIXct("1970-01-02 00:00:00", tz = "UTC")
+  expect_identical(warp_chunk(x, "day"), 1L)
+
+  x <- as.POSIXct("1969-01-01 00:00:00", tz = "UTC")
+  expect_identical(warp_chunk(x, "day"), -365L)
+
+  x <- as.POSIXct("1968-12-31 23:59:59", tz = "UTC")
+  expect_identical(warp_chunk(x, "day"), -366L)
+})
+
+test_that("can warp_chunk() by day with 'negative' POSIXct and different UTC origins", {
+  origin <- as.POSIXct("1969-12-31", tz = "UTC")
+
+  x <- as.POSIXct("1969-12-30 00:00:00", tz = "UTC")
+  expect_identical(warp_chunk(x, "day", origin), -1L)
+
+  x <- as.POSIXct("1969-12-30 23:59:59", tz = "UTC")
+  expect_identical(warp_chunk(x, "day", origin), -1L)
+
+  x <- as.POSIXct("1969-12-31 00:00:00", tz = "UTC")
+  expect_identical(warp_chunk(x, "day", origin), 0L)
+
+  x <- as.POSIXct("1969-12-31 23:59:59", tz = "UTC")
+  expect_identical(warp_chunk(x, "day", origin), 0L)
+
+  x <- as.POSIXct("1970-01-01 00:00:00", tz = "UTC")
+  expect_identical(warp_chunk(x, "day", origin), 1L)
+
+  x <- as.POSIXct("1970-01-01 23:59:59", tz = "UTC")
+  expect_identical(warp_chunk(x, "day", origin), 1L)
+})
+
+test_that("can warp_chunk() by day with 'negative' POSIXct and non-UTC origins", {
+  origin <- as.POSIXct("1970-01-01", tz = "America/New_York")
+
+  x <- as.POSIXct("1969-12-30 00:00:00", tz = "America/New_York")
+  expect_identical(warp_chunk(x, "day", origin), -2L)
+
+  x <- as.POSIXct("1969-12-30 23:59:59", tz = "America/New_York")
+  expect_identical(warp_chunk(x, "day", origin), -2L)
+
+  x <- as.POSIXct("1969-12-31 00:00:00", tz = "America/New_York")
+  expect_identical(warp_chunk(x, "day", origin), -1L)
+
+  x <- as.POSIXct("1969-12-31 23:59:59", tz = "America/New_York")
+  expect_identical(warp_chunk(x, "day", origin), -1L)
+
+  x <- as.POSIXct("1970-01-01 00:00:00", tz = "America/New_York")
+  expect_identical(warp_chunk(x, "day", origin), 0L)
+
+  x <- as.POSIXct("1970-01-01 23:59:59", tz = "America/New_York")
+  expect_identical(warp_chunk(x, "day", origin), 0L)
+
+  x <- as.POSIXct("1970-01-02 00:00:00", tz = "America/New_York")
+  expect_identical(warp_chunk(x, "day", origin), 1L)
+})
+
+test_that("UTC POSIXct + UTC origin does not emit a warning", {
+  x <- as.POSIXct("1971-01-01", tz = "UTC")
+
+  expect_warning(warp_chunk(x, "day"), NA)
+
+  expect_identical(warp_chunk(x, "day"), 365L)
+  expect_identical(warp_chunk(x, "day", x), 0L)
+})
+
+test_that("UTC POSIXct + Date origin does not emit a warning", {
+  x <- as.POSIXct("1971-01-01", tz = "UTC")
+  origin1 <- as.Date("1971-01-01")
+  origin2 <- as.Date("1972-01-01")
+
+  expect_warning(warp_chunk(x, "day", origin1), NA)
+
+  expect_identical(warp_chunk(x, "day", origin1), 0L)
+  expect_identical(warp_chunk(x, "day", origin2), -365L)
+})
+
+test_that("UTC POSIXct + non-UTC origin converts with a warning", {
+  x <- as.POSIXct("1971-01-01", tz = "UTC")
+  x_with_tz <- structure(x, tzone = "America/New_York")
+  origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
+
+  expect_identical(
+    expect_warning(
+      warp_chunk(x, "day", origin),
+      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
+    ),
+    warp_chunk(x_with_tz, "day", origin)
+  )
+})
+
+test_that("local time POSIXct + UTC origin converts with a warning", {
+  with_envvar(list(TZ = "America/New_York"), {
+    x <- as.POSIXct("1970-12-31 23:00:00") # in UTC this is in 1971-01-01
+    origin <- as.POSIXct("1971-01-01", tz = "UTC")
+
+    expect_identical(
+      expect_warning(warp_chunk(x, "day", origin)),
+      0L
+    )
+  })
+})
+
+test_that("can use integer POSIXct", {
+  x <- structure(-1L, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_identical(warp_chunk(x, "day"), -1L)
+})
+
+test_that("can handle `NA` dates", {
+  x <- structure(NA_real_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_identical(warp_chunk(x, "day"), NA_integer_)
+
+  x <- structure(NA_integer_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_identical(warp_chunk(x, "day"), NA_integer_)
+})
+
+# ------------------------------------------------------------------------------
+# warp_chunk(<POSIXlt>, by = "day")
+
+test_that("can warp_chunk() by day with POSIXlt", {
+  x <- as.POSIXct("1970-01-01", tz = "UTC")
+  x <- as.POSIXlt(x)
+  expect_identical(warp_chunk(x, "day"), 0L)
+
+  x <- as.POSIXct("1971-01-01", tz = "UTC")
+  x <- as.POSIXlt(x)
+  expect_identical(warp_chunk(x, "day"), 365L)
+})

@@ -135,6 +135,26 @@ enum timeslide_chunk_type as_chunk_type(SEXP by) {
 
 // -----------------------------------------------------------------------------
 
+#define BUFSIZE 8192
+
+// [[ include("utils.h") ]]
+void __attribute__((noreturn)) r_error(const char* where, const char* why, ...) {
+  char buf[BUFSIZE];
+
+  va_list dots;
+  va_start(dots, why);
+  vsnprintf(buf, BUFSIZE, why, dots);
+  va_end(dots);
+
+  buf[BUFSIZE - 1] = '\0';
+
+  Rf_errorcall(R_NilValue, "In C function `%s()`:, %s", where, buf);
+}
+
+#undef BUFSIZE
+
+// -----------------------------------------------------------------------------
+
 static SEXP r_env_get(SEXP env, SEXP sym) {
   SEXP obj = PROTECT(Rf_findVarInFrame3(env, sym, FALSE));
 
