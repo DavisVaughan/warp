@@ -509,3 +509,31 @@ test_that("can warp_chunk() by day with POSIXlt", {
   x <- as.POSIXlt(x)
   expect_identical(warp_chunk(x, "day"), 365L)
 })
+
+# ------------------------------------------------------------------------------
+# warp_chunk() misc
+
+test_that("`x` is validated", {
+  expect_error(warp_chunk(1), "must inherit from")
+})
+
+test_that("`origin` is validated", {
+  expect_error(warp_chunk(new_date(0), origin = 1), "must inherit from")
+  expect_error(warp_chunk(new_date(0), origin = new_date(c(0, 1))), "size 1, not 2")
+  expect_error(warp_chunk(new_date(0), origin = new_date(NA_real_)), "cannot be `NA`")
+})
+
+test_that("`every` is validated", {
+  expect_error(warp_chunk(new_date(0), every = 0), "greater than 0, not 0")
+  expect_error(warp_chunk(new_date(0), every = -1), "greater than 0, not -1")
+  expect_error(warp_chunk(new_date(0), every = "x"), "integer-ish, not character")
+  expect_error(warp_chunk(new_date(0), every = c(1, 1)), "size 1, not 2")
+  expect_error(warp_chunk(new_date(0), every = integer()), "size 1, not 0")
+})
+
+test_that("`by` is validated", {
+  expect_error(warp_chunk(new_date(0), by = 1), "single string")
+  expect_error(warp_chunk(new_date(0), by = c("x", "y")), "single string")
+  expect_error(warp_chunk(new_date(0), by = "yr"), "Unknown `by` value 'yr'")
+})
+

@@ -21,14 +21,22 @@ void validate_origin(SEXP origin) {
 
 // TODO - Could be lossy...really should use vctrs? Callable from C?
 int pull_every(SEXP every) {
+  if (Rf_length(every) != 1) {
+    r_error("pull_every", "`every` must have size 1, not %i", Rf_length(every));
+  }
+
   switch (TYPEOF(every)) {
   case INTSXP: return INTEGER(every)[0];
   case REALSXP: return Rf_asInteger(every);
-  default: r_error("pull_every", "`every` must be integer-ish, not %s", TYPEOF(every));
+  default: r_error("pull_every", "`every` must be integer-ish, not %s", Rf_type2char(TYPEOF(every)));
   }
 }
 
 void validate_every(int every) {
+  if (every == NA_INTEGER) {
+    r_error("validate_every", "`every` must not be `NA`");
+  }
+
   if (every <= 0) {
     r_error("validate_every", "`every` must be an integer greater than 0, not %i", every);
   }
@@ -82,6 +90,10 @@ SEXP warp_chunk(SEXP x, enum timeslide_chunk_type type, int every, SEXP origin) 
   validate_origin(origin);
   validate_every(every);
 
+  if (time_class_type(x) == timeslide_class_unknown) {
+    r_error("warp_chunk", "`x` must inherit from 'Date', 'POSIXct', or 'POSIXlt'.");
+  }
+
   const char* origin_timezone = get_timezone(origin);
   x = PROTECT(convert_timezone(x, origin_timezone));
 
@@ -108,7 +120,13 @@ static SEXP warp_chunk_year(SEXP x, int every, SEXP origin) {
   if (origin != R_NilValue) {
     SEXP origin_time_df = PROTECT_N(time_get(origin, strings_year), &n_prot);
     origin_year = INTEGER(VECTOR_ELT(origin_time_df, 0))[0];
+
+    if (origin_year == NA_INTEGER) {
+      r_error("warp_chunk_year", "`origin` cannot be `NA`.");
+    }
   }
+
+  bool needs_every = (every != 1);
 
   SEXP time_df = PROTECT_N(time_get(x, strings_year), &n_prot);
   SEXP out = VECTOR_ELT(time_df, 0);
@@ -125,7 +143,18 @@ static SEXP warp_chunk_year(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    p_out[i] = (elt - origin_year) / every;
+    elt -= origin_year;
+
+    if (!needs_every) {
+      p_out[i] = elt;
+      continue;
+    }
+
+    if (elt < 0) {
+      p_out[i] = (elt - 1) / every;
+    } else {
+      p_out[i] = elt / every;
+    }
   }
 
   UNPROTECT(n_prot);
