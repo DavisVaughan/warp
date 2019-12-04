@@ -5,6 +5,8 @@
 
 <!-- badges: start -->
 
+[![Travis build
+status](https://travis-ci.org/DavisVaughan/timewarp.svg?branch=master)](https://travis-ci.org/DavisVaughan/timewarp)
 <!-- badges: end -->
 
 The goal of timewarp is to provide tooling to group date times by
