@@ -37,10 +37,10 @@ particularly important when \code{every > 1} and you need to define when the
 }
 \description{
 \code{warp_group()} is a low level engine for constructing groups by period for a
-date vector. It returns the distance from the \code{origin} in units defined by
-the \code{by} period. For example, \code{by = "year"} would return the number of years
-from the \code{origin}, which is the Unix epoch of \verb{1970-01-01 00:00:00}
-by default.
+date vector. It returns the distance from \code{x} to the \code{origin} in units
+defined by the period specified with \code{by}. For example, \code{by = "year"} would
+return the number of years from the \code{origin}, which is the Unix epoch of
+\verb{1970-01-01 00:00:00} by default.
 }
 \details{
 The return value of \code{warp_group()} is suitable for use as a grouping column

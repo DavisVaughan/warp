@@ -2,10 +2,10 @@
 #'
 #' @description
 #' `warp_group()` is a low level engine for constructing groups by period for a
-#' date vector. It returns the distance from the `origin` in units defined by
-#' the `by` period. For example, `by = "year"` would return the number of years
-#' from the `origin`, which is the Unix epoch of `1970-01-01 00:00:00`
-#' by default.
+#' date vector. It returns the distance from `x` to the `origin` in units
+#' defined by the period specified with `by`. For example, `by = "year"` would
+#' return the number of years from the `origin`, which is the Unix epoch of
+#' `1970-01-01 00:00:00` by default.
 #'
 #' @details
 #' The return value of `warp_group()` is suitable for use as a grouping column
