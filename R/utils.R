@@ -37,7 +37,7 @@ as_date <- function(x) {
 tz <- function(x) {
   tzone <- attr(x, "tzone")[[1]]
 
-  if (is.null(tzone) && !is.POSIXt(x)) {
+  if (is.null(tzone) && !is_POSIXt(x)) {
     return("UTC")
   }
 
@@ -52,4 +52,8 @@ tz <- function(x) {
   }
 
   tzone
+}
+
+is_POSIXt <- function(x) {
+  inherits(x, "POSIXt")
 }
