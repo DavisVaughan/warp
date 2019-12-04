@@ -28,10 +28,10 @@ test_that("Date + non-UTC origin converts with a warning", {
 
   expect_identical(
     expect_warning(
-      warp_chunk(x, "year", origin),
+      warp_chunk(x, "year", origin = origin),
       "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
     ),
-    warp_chunk(x_with_tz, "year", origin)
+    warp_chunk(x_with_tz, "year", origin = origin)
   )
 })
 
@@ -86,8 +86,8 @@ test_that("UTC POSIXct + Date origin does not emit a warning", {
 
   expect_warning(warp_chunk(x, "year", origin1), NA)
 
-  expect_identical(warp_chunk(x, "year", origin1), 0L)
-  expect_identical(warp_chunk(x, "year", origin2), -1L)
+  expect_identical(warp_chunk(x, "year", origin = origin1), 0L)
+  expect_identical(warp_chunk(x, "year", origin = origin2), -1L)
 })
 
 test_that("UTC POSIXct + non-UTC origin converts with a warning", {
@@ -97,10 +97,10 @@ test_that("UTC POSIXct + non-UTC origin converts with a warning", {
 
   expect_identical(
     expect_warning(
-      warp_chunk(x, "year", origin),
+      warp_chunk(x, "year", origin = origin),
       "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
     ),
-    warp_chunk(x_with_tz, "year", origin)
+    warp_chunk(x_with_tz, "year", origin = origin)
   )
 })
 
@@ -168,7 +168,7 @@ test_that("Date + UTC origin does not emit a warning", {
   x <- as.Date("1971-01-01")
   origin <- as.POSIXct("1971-01-01", tz = "UTC")
 
-  expect_identical(warp_chunk(x, "month", origin), 0L)
+  expect_identical(warp_chunk(x, "month", origin = origin), 0L)
 })
 
 test_that("Date + non-UTC origin converts with a warning", {
@@ -178,10 +178,10 @@ test_that("Date + non-UTC origin converts with a warning", {
 
   expect_identical(
     expect_warning(
-      warp_chunk(x, "month", origin),
+      warp_chunk(x, "month", origin = origin),
       "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
     ),
-    warp_chunk(x_with_tz, "month", origin)
+    warp_chunk(x_with_tz, "month", origin = origin)
   )
 })
 
@@ -221,7 +221,7 @@ test_that("UTC POSIXct + UTC origin does not emit a warning", {
   expect_warning(warp_chunk(x, "month"), NA)
 
   expect_identical(warp_chunk(x, "month"), 12L)
-  expect_identical(warp_chunk(x, "month", x), 0L)
+  expect_identical(warp_chunk(x, "month", origin = x), 0L)
 })
 
 test_that("UTC POSIXct + Date origin does not emit a warning", {
@@ -229,10 +229,10 @@ test_that("UTC POSIXct + Date origin does not emit a warning", {
   origin1 <- as.Date("1971-01-01")
   origin2 <- as.Date("1972-01-01")
 
-  expect_warning(warp_chunk(x, "month", origin1), NA)
+  expect_warning(warp_chunk(x, "month", origin = origin1), NA)
 
-  expect_identical(warp_chunk(x, "month", origin1), 0L)
-  expect_identical(warp_chunk(x, "month", origin2), -12L)
+  expect_identical(warp_chunk(x, "month", origin = origin1), 0L)
+  expect_identical(warp_chunk(x, "month", origin = origin2), -12L)
 })
 
 test_that("UTC POSIXct + non-UTC origin converts with a warning", {
@@ -242,10 +242,10 @@ test_that("UTC POSIXct + non-UTC origin converts with a warning", {
 
   expect_identical(
     expect_warning(
-      warp_chunk(x, "month", origin),
+      warp_chunk(x, "month", origin = origin),
       "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
     ),
-    warp_chunk(x_with_tz, "month", origin)
+    warp_chunk(x_with_tz, "month", origin = origin)
   )
 })
 
@@ -255,7 +255,7 @@ test_that("local time POSIXct + UTC origin converts with a warning", {
     origin <- as.POSIXct("1971-01-01", tz = "UTC")
 
     expect_identical(
-      expect_warning(warp_chunk(x, "month", origin)),
+      expect_warning(warp_chunk(x, "month", origin = origin)),
       0L
     )
   })
@@ -313,7 +313,7 @@ test_that("Date + UTC origin does not emit a warning", {
   x <- as.Date("1971-01-01")
   origin <- as.POSIXct("1971-01-01", tz = "UTC")
 
-  expect_identical(warp_chunk(x, "day", origin), 0L)
+  expect_identical(warp_chunk(x, "day", origin = origin), 0L)
 })
 
 test_that("Date + non-UTC origin converts with a warning", {
@@ -323,10 +323,10 @@ test_that("Date + non-UTC origin converts with a warning", {
 
   expect_identical(
     expect_warning(
-      warp_chunk(x, "day", origin),
+      warp_chunk(x, "day", origin = origin),
       "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
     ),
-    warp_chunk(x_with_tz, "day", origin)
+    warp_chunk(x_with_tz, "day", origin = origin)
   )
 })
 
@@ -395,47 +395,47 @@ test_that("can warp_chunk() by day with 'negative' POSIXct and different UTC ori
   origin <- as.POSIXct("1969-12-31", tz = "UTC")
 
   x <- as.POSIXct("1969-12-30 00:00:00", tz = "UTC")
-  expect_identical(warp_chunk(x, "day", origin), -1L)
+  expect_identical(warp_chunk(x, "day", origin = origin), -1L)
 
   x <- as.POSIXct("1969-12-30 23:59:59", tz = "UTC")
-  expect_identical(warp_chunk(x, "day", origin), -1L)
+  expect_identical(warp_chunk(x, "day", origin = origin), -1L)
 
   x <- as.POSIXct("1969-12-31 00:00:00", tz = "UTC")
-  expect_identical(warp_chunk(x, "day", origin), 0L)
+  expect_identical(warp_chunk(x, "day", origin = origin), 0L)
 
   x <- as.POSIXct("1969-12-31 23:59:59", tz = "UTC")
-  expect_identical(warp_chunk(x, "day", origin), 0L)
+  expect_identical(warp_chunk(x, "day", origin = origin), 0L)
 
   x <- as.POSIXct("1970-01-01 00:00:00", tz = "UTC")
-  expect_identical(warp_chunk(x, "day", origin), 1L)
+  expect_identical(warp_chunk(x, "day", origin = origin), 1L)
 
   x <- as.POSIXct("1970-01-01 23:59:59", tz = "UTC")
-  expect_identical(warp_chunk(x, "day", origin), 1L)
+  expect_identical(warp_chunk(x, "day", origin = origin), 1L)
 })
 
 test_that("can warp_chunk() by day with 'negative' POSIXct and non-UTC origins", {
   origin <- as.POSIXct("1970-01-01", tz = "America/New_York")
 
   x <- as.POSIXct("1969-12-30 00:00:00", tz = "America/New_York")
-  expect_identical(warp_chunk(x, "day", origin), -2L)
+  expect_identical(warp_chunk(x, "day", origin = origin), -2L)
 
   x <- as.POSIXct("1969-12-30 23:59:59", tz = "America/New_York")
-  expect_identical(warp_chunk(x, "day", origin), -2L)
+  expect_identical(warp_chunk(x, "day", origin = origin), -2L)
 
   x <- as.POSIXct("1969-12-31 00:00:00", tz = "America/New_York")
-  expect_identical(warp_chunk(x, "day", origin), -1L)
+  expect_identical(warp_chunk(x, "day", origin = origin), -1L)
 
   x <- as.POSIXct("1969-12-31 23:59:59", tz = "America/New_York")
-  expect_identical(warp_chunk(x, "day", origin), -1L)
+  expect_identical(warp_chunk(x, "day", origin = origin), -1L)
 
   x <- as.POSIXct("1970-01-01 00:00:00", tz = "America/New_York")
-  expect_identical(warp_chunk(x, "day", origin), 0L)
+  expect_identical(warp_chunk(x, "day", origin = origin), 0L)
 
   x <- as.POSIXct("1970-01-01 23:59:59", tz = "America/New_York")
-  expect_identical(warp_chunk(x, "day", origin), 0L)
+  expect_identical(warp_chunk(x, "day", origin = origin), 0L)
 
   x <- as.POSIXct("1970-01-02 00:00:00", tz = "America/New_York")
-  expect_identical(warp_chunk(x, "day", origin), 1L)
+  expect_identical(warp_chunk(x, "day", origin = origin), 1L)
 })
 
 test_that("UTC POSIXct + UTC origin does not emit a warning", {
@@ -444,7 +444,7 @@ test_that("UTC POSIXct + UTC origin does not emit a warning", {
   expect_warning(warp_chunk(x, "day"), NA)
 
   expect_identical(warp_chunk(x, "day"), 365L)
-  expect_identical(warp_chunk(x, "day", x), 0L)
+  expect_identical(warp_chunk(x, "day", origin = x), 0L)
 })
 
 test_that("UTC POSIXct + Date origin does not emit a warning", {
@@ -452,10 +452,10 @@ test_that("UTC POSIXct + Date origin does not emit a warning", {
   origin1 <- as.Date("1971-01-01")
   origin2 <- as.Date("1972-01-01")
 
-  expect_warning(warp_chunk(x, "day", origin1), NA)
+  expect_warning(warp_chunk(x, "day", origin = origin1), NA)
 
-  expect_identical(warp_chunk(x, "day", origin1), 0L)
-  expect_identical(warp_chunk(x, "day", origin2), -365L)
+  expect_identical(warp_chunk(x, "day", origin = origin1), 0L)
+  expect_identical(warp_chunk(x, "day", origin = origin2), -365L)
 })
 
 test_that("UTC POSIXct + non-UTC origin converts with a warning", {
@@ -465,10 +465,10 @@ test_that("UTC POSIXct + non-UTC origin converts with a warning", {
 
   expect_identical(
     expect_warning(
-      warp_chunk(x, "day", origin),
+      warp_chunk(x, "day", origin = origin),
       "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
     ),
-    warp_chunk(x_with_tz, "day", origin)
+    warp_chunk(x_with_tz, "day", origin = origin)
   )
 })
 
@@ -478,7 +478,7 @@ test_that("local time POSIXct + UTC origin converts with a warning", {
     origin <- as.POSIXct("1971-01-01", tz = "UTC")
 
     expect_identical(
-      expect_warning(warp_chunk(x, "day", origin)),
+      expect_warning(warp_chunk(x, "day", origin = origin)),
       0L
     )
   })
