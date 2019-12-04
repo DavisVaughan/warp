@@ -12,8 +12,8 @@ static SEXP as_datetime_from_date(SEXP x);
 static SEXP as_datetime_from_posixlt(SEXP x);
 
 // [[ include("utils.h") ]]
-SEXP as_datetime(SEXP x, enum timeslide_class_type type) {
-  switch(type) {
+SEXP as_datetime(SEXP x) {
+  switch(time_class_type(x)) {
   case timeslide_class_posixct: return x;
   case timeslide_class_date: return as_datetime_from_date(x);
   case timeslide_class_posixlt: return as_datetime_from_posixlt(x);

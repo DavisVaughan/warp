@@ -14,13 +14,11 @@ SEXP validate_origin(SEXP origin) {
     Rf_errorcall(R_NilValue, "`origin` must have size 1, not %i.", n_origin);
   }
 
-  enum timeslide_class_type type = time_class_type(origin);
-
-  if (type == timeslide_class_unknown) {
+  if (time_class_type(origin) == timeslide_class_unknown) {
     Rf_errorcall(R_NilValue, "`origin` must inherit from 'Date', 'POSIXct', or 'POSIXlt'.");
   }
 
-  SEXP out = PROTECT(as_datetime(origin, type));
+  SEXP out = PROTECT(as_datetime(origin));
 
   if (REAL(out)[0] == NA_REAL) {
     Rf_errorcall(R_NilValue, "`origin` must be a valid date value, not `NA`.");
