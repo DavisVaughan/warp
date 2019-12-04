@@ -9,9 +9,11 @@ SEXP syms_components = NULL;
 
 SEXP syms_time_get = NULL;
 SEXP syms_as_posixct_from_posixlt = NULL;
+SEXP syms_as_date = NULL;
 
 SEXP fns_time_get = NULL;
 SEXP fns_as_posixct_from_posixlt = NULL;
+SEXP fns_as_date = NULL;
 
 SEXP strings_year = NULL;
 SEXP strings_year_month = NULL;
@@ -306,6 +308,14 @@ SEXP as_posixct_from_posixlt(SEXP x) {
   );
 }
 
+// [[ include("utils.h") ]]
+SEXP as_date(SEXP x) {
+  return timeslide_dispatch1(
+    syms_as_date, fns_as_date,
+    syms_x, x
+  );
+}
+
 // -----------------------------------------------------------------------------
 
 void timeslide_init_utils(SEXP ns) {
@@ -322,9 +332,11 @@ void timeslide_init_utils(SEXP ns) {
 
   syms_time_get = Rf_install("time_get");
   syms_as_posixct_from_posixlt = Rf_install("as_posixct_from_posixlt");
+  syms_as_date = Rf_install("as_date");
 
   fns_time_get = r_env_get(timeslide_ns_env, syms_time_get);
   fns_as_posixct_from_posixlt = r_env_get(timeslide_ns_env, syms_as_posixct_from_posixlt);
+  fns_as_date = r_env_get(timeslide_ns_env, syms_as_date);
 
   strings_year = Rf_allocVector(STRSXP, 1);
   R_PreserveObject(strings_year);

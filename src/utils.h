@@ -32,6 +32,10 @@ SEXP r_maybe_duplicate(SEXP x);
 
 SEXP time_get(SEXP x, SEXP components);
 SEXP as_posixct_from_posixlt(SEXP x);
+SEXP as_date(SEXP x);
+
+const char* get_timezone(SEXP x);
+SEXP convert_timezone(SEXP x, const char* timezone);
 
 extern SEXP strings_year;
 extern SEXP strings_year_month;

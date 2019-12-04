@@ -3,9 +3,9 @@
 
 // -----------------------------------------------------------------------------
 
-SEXP validate_origin(SEXP origin) {
+void validate_origin(SEXP origin) {
   if (origin == R_NilValue) {
-    return(origin);
+    return;
   }
 
   R_len_t n_origin = Rf_length(origin);
@@ -17,11 +17,28 @@ SEXP validate_origin(SEXP origin) {
   if (time_class_type(origin) == timeslide_class_unknown) {
     Rf_errorcall(R_NilValue, "`origin` must inherit from 'Date', 'POSIXct', or 'POSIXlt'.");
   }
+}
 
-  SEXP out = PROTECT(as_datetime(origin));
+double origin_to_days_from_epoch(SEXP origin) {
+  origin = PROTECT(as_date(origin));
 
-  if (REAL(out)[0] == NA_REAL) {
-    Rf_errorcall(R_NilValue, "`origin` must be a valid date value, not `NA`.");
+  double out = REAL(origin)[0];
+
+  if (out == NA_REAL) {
+    Rf_errorcall(R_NilValue, "`origin` must not be `NA`.");
+  }
+
+  UNPROTECT(1);
+  return out;
+}
+
+double origin_to_seconds_from_epoch(SEXP origin) {
+  origin = PROTECT(as_datetime(origin));
+
+  double out = REAL(origin)[0];
+
+  if (out == NA_REAL) {
+    Rf_errorcall(R_NilValue, "`origin` must not be `NA`.");
   }
 
   UNPROTECT(1);
@@ -46,7 +63,10 @@ static SEXP warp_chunk_day(SEXP x, SEXP origin);
 
 // [[ include("timeslide.h") ]]
 SEXP warp_chunk(SEXP x, enum timeslide_chunk_type type, SEXP origin) {
-  origin = PROTECT(validate_origin(origin));
+  validate_origin(origin);
+
+  const char* origin_timezone = get_timezone(origin);
+  x = PROTECT(convert_timezone(x, origin_timezone));
 
   SEXP out;
 
@@ -129,7 +149,22 @@ static SEXP warp_chunk_month(SEXP x, SEXP origin) {
 static SEXP int_date_warp_chunk_day(SEXP x, SEXP origin) {
   SEXP out = PROTECT(r_maybe_duplicate(x));
   SET_ATTRIB(out, R_NilValue);
-  UNPROTECT(1);
+
+  if (origin == R_NilValue) {
+    UNPROTECT(1);
+    return out;
+  }
+
+  int* p_out = INTEGER(out);
+  R_xlen_t out_size = Rf_xlength(out);
+
+  double origin_offset = origin_to_days_from_epoch(origin);
+
+  for (R_xlen_t i = 0; i < out_size; ++i) {
+    p_out[i] -= origin_offset;
+  }
+
+  UNPROTECT(2);
   return out;
 }
 
@@ -141,19 +176,34 @@ static SEXP dbl_date_warp_chunk_day(SEXP x, SEXP origin) {
   SEXP out = PROTECT(Rf_allocVector(INTSXP, x_size));
   int* p_out = INTEGER(out);
 
-  for (R_xlen_t i = 0; i < x_size; ++i) {
-    double elt = p_x[i];
+  bool needs_offset = (origin != R_NilValue);
+  double origin_offset;
 
-    if (!R_FINITE(elt)) {
+  if (needs_offset) {
+    origin_offset = origin_to_days_from_epoch(origin);
+  }
+
+  for (R_xlen_t i = 0; i < x_size; ++i) {
+    double x_elt = p_x[i];
+
+    if (!R_FINITE(x_elt)) {
       p_out[i] = NA_INTEGER;
       continue;
     }
 
-    if (elt < 0) {
-      p_out[i] = (int) floor(elt);
+    int out_elt;
+
+    if (x_elt < 0) {
+      out_elt = (int) floor(x_elt);
     } else {
-      p_out[i] = (int) elt;
+      out_elt = (int) x_elt;
     }
+
+    if (needs_offset) {
+      out_elt -= origin_offset;
+    }
+
+    p_out[i] = out_elt;
   }
 
   UNPROTECT(1);
@@ -171,6 +221,19 @@ static SEXP date_warp_chunk_day(SEXP x, SEXP origin) {
 static SEXP int_posixct_warp_chunk_day(SEXP x, SEXP origin) {
   R_xlen_t x_size = Rf_xlength(x);
 
+  bool needs_offset = (origin != R_NilValue);
+  double origin_offset;
+
+  if (needs_offset) {
+    origin_offset = origin_to_seconds_from_epoch(origin);
+
+    if (origin_offset < 0) {
+      origin_offset = floor(origin_offset) / 86400 - 1;
+    } else {
+      origin_offset = origin_offset / 86400;
+    }
+  }
+
   SEXP out = PROTECT(Rf_allocVector(INTSXP, x_size));
   int* p_out = INTEGER(out);
 
@@ -184,7 +247,17 @@ static SEXP int_posixct_warp_chunk_day(SEXP x, SEXP origin) {
       continue;
     }
 
-    p_out[i] = elt / 86400;
+    if (elt < 0) {
+      elt = elt / 86400 - 1;
+    } else {
+      elt = elt / 86400;
+    }
+
+    if (needs_offset) {
+      elt -= origin_offset;
+    }
+
+    p_out[i] = elt;
   }
 
   UNPROTECT(1);
@@ -194,24 +267,45 @@ static SEXP int_posixct_warp_chunk_day(SEXP x, SEXP origin) {
 static SEXP dbl_posixct_warp_chunk_day(SEXP x, SEXP origin) {
   R_xlen_t x_size = Rf_xlength(x);
 
+  bool needs_offset = (origin != R_NilValue);
+  double origin_offset;
+
+  if (needs_offset) {
+    origin_offset = origin_to_seconds_from_epoch(origin);
+
+    if (origin_offset < 0) {
+      origin_offset = floor(origin_offset) / 86400 - 1;
+    } else {
+      origin_offset = origin_offset / 86400;
+    }
+  }
+
   SEXP out = PROTECT(Rf_allocVector(INTSXP, x_size));
   int* p_out = INTEGER(out);
 
   double* p_x = REAL(x);
 
   for (R_xlen_t i = 0; i < x_size; ++i) {
-    double elt = p_x[i];
+    double x_elt = p_x[i];
 
-    if (!R_FINITE(elt)) {
+    if (!R_FINITE(x_elt)) {
       p_out[i] = NA_INTEGER;
       continue;
     }
 
-    if (elt < 0) {
-      p_out[i] = (int) (floor(elt) / 86400);
+    int out_elt;
+
+    if (x_elt < 0) {
+      out_elt = ((int) floor(x_elt)) / 86400 - 1;
     } else {
-      p_out[i] = (int) (elt / 86400);
+      out_elt = ((int) x_elt) / 86400;
     }
+
+    if (needs_offset) {
+      out_elt -= origin_offset;
+    }
+
+    p_out[i] = out_elt;
   }
 
   UNPROTECT(1);
@@ -227,7 +321,11 @@ static SEXP posixct_warp_chunk_day(SEXP x, SEXP origin) {
 }
 
 static SEXP posixlt_warp_chunk_day(SEXP x, SEXP origin) {
-  return x;
+  x = PROTECT(as_datetime(x));
+  SEXP out = PROTECT(posixct_warp_chunk_day(x, origin));
+
+  UNPROTECT(2);
+  return out;
 }
 
 static SEXP warp_chunk_day(SEXP x, SEXP origin) {

@@ -9,13 +9,14 @@
 // `as_posixct_from_posixlt()`.
 
 static SEXP as_datetime_from_date(SEXP x);
+static SEXP as_datetime_from_posixct(SEXP x);
 static SEXP as_datetime_from_posixlt(SEXP x);
 
 // [[ include("utils.h") ]]
 SEXP as_datetime(SEXP x) {
   switch(time_class_type(x)) {
-  case timeslide_class_posixct: return x;
   case timeslide_class_date: return as_datetime_from_date(x);
+  case timeslide_class_posixct: return as_datetime_from_posixct(x);
   case timeslide_class_posixlt: return as_datetime_from_posixlt(x);
   case timeslide_class_unknown: Rf_errorcall(R_NilValue, "Internal error: Unknown date time class.");
   }
@@ -64,6 +65,41 @@ static SEXP as_datetime_from_date(SEXP x) {
 }
 
 #undef AS_DATETIME_FROM_DATE_LOOP
+
+// Convert integer POSIXct (if they ever happen) to double
+static SEXP as_datetime_from_posixct(SEXP x) {
+  SEXPTYPE type = TYPEOF(x);
+
+  if (type == REALSXP) {
+    return x;
+  }
+
+  if (type != INTSXP) {
+    Rf_errorcall(R_NilValue, "A 'POSIXct' can only be an integer or double.");
+  }
+
+  R_xlen_t x_size = Rf_xlength(x);
+
+  const int* p_x = INTEGER_RO(x);
+
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, x_size));
+  double* p_out = REAL(out);
+
+  for (R_xlen_t i = 0; i < x_size; ++i) {
+    int elt = p_x[i];
+
+    if (elt == NA_INTEGER) {
+      p_out[i] = NA_REAL;
+    } else {
+      p_out[i] = (double) elt;
+    }
+  }
+
+  SET_ATTRIB(out, ATTRIB(x));
+
+  UNPROTECT(1);
+  return out;
+}
 
 static SEXP as_datetime_from_posixlt(SEXP x) {
   return as_posixct_from_posixlt(x);
