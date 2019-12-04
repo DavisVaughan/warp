@@ -303,26 +303,15 @@ static SEXP dbl_date_warp_chunk_day(SEXP x, int every, SEXP origin) {
       continue;
     }
 
+    // Truncate towards 0 to get rid of any fractional date pieces.
+    // We ignore them completely, you should just uses a POSIXct if you
+    // need them
+    int elt = x_elt;
+
     // `origin_offset` should be correct from `as_date()` in
     // `origin_to_days_from_epoch()`, even if it had fractional parts
     if (needs_offset) {
-      x_elt -= origin_offset;
-    }
-
-    int elt;
-
-    // The floor is a guard against potential fractional dates since casting
-    // always goes towards 0, which is not desired because that is forward in time
-    // (int) 1.5 = 1
-    // (int) floor(1.5) = 1
-    // (int) -1.5 = -1
-    // (int) floor(-1.5) = -2
-
-    // Automatic integer cast into `elt`
-    if (x_elt < 0) {
-      elt = floor(x_elt);
-    } else {
-      elt = x_elt;
+      elt -= origin_offset;
     }
 
     if (!needs_every) {
@@ -582,21 +571,17 @@ static SEXP dbl_date_warp_chunk_hour(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    x_elt = x_elt * HOURS_IN_DAY;
+    // Truncate towards 0 to get rid of any fractional date pieces.
+    // We ignore them completely, you should just uses a POSIXct if you
+    // need them
+    int elt = x_elt;
+
+    elt = elt * HOURS_IN_DAY;
 
     // `origin_offset` should be correct from `as_date()` in
     // `origin_to_days_from_epoch()`, even if it had fractional parts
     if (needs_offset) {
-      x_elt -= origin_offset;
-    }
-
-    int elt;
-
-    // Automatic integer cast into `elt`
-    if (x_elt < 0) {
-      elt = floor(x_elt);
-    } else {
-      elt = x_elt;
+      elt -= origin_offset;
     }
 
     if (!needs_every) {
@@ -858,21 +843,17 @@ static SEXP dbl_date_warp_chunk_minute(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    x_elt = x_elt * MINUTES_IN_DAY;
+    // Truncate towards 0 to get rid of any fractional date pieces.
+    // We ignore them completely, you should just uses a POSIXct if you
+    // need them
+    int elt = x_elt;
+
+    elt = elt * MINUTES_IN_DAY;
 
     // `origin_offset` should be correct from `as_date()` in
     // `origin_to_days_from_epoch()`, even if it had fractional parts
     if (needs_offset) {
-      x_elt -= origin_offset;
-    }
-
-    int elt;
-
-    // Automatic integer cast into `elt`
-    if (x_elt < 0) {
-      elt = floor(x_elt);
-    } else {
-      elt = x_elt;
+      elt -= origin_offset;
     }
 
     if (!needs_every) {
@@ -1136,18 +1117,16 @@ static SEXP dbl_date_warp_chunk_second(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    x_elt = x_elt * SECONDS_IN_DAY;
+    // Truncate towards 0 to get rid of the fractional pieces
+    int64_t elt = x_elt;
+
+    elt = elt * SECONDS_IN_DAY;
 
     // `origin_offset` should be correct from `as_date()` in
     // `origin_to_days_from_epoch()`, even if it had fractional parts
     if (needs_offset) {
-      x_elt -= origin_offset;
+      elt -= origin_offset;
     }
-
-    // Always floor, whether negative or positive, to get rid of the
-    // fractional piece. `floor()` always goes the right way. Need
-    // int64_t for the integer division later
-    int64_t elt = floor(x_elt);
 
     if (!needs_every) {
       p_out[i] = elt;
@@ -1251,7 +1230,8 @@ static SEXP dbl_posixct_warp_chunk_second(SEXP x, int every, SEXP origin) {
 
     // Always floor() to get rid of fractional seconds, whether `x_elt` is
     // negative or positive. Need int64_t here because of the integer
-    // division later
+    // division later. Flooring takes the fractional seconds into account,
+    // which we want to do.
     int64_t elt = floor(x_elt);
 
     if (!needs_every) {

@@ -76,6 +76,15 @@ test_that("can handle `every` with altered origin", {
   expect_equal(warp_chunk(x, every = 4L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
 })
 
+test_that("fractional Date pieces are ignored", {
+  # "1969-12-31 23:59:52 UTC"
+  # .POSIXct(-0.0001 * 86400, "UTC")
+  y <- structure(-0.0001, class = "Date")
+
+  # But we really treat this as `new_date(0)`
+  expect_equal(warp_chunk(y), 0L)
+})
+
 # ------------------------------------------------------------------------------
 # warp_chunk(<POSIXct>, by = "year")
 
@@ -290,6 +299,15 @@ test_that("can handle `every` with altered origin", {
   expect_equal(warp_chunk(x, by = "month", every = 2L, origin = origin), c(-2L, -2L, -1L, -1L, 0L, 0L, 1L))
   expect_equal(warp_chunk(x, by = "month", every = 3L, origin = origin), c(-2L, -1L, -1L, -1L, 0L, 0L, 0L))
   expect_equal(warp_chunk(x, by = "month", every = 4L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
+})
+
+test_that("fractional Date pieces are ignored", {
+  # "1969-12-31 23:59:52 UTC"
+  # .POSIXct(-0.0001 * 86400, "UTC")
+  x <- structure(-0.0001, class = "Date")
+
+  # But we really treat this as `new_date(0)`
+  expect_equal(warp_chunk(x, by = "month"), 0L)
 })
 
 # ------------------------------------------------------------------------------
@@ -519,6 +537,15 @@ test_that("can handle `every` with altered origin - numeric Dates", {
   expect_equal(warp_chunk(x, by = "day", every = 2L, origin = origin), c(-2L, -2L, -1L, -1L, 0L, 0L, 1L))
   expect_equal(warp_chunk(x, by = "day", every = 3L, origin = origin), c(-2L, -1L, -1L, -1L, 0L, 0L, 0L))
   expect_equal(warp_chunk(x, by = "day", every = 4L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
+})
+
+test_that("fractional Date pieces are ignored", {
+  # "1969-12-31 23:59:52 UTC"
+  # .POSIXct(-0.0001 * 86400, "UTC")
+  x <- structure(-0.0001, class = "Date")
+
+  # But we really treat this as `new_date(0)`
+  expect_equal(warp_chunk(x, by = "day"), 0L)
 })
 
 # ------------------------------------------------------------------------------
@@ -857,6 +884,19 @@ test_that("can handle `every` with altered origin - numeric Dates", {
   expect_equal(warp_chunk(x, by = "hour", every = 96L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
 })
 
+test_that("can ignore fractional pieces in Dates", {
+  # "1970-01-01 02:24:00 UTC"
+  # structure(.1 * 86400, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  x <- structure(.1, class = "Date")
+
+  # "1969-12-31 23:52:48 UTC"
+  # structure(-.005 * 86400, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  y <- structure(-.005, class = "Date")
+
+  expect_identical(warp_chunk(x, by = "hour"), 0L)
+  expect_identical(warp_chunk(y, by = "hour"), 0L)
+})
+
 # ------------------------------------------------------------------------------
 # warp_chunk(<POSIXct>, by = "hour")
 
@@ -1104,6 +1144,356 @@ test_that("can warp_chunk() by hour with POSIXlt", {
   x <- as.POSIXct("1971-01-01", tz = "UTC")
   x <- as.POSIXlt(x)
   expect_identical(warp_chunk(x, "hour"), 8760L)
+})
+
+# ------------------------------------------------------------------------------
+# warp_chunk(<Date>, by = "minute")
+
+test_that("can warp_chunk() by minute with Date", {
+  x <- as.Date("1970-01-01")
+  expect_identical(warp_chunk(x, "minute"), 0L)
+
+  x <- as.Date("1970-01-02")
+  expect_identical(warp_chunk(x, "minute"), 1440L)
+
+  x <- as.Date("1971-01-01")
+  expect_identical(warp_chunk(x, "minute"), 60L * 24L * 365L)
+})
+
+test_that("can warp_chunk() by minute with 'negative' Dates", {
+  x <- as.Date("1969-12-31")
+  expect_identical(warp_chunk(x, "minute"), -1440L)
+
+  x <- as.Date("1969-12-30")
+  expect_identical(warp_chunk(x, "minute"), -1440L * 2L)
+})
+
+test_that("Date + UTC origin does not emit a warning", {
+  x <- as.Date("1971-01-01")
+  origin <- as.POSIXct("1971-01-01", tz = "UTC")
+
+  expect_identical(warp_chunk(x, "minute", origin = origin), 0L)
+})
+
+test_that("Date + non-UTC origin converts with a warning", {
+  # America/New_York is 5 minutes before UTC
+  x <- as.Date("1971-01-01")
+  x_with_tz <- structure(unclass(x) * 86400, tzone = "America/New_York", class = c("POSIXct", "POSIXt"))
+  origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
+
+  expect_identical(
+    expect_warning(
+      warp_chunk(x, "minute", origin = origin),
+      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
+    ),
+    warp_chunk(x_with_tz, "minute", origin = origin)
+  )
+})
+
+test_that("can use integer Dates", {
+  x <- structure(0L, class = "Date")
+  expect_identical(warp_chunk(x, "minute"), 0L)
+})
+
+test_that("can handle `NA` dates", {
+  x <- structure(NA_real_, class = "Date")
+  expect_identical(warp_chunk(x, "minute"), NA_integer_)
+
+  x <- structure(NA_integer_, class = "Date")
+  expect_identical(warp_chunk(x, "minute"), NA_integer_)
+})
+
+test_that("can handle `every` with default origin - integer Dates", {
+  x <- structure(-3L:3L, class = "Date")
+
+  expect_equal(warp_chunk(x, by = "minute", every = 2880L), c(-2L, -1L, -1L, 0L, 0L, 1L, 1L))
+  expect_equal(warp_chunk(x, by = "minute", every = 4320L), c(-1L, -1L, -1L, 0L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, by = "minute", every = 5760L), c(-1L, -1L, -1L, 0L, 0L, 0L, 0L))
+})
+
+test_that("can handle `every` with altered origin - integer Dates", {
+  x <- structure(-3L:3L, class = "Date")
+
+  origin <- as.Date("1970-01-02")
+
+  expect_equal(warp_chunk(x, by = "minute", every = 2880L, origin = origin), c(-2L, -2L, -1L, -1L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, by = "minute", every = 4320L, origin = origin), c(-2L, -1L, -1L, -1L, 0L, 0L, 0L))
+  expect_equal(warp_chunk(x, by = "minute", every = 5760L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
+})
+
+test_that("can handle `every` with default origin - numeric Dates", {
+  x <- structure(as.numeric(-3:3), class = "Date")
+
+  expect_equal(warp_chunk(x, by = "minute", every = 2880L), c(-2L, -1L, -1L, 0L, 0L, 1L, 1L))
+  expect_equal(warp_chunk(x, by = "minute", every = 4320L), c(-1L, -1L, -1L, 0L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, by = "minute", every = 5760L), c(-1L, -1L, -1L, 0L, 0L, 0L, 0L))
+})
+
+test_that("can handle `every` with altered origin - numeric Dates", {
+  x <- structure(as.numeric(-3:3), class = "Date")
+
+  origin <- as.Date("1970-01-02")
+
+  expect_equal(warp_chunk(x, by = "minute", every = 2880L, origin = origin), c(-2L, -2L, -1L, -1L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, by = "minute", every = 4320L, origin = origin), c(-2L, -1L, -1L, -1L, 0L, 0L, 0L))
+  expect_equal(warp_chunk(x, by = "minute", every = 5760L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
+})
+
+test_that("can ignore fractional pieces in Dates", {
+  # "1970-01-01 00:07:12 UTC"
+  # structure(.005 * 86400, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  x <- structure(.005, class = "Date")
+
+  # "1969-12-31 23:52:48 UTC"
+  # structure(-.005 * 86400, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  y <- structure(-.005, class = "Date")
+
+  expect_identical(warp_chunk(x, by = "minute"), 0L)
+  expect_identical(warp_chunk(y, by = "minute"), 0L)
+})
+
+# ------------------------------------------------------------------------------
+# warp_chunk(<POSIXct>, by = "minute")
+
+test_that("can warp_chunk() by minute with POSIXct", {
+  x <- as.POSIXct("1970-01-01", tz = "UTC")
+  expect_identical(warp_chunk(x, "minute"), 0L)
+
+  x <- as.POSIXct("1970-01-02", tz = "UTC")
+  expect_identical(warp_chunk(x, "minute"), 1440L)
+
+  x <- as.POSIXct("1971-01-01", tz = "UTC")
+  expect_identical(warp_chunk(x, "minute"), 60L * 24L * 365L)
+})
+
+# In terms of inclusion/exclusion, we define the cutoffs like:
+# [1969-12-30 00:00:00 -> 1969-12-31 00:00:00) = -2880 minutes from epoch
+# [1969-12-31 00:00:00 -> 1970-01-01 00:00:00) = -1440 minutes from epoch
+# [1970-01-01 00:00:00 -> 1970-01-02 00:00:00) = 0 minutes from epoch
+# [1970-01-02 00:00:00 -> 1970-01-03 00:00:00) = 1440 minutes from epoch
+test_that("can warp_chunk() by minute with 'negative' POSIXct", {
+  x <- as.POSIXct("1969-12-30 00:00:00", tz = "UTC")
+  expect_identical(warp_chunk(x, "minute"), -2880L)
+
+  x <- as.POSIXct("1969-12-30 23:59:59", tz = "UTC")
+  expect_identical(warp_chunk(x, "minute"), -1441L)
+
+  x <- as.POSIXct("1969-12-31 00:00:00", tz = "UTC")
+  expect_identical(warp_chunk(x, "minute"), -1440L)
+
+  x <- as.POSIXct("1969-12-31 23:59:59", tz = "UTC")
+  expect_identical(warp_chunk(x, "minute"), -1L)
+
+  x <- as.POSIXct("1970-01-01 00:00:00", tz = "UTC")
+  expect_identical(warp_chunk(x, "minute"), 0L)
+
+  x <- as.POSIXct("1970-01-01 23:59:59", tz = "UTC")
+  expect_identical(warp_chunk(x, "minute"), 1439L)
+
+  x <- as.POSIXct("1970-01-02 00:00:00", tz = "UTC")
+  expect_identical(warp_chunk(x, "minute"), 1440L)
+
+  x <- as.POSIXct("1969-01-01 00:00:00", tz = "UTC")
+  expect_identical(warp_chunk(x, "minute"), -(60L * 24L * 365L))
+})
+
+test_that("can warp_chunk() by minute with 'negative' POSIXct and different UTC origins", {
+  origin <- as.POSIXct("1969-12-31", tz = "UTC")
+
+  x <- as.POSIXct("1969-12-30 00:00:00", tz = "UTC")
+  expect_identical(warp_chunk(x, "minute", origin = origin), -1440L)
+
+  x <- as.POSIXct("1969-12-30 23:59:59", tz = "UTC")
+  expect_identical(warp_chunk(x, "minute", origin = origin), -1L)
+
+  x <- as.POSIXct("1969-12-31 00:00:00", tz = "UTC")
+  expect_identical(warp_chunk(x, "minute", origin = origin), 0L)
+
+  x <- as.POSIXct("1969-12-31 01:00:00", tz = "UTC")
+  expect_identical(warp_chunk(x, "minute", origin = origin), 60L)
+
+  x <- as.POSIXct("1969-12-31 23:59:59", tz = "UTC")
+  expect_identical(warp_chunk(x, "minute", origin = origin), 1439L)
+
+  x <- as.POSIXct("1970-01-01 00:00:00", tz = "UTC")
+  expect_identical(warp_chunk(x, "minute", origin = origin), 1440L)
+
+  x <- as.POSIXct("1970-01-01 23:59:59", tz = "UTC")
+  expect_identical(warp_chunk(x, "minute", origin = origin), 2880L - 1L)
+})
+
+test_that("can warp_chunk() by minute with 'negative' POSIXct and non-UTC origins", {
+  origin <- as.POSIXct("1970-01-01", tz = "America/New_York")
+
+  x <- as.POSIXct("1969-12-30 00:00:00", tz = "America/New_York")
+  expect_identical(warp_chunk(x, "minute", origin = origin), -2880L)
+
+  x <- as.POSIXct("1969-12-30 23:59:59", tz = "America/New_York")
+  expect_identical(warp_chunk(x, "minute", origin = origin), -1441L)
+
+  x <- as.POSIXct("1969-12-31 00:00:00", tz = "America/New_York")
+  expect_identical(warp_chunk(x, "minute", origin = origin), -1440L)
+
+  x <- as.POSIXct("1969-12-31 23:59:59", tz = "America/New_York")
+  expect_identical(warp_chunk(x, "minute", origin = origin), -1L)
+
+  x <- as.POSIXct("1970-01-01 00:00:00", tz = "America/New_York")
+  expect_identical(warp_chunk(x, "minute", origin = origin), 0L)
+
+  x <- as.POSIXct("1970-01-01 23:59:59", tz = "America/New_York")
+  expect_identical(warp_chunk(x, "minute", origin = origin), 1439L)
+
+  x <- as.POSIXct("1970-01-02 00:00:00", tz = "America/New_York")
+  expect_identical(warp_chunk(x, "minute", origin = origin), 1440L)
+})
+
+test_that("UTC POSIXct + UTC origin does not emit a warning", {
+  x <- as.POSIXct("1971-01-01", tz = "UTC")
+
+  expect_warning(warp_chunk(x, "minute"), NA)
+
+  expect_identical(warp_chunk(x, "minute"), 525600L)
+  expect_identical(warp_chunk(x, "minute", origin = x), 0L)
+})
+
+test_that("UTC POSIXct + Date origin does not emit a warning", {
+  x <- as.POSIXct("1971-01-01", tz = "UTC")
+  origin1 <- as.Date("1971-01-01")
+  origin2 <- as.Date("1972-01-01")
+
+  expect_warning(warp_chunk(x, "minute", origin = origin1), NA)
+
+  expect_identical(warp_chunk(x, "minute", origin = origin1), 0L)
+  expect_identical(warp_chunk(x, "minute", origin = origin2), -525600L)
+})
+
+test_that("UTC POSIXct + non-UTC origin converts with a warning", {
+  # America/New_York is 5 hours behind UTC, or 300 minutes
+  x <- as.POSIXct("1971-01-01", tz = "UTC")
+  x_with_tz <- structure(x, tzone = "America/New_York")
+  origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
+
+  expect_identical(
+    expect_warning(
+      warp_chunk(x, "minute", origin = origin),
+      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
+    ),
+    warp_chunk(x_with_tz, "minute", origin = origin)
+  )
+})
+
+test_that("local time POSIXct + UTC origin converts with a warning", {
+  with_envvar(list(TZ = "America/New_York"), {
+    x <- as.POSIXct("1970-12-31 23:00:00") # in UTC this is in 1971-01-01 04:00:00
+    origin <- as.POSIXct("1971-01-01", tz = "UTC")
+
+    expect_identical(
+      expect_warning(warp_chunk(x, "minute", origin = origin)),
+      240L # 4 hr * 60 min
+    )
+  })
+})
+
+test_that("can use integer POSIXct", {
+  x <- structure(-1L, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_identical(warp_chunk(x, "minute"), -1L)
+})
+
+test_that("can handle `NA` dates", {
+  x <- structure(NA_real_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_identical(warp_chunk(x, "minute"), NA_integer_)
+
+  x <- structure(NA_integer_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_identical(warp_chunk(x, "minute"), NA_integer_)
+})
+
+test_that("can handle `every` with default origin - integer POSIXct", {
+  x <- as.POSIXct(c(
+    "1969-12-31 23:57:00", "1969-12-31 23:58:00",
+    "1969-12-31 23:59:00", "1970-01-01 00:00:00",
+    "1970-01-01 00:01:00", "1970-01-01 00:02:00",
+    "1970-01-01 00:03:00"
+  ), tz = "UTC")
+
+  x <- structure(as.integer(unclass(x)), tzone = "UTC", class = class(x))
+
+  expect_equal(warp_chunk(x, by = "minute", every = 2L), c(-2L, -1L, -1L, 0L, 0L, 1L, 1L))
+  expect_equal(warp_chunk(x, by = "minute", every = 3L), c(-1L, -1L, -1L, 0L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, by = "minute", every = 4L), c(-1L, -1L, -1L, 0L, 0L, 0L, 0L))
+})
+
+test_that("can handle `every` with altered origin - integer POSIXct", {
+  x <- as.POSIXct(c(
+    "1969-12-31 23:57:00", "1969-12-31 23:58:00",
+    "1969-12-31 23:59:00", "1970-01-01 00:00:00",
+    "1970-01-01 00:01:00", "1970-01-01 00:02:00",
+    "1970-01-01 00:03:00"
+  ), tz = "UTC")
+
+  x <- structure(as.integer(unclass(x)), tzone = "UTC", class = class(x))
+
+  origin <- as.POSIXct("1970-01-01 00:01:00", tz = "UTC")
+
+  expect_equal(warp_chunk(x, by = "minute", every = 2L, origin = origin), c(-2L, -2L, -1L, -1L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, by = "minute", every = 3L, origin = origin), c(-2L, -1L, -1L, -1L, 0L, 0L, 0L))
+  expect_equal(warp_chunk(x, by = "minute", every = 4L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
+})
+
+test_that("can handle `every` with default origin - numeric POSIXct", {
+  x <- as.POSIXct(c(
+    "1969-12-31 23:57:00", "1969-12-31 23:58:00",
+    "1969-12-31 23:59:00", "1970-01-01 00:00:00",
+    "1970-01-01 00:01:00", "1970-01-01 00:02:00",
+    "1970-01-01 00:03:00"
+  ), tz = "UTC")
+
+  expect_equal(warp_chunk(x, by = "minute", every = 2L), c(-2L, -1L, -1L, 0L, 0L, 1L, 1L))
+  expect_equal(warp_chunk(x, by = "minute", every = 3L), c(-1L, -1L, -1L, 0L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, by = "minute", every = 4L), c(-1L, -1L, -1L, 0L, 0L, 0L, 0L))
+})
+
+test_that("can handle `every` with altered origin - numeric POSIXct", {
+  x <- as.POSIXct(c(
+    "1969-12-31 23:57:00", "1969-12-31 23:58:00",
+    "1969-12-31 23:59:00", "1970-01-01 00:00:00",
+    "1970-01-01 00:01:00", "1970-01-01 00:02:00",
+    "1970-01-01 00:03:00"
+  ), tz = "UTC")
+
+  origin <- as.POSIXct("1970-01-01 00:01:00", tz = "UTC")
+
+  expect_equal(warp_chunk(x, by = "minute", every = 2L, origin = origin), c(-2L, -2L, -1L, -1L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, by = "minute", every = 3L, origin = origin), c(-2L, -1L, -1L, -1L, 0L, 0L, 0L))
+  expect_equal(warp_chunk(x, by = "minute", every = 4L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
+})
+
+test_that("can handle fractional seconds before the epoch correctly", {
+  # Base R printing is wrong, because as.POSIXlt() is wrong
+  # https://bugs.r-project.org/bugzilla/show_bug.cgi?id=17667
+
+  # I don't care what base R prints this as, this is:
+  # "1969-12-31T23:59:59.5"
+  x <- .POSIXct(-0.5, "UTC")
+
+  # This is
+  # "1969-12-31T22:59:59.5"
+  y <- .POSIXct(-3600.5, "UTC")
+
+  expect_equal(warp_chunk(x, "minute"), -1)
+  expect_equal(warp_chunk(y, "minute"), -61)
+})
+
+# ------------------------------------------------------------------------------
+# warp_chunk(<POSIXlt>, by = "minute")
+
+test_that("can warp_chunk() by minute with POSIXlt", {
+  x <- as.POSIXct("1970-01-01", tz = "UTC")
+  x <- as.POSIXlt(x)
+  expect_identical(warp_chunk(x, "minute"), 0L)
+
+  x <- as.POSIXct("1971-01-01", tz = "UTC")
+  x <- as.POSIXlt(x)
+  expect_identical(warp_chunk(x, "minute"), 525600L)
 })
 
 # ------------------------------------------------------------------------------
