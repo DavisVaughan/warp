@@ -12,8 +12,10 @@
 
 // Functionality ------------------------------------------------
 
-SEXP warp_chunk(SEXP x, enum timeslide_unique_type type);
+SEXP warp_chunk(SEXP x, enum timeslide_chunk_type type, SEXP origin);
 SEXP breakpoints(SEXP x);
+
+SEXP as_datetime(SEXP x, enum timeslide_class_type type);
 
 // Compatibility ------------------------------------------------
 

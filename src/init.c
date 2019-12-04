@@ -12,7 +12,7 @@ extern SEXP timeslide_class_type(SEXP);
 SEXP timeslide_init_library(SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-  {"timeslide_uniquify",     (DL_FUNC) &timeslide_warp_chunk, 2},
+  {"timeslide_warp_chunk",   (DL_FUNC) &timeslide_warp_chunk, 3},
   {"timeslide_breakpoints",  (DL_FUNC) &timeslide_breakpoints, 1},
   {"timeslide_class_type",   (DL_FUNC) &timeslide_class_type, 1},
   {"timeslide_init_library", (DL_FUNC) &timeslide_init_library, 1},

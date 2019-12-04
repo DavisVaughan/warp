@@ -1,26 +1,3 @@
-warp_chunk <- function(x, by = "year") {
-  by <- vec_assert(by, ptype = character(), size = 1L)
-  by <- normalize_period(by)
-
-  .Call(timeslide_warp_chunk, x, by)
-}
-
-normalize_period <- function(x) {
-  switch(
-    x,
-
-    year = ,
-    years =,
-    yearly = 1L,
-
-    month =,
-    months =,
-    monthly = 2L,
-
-    day = ,
-    days = ,
-    daily = 4L,
-
-    stop("Unknown period specification.", call. = FALSE)
-  )
+warp_chunk <- function(x, by = "year", origin = NULL) {
+  .Call(timeslide_warp_chunk, x, by, origin)
 }

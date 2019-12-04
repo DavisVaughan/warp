@@ -8,8 +8,10 @@ SEXP syms_x = NULL;
 SEXP syms_components = NULL;
 
 SEXP syms_time_get = NULL;
+SEXP syms_as_posixct_from_posixlt = NULL;
 
 SEXP fns_time_get = NULL;
+SEXP fns_as_posixct_from_posixlt = NULL;
 
 SEXP strings_year = NULL;
 SEXP strings_year_month = NULL;
@@ -82,18 +84,51 @@ static const char* class_type_as_str(enum timeslide_class_type type) {
 
 // -----------------------------------------------------------------------------
 
-enum timeslide_unique_type as_unique_type(int type) {
-  switch (type) {
-  case 1: return timeslide_unique_year;
-  case 2: return timeslide_unique_month;
-  case 3: return timeslide_unique_week;
-  case 4: return timeslide_unique_day;
-  case 5: return timeslide_unique_hour;
-  case 6: return timeslide_unique_minute;
-  case 7: return timeslide_unique_second;
-  case 8: return timeslide_unique_millisecond;
-  default: Rf_errorcall(R_NilValue, "Internal error: unknown `type`.");
+static bool str_equal(const char* x, const char* y) {
+  return strcmp(x, y) == 0;
+}
+
+// [[ include("utils.h") ]]
+enum timeslide_chunk_type as_chunk_type(SEXP by) {
+  if (TYPEOF(by) != STRSXP || Rf_length(by) != 1) {
+    Rf_errorcall(R_NilValue, "`by` must be a single string.");
   }
+
+  const char* type = CHAR(STRING_ELT(by, 0));
+
+  if (str_equal(type, "year") || str_equal(type, "years") || str_equal(type, "yearly")) {
+    return timeslide_chunk_year;
+  }
+
+  if (str_equal(type, "month") || str_equal(type, "months") || str_equal(type, "monthly")) {
+    return timeslide_chunk_month;
+  }
+
+  if (str_equal(type, "week") || str_equal(type, "weeks") || str_equal(type, "weekly")) {
+    return timeslide_chunk_week;
+  }
+
+  if (str_equal(type, "day") || str_equal(type, "days") || str_equal(type, "daily")) {
+    return timeslide_chunk_day;
+  }
+
+  if (str_equal(type, "hour") || str_equal(type, "hours") || str_equal(type, "hourly")) {
+    return timeslide_chunk_hour;
+  }
+
+  if (str_equal(type, "minute") || str_equal(type, "minutes") || str_equal(type, "minutely")) {
+    return timeslide_chunk_minute;
+  }
+
+  if (str_equal(type, "second") || str_equal(type, "seconds") || str_equal(type, "secondly")) {
+    return timeslide_chunk_second;
+  }
+
+  if (str_equal(type, "millisecond") || str_equal(type, "milliseconds")) {
+    return timeslide_chunk_millisecond;
+  }
+
+  Rf_errorcall(R_NilValue, "Unknown `by` value '%s'.", type);
 }
 
 // -----------------------------------------------------------------------------
@@ -245,6 +280,13 @@ SEXP timeslide_dispatch2(SEXP fn_sym, SEXP fn,
   return timeslide_dispatch_n(fn_sym, fn, syms, args);
 }
 
+SEXP timeslide_dispatch1(SEXP fn_sym, SEXP fn,
+                         SEXP x_sym, SEXP x) {
+  SEXP syms[2] = { x_sym, NULL };
+  SEXP args[2] = { x, NULL };
+  return timeslide_dispatch_n(fn_sym, fn, syms, args);
+}
+
 // -----------------------------------------------------------------------------
 
 // [[ include("utils.h") ]]
@@ -253,6 +295,14 @@ SEXP time_get(SEXP x, SEXP components) {
     syms_time_get, fns_time_get,
     syms_x, x,
     syms_components, components
+  );
+}
+
+// [[ include("utils.h") ]]
+SEXP as_posixct_from_posixlt(SEXP x) {
+  return timeslide_dispatch1(
+    syms_as_posixct_from_posixlt, fns_as_posixct_from_posixlt,
+    syms_x, x
   );
 }
 
@@ -271,8 +321,10 @@ void timeslide_init_utils(SEXP ns) {
   new_env__size_node = CDR(new_env__parent_node);
 
   syms_time_get = Rf_install("time_get");
+  syms_as_posixct_from_posixlt = Rf_install("as_posixct_from_posixlt");
 
   fns_time_get = r_env_get(timeslide_ns_env, syms_time_get);
+  fns_as_posixct_from_posixlt = r_env_get(timeslide_ns_env, syms_as_posixct_from_posixlt);
 
   strings_year = Rf_allocVector(STRSXP, 1);
   R_PreserveObject(strings_year);

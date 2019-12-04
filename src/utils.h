@@ -4,16 +4,17 @@
 #define R_NO_REMAP
 #include <R.h>
 #include <Rinternals.h>
+#include <stdbool.h>
 
-enum timeslide_unique_type {
-  timeslide_unique_year,
-  timeslide_unique_month,
-  timeslide_unique_week,
-  timeslide_unique_day,
-  timeslide_unique_hour,
-  timeslide_unique_minute,
-  timeslide_unique_second,
-  timeslide_unique_millisecond
+enum timeslide_chunk_type {
+  timeslide_chunk_year,
+  timeslide_chunk_month,
+  timeslide_chunk_week,
+  timeslide_chunk_day,
+  timeslide_chunk_hour,
+  timeslide_chunk_minute,
+  timeslide_chunk_second,
+  timeslide_chunk_millisecond
 };
 
 enum timeslide_class_type {
@@ -25,11 +26,12 @@ enum timeslide_class_type {
 
 enum timeslide_class_type time_class_type(SEXP x);
 
-enum timeslide_unique_type as_unique_type(int type);
+enum timeslide_chunk_type as_chunk_type(SEXP by);
 
 SEXP r_maybe_duplicate(SEXP x);
 
 SEXP time_get(SEXP x, SEXP components);
+SEXP as_posixct_from_posixlt(SEXP x);
 
 extern SEXP strings_year;
 extern SEXP strings_year_month;
