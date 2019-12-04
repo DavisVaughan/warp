@@ -102,6 +102,10 @@ static SEXP warp_chunk_year(SEXP x, SEXP origin) {
   R_xlen_t n_out = Rf_xlength(out);
 
   for (R_xlen_t i = 0; i < n_out; ++i) {
+    if (p_out[i] == NA_INTEGER) {
+      continue;
+    }
+
     p_out[i] -= origin_year;
   }
 
@@ -137,7 +141,12 @@ static SEXP warp_chunk_month(SEXP x, SEXP origin) {
   int* p_out = INTEGER(out);
 
   for (R_xlen_t i = 0; i < size; ++i) {
-    p_out[i] = (p_year[i] - origin_year) * 12 + (p_month[i] - 1 - origin_month);
+    // Assume p_month[i] would also be NA
+    if (p_year[i] == NA_INTEGER) {
+      p_out[i] = NA_INTEGER;
+    } else {
+      p_out[i] = (p_year[i] - origin_year) * 12 + (p_month[i] - 1 - origin_month);
+    }
   }
 
   UNPROTECT(n_prot);

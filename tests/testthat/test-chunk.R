@@ -40,6 +40,14 @@ test_that("can use integer Dates", {
   expect_identical(warp_chunk(x, "year"), 0L)
 })
 
+test_that("can handle `NA` dates", {
+  x <- structure(NA_real_, class = "Date")
+  expect_identical(warp_chunk(x, "year"), NA_integer_)
+
+  x <- structure(NA_integer_, class = "Date")
+  expect_identical(warp_chunk(x, "year"), NA_integer_)
+})
+
 # ------------------------------------------------------------------------------
 # warp_chunk(<POSIXct>, by = "year")
 
@@ -111,6 +119,14 @@ test_that("local time POSIXct + UTC origin converts with a warning", {
 test_that("can use integer POSIXct", {
   x <- structure(-1L, tzone = "UTC", class = c("POSIXct", "POSIXt"))
   expect_identical(warp_chunk(x, "year"), -1L)
+})
+
+test_that("can handle `NA` dates", {
+  x <- structure(NA_real_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_identical(warp_chunk(x, "year"), NA_integer_)
+
+  x <- structure(NA_integer_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_identical(warp_chunk(x, "year"), NA_integer_)
 })
 
 # ------------------------------------------------------------------------------
@@ -248,6 +264,14 @@ test_that("local time POSIXct + UTC origin converts with a warning", {
 test_that("can use integer POSIXct", {
   x <- structure(-1L, tzone = "UTC", class = c("POSIXct", "POSIXt"))
   expect_identical(warp_chunk(x, "month"), -1L)
+})
+
+test_that("can handle `NA` dates", {
+  x <- structure(NA_real_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_identical(warp_chunk(x, "month"), NA_integer_)
+
+  x <- structure(NA_integer_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_identical(warp_chunk(x, "month"), NA_integer_)
 })
 
 # ------------------------------------------------------------------------------
