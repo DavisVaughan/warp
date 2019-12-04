@@ -13,10 +13,6 @@ License: `use_mit_license()`, `use_gpl3_license()` or friends to
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-Imports: 
-    slide,
-    vctrs,
-    rlang
 RoxygenNote: 7.0.1
 URL: https://github.com/DavisVaughan/timeslide
 BugReports: https://github.com/DavisVaughan/timeslide/issues
