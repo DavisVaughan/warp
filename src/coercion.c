@@ -55,8 +55,8 @@ static SEXP as_datetime_from_date(SEXP x) {
   Rf_setAttrib(out, Rf_install("tzone"), strings_utc);
 
   SEXP classes_posixct = PROTECT(Rf_allocVector(STRSXP, 2));
-  SET_STRING_ELT(classes_posixct, 0, Rf_mkChar("POSIXt"));
-  SET_STRING_ELT(classes_posixct, 1, Rf_mkChar("POSIXct"));
+  SET_STRING_ELT(classes_posixct, 0, Rf_mkChar("POSIXct"));
+  SET_STRING_ELT(classes_posixct, 1, Rf_mkChar("POSIXt"));
 
   Rf_setAttrib(out, R_ClassSymbol, classes_posixct);
 
