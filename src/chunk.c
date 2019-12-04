@@ -151,7 +151,7 @@ static SEXP warp_chunk_year(SEXP x, int every, SEXP origin) {
     }
 
     if (elt < 0) {
-      p_out[i] = (elt - 1) / every;
+      p_out[i] = (elt - (every - 1)) / every;
     } else {
       p_out[i] = elt / every;
     }
