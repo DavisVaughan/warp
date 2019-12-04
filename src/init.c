@@ -4,7 +4,7 @@
 #include <R_ext/Rdynload.h>
 
 /* .Call calls */
-extern SEXP timeslide_warp_chunk(SEXP, SEXP, SEXP, SEXP);
+extern SEXP timeslide_warp_group(SEXP, SEXP, SEXP, SEXP);
 extern SEXP timeslide_breakpoints(SEXP);
 extern SEXP timeslide_class_type(SEXP);
 
@@ -12,7 +12,7 @@ extern SEXP timeslide_class_type(SEXP);
 SEXP timeslide_init_library(SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-  {"timeslide_warp_chunk",   (DL_FUNC) &timeslide_warp_chunk, 4},
+  {"timeslide_warp_group",   (DL_FUNC) &timeslide_warp_group, 4},
   {"timeslide_breakpoints",  (DL_FUNC) &timeslide_breakpoints, 1},
   {"timeslide_class_type",   (DL_FUNC) &timeslide_class_type, 1},
   {"timeslide_init_library", (DL_FUNC) &timeslide_init_library, 1},

@@ -10,31 +10,31 @@ double origin_to_seconds_from_epoch(SEXP origin);
 
 // -----------------------------------------------------------------------------
 
-SEXP warp_chunk(SEXP x, enum timeslide_chunk_type type, int every, SEXP origin);
+SEXP warp_group(SEXP x, enum timeslide_group_type type, int every, SEXP origin);
 
 // [[ register() ]]
-SEXP timeslide_warp_chunk(SEXP x, SEXP by, SEXP every, SEXP origin) {
-  enum timeslide_chunk_type type = as_chunk_type(by);
+SEXP timeslide_warp_group(SEXP x, SEXP by, SEXP every, SEXP origin) {
+  enum timeslide_group_type type = as_group_type(by);
   int every_ = pull_every(every);
-  return warp_chunk(x, type, every_, origin);
+  return warp_group(x, type, every_, origin);
 }
 
 // -----------------------------------------------------------------------------
 
-static SEXP warp_chunk_year(SEXP x, int every, SEXP origin);
-static SEXP warp_chunk_month(SEXP x, int every, SEXP origin);
-static SEXP warp_chunk_day(SEXP x, int every, SEXP origin);
-static SEXP warp_chunk_hour(SEXP x, int every, SEXP origin);
-static SEXP warp_chunk_minute(SEXP x, int every, SEXP origin);
-static SEXP warp_chunk_second(SEXP x, int every, SEXP origin);
+static SEXP warp_group_year(SEXP x, int every, SEXP origin);
+static SEXP warp_group_month(SEXP x, int every, SEXP origin);
+static SEXP warp_group_day(SEXP x, int every, SEXP origin);
+static SEXP warp_group_hour(SEXP x, int every, SEXP origin);
+static SEXP warp_group_minute(SEXP x, int every, SEXP origin);
+static SEXP warp_group_second(SEXP x, int every, SEXP origin);
 
 // [[ include("timeslide.h") ]]
-SEXP warp_chunk(SEXP x, enum timeslide_chunk_type type, int every, SEXP origin) {
+SEXP warp_group(SEXP x, enum timeslide_group_type type, int every, SEXP origin) {
   validate_origin(origin);
   validate_every(every);
 
   if (time_class_type(x) == timeslide_class_unknown) {
-    r_error("warp_chunk", "`x` must inherit from 'Date', 'POSIXct', or 'POSIXlt'.");
+    r_error("warp_group", "`x` must inherit from 'Date', 'POSIXct', or 'POSIXlt'.");
   }
 
   const char* origin_timezone = get_timezone(origin);
@@ -43,13 +43,13 @@ SEXP warp_chunk(SEXP x, enum timeslide_chunk_type type, int every, SEXP origin) 
   SEXP out;
 
   switch (type) {
-  case timeslide_chunk_year: out = PROTECT(warp_chunk_year(x, every, origin)); break;
-  case timeslide_chunk_month: out = PROTECT(warp_chunk_month(x, every, origin)); break;
-  case timeslide_chunk_day: out = PROTECT(warp_chunk_day(x, every, origin)); break;
-  case timeslide_chunk_hour: out = PROTECT(warp_chunk_hour(x, every, origin)); break;
-  case timeslide_chunk_minute: out = PROTECT(warp_chunk_minute(x, every, origin)); break;
-  case timeslide_chunk_second: out = PROTECT(warp_chunk_second(x, every, origin)); break;
-  default: r_error("warp_chunk", "Internal error: unknown `type`.");
+  case timeslide_group_year: out = PROTECT(warp_group_year(x, every, origin)); break;
+  case timeslide_group_month: out = PROTECT(warp_group_month(x, every, origin)); break;
+  case timeslide_group_day: out = PROTECT(warp_group_day(x, every, origin)); break;
+  case timeslide_group_hour: out = PROTECT(warp_group_hour(x, every, origin)); break;
+  case timeslide_group_minute: out = PROTECT(warp_group_minute(x, every, origin)); break;
+  case timeslide_group_second: out = PROTECT(warp_group_second(x, every, origin)); break;
+  default: r_error("warp_group", "Internal error: unknown `type`.");
   }
 
   UNPROTECT(2);
@@ -61,7 +61,7 @@ SEXP warp_chunk(SEXP x, enum timeslide_chunk_type type, int every, SEXP origin) 
 #define EPOCH_YEAR 1970
 #define EPOCH_MONTH 0
 
-static SEXP warp_chunk_year(SEXP x, int every, SEXP origin) {
+static SEXP warp_group_year(SEXP x, int every, SEXP origin) {
   int n_prot = 0;
 
   int origin_year = EPOCH_YEAR;
@@ -71,7 +71,7 @@ static SEXP warp_chunk_year(SEXP x, int every, SEXP origin) {
     origin_year = INTEGER(VECTOR_ELT(origin_time_df, 0))[0];
 
     if (origin_year == NA_INTEGER) {
-      r_error("warp_chunk_year", "`origin` cannot be `NA`.");
+      r_error("warp_group_year", "`origin` cannot be `NA`.");
     }
   }
 
@@ -114,7 +114,7 @@ static SEXP warp_chunk_year(SEXP x, int every, SEXP origin) {
 
 #define MONTHS_IN_YEAR 12
 
-static SEXP warp_chunk_month(SEXP x, int every, SEXP origin) {
+static SEXP warp_group_month(SEXP x, int every, SEXP origin) {
   int n_prot = 0;
 
   int origin_year = EPOCH_YEAR;
@@ -126,7 +126,7 @@ static SEXP warp_chunk_month(SEXP x, int every, SEXP origin) {
     origin_month = INTEGER(VECTOR_ELT(origin_time_df, 1))[0] - 1;
 
     if (origin_year == NA_INTEGER) {
-      r_error("warp_chunk_month", "`origin` cannot be `NA`.");
+      r_error("warp_group_month", "`origin` cannot be `NA`.");
     }
   }
 
@@ -180,54 +180,54 @@ static SEXP warp_chunk_month(SEXP x, int every, SEXP origin) {
 
 // -----------------------------------------------------------------------------
 
-static SEXP date_warp_chunk_day(SEXP x, int every, SEXP origin);
-static SEXP posixct_warp_chunk_day(SEXP x, int every, SEXP origin);
-static SEXP posixlt_warp_chunk_day(SEXP x, int every, SEXP origin);
+static SEXP date_warp_group_day(SEXP x, int every, SEXP origin);
+static SEXP posixct_warp_group_day(SEXP x, int every, SEXP origin);
+static SEXP posixlt_warp_group_day(SEXP x, int every, SEXP origin);
 
-static SEXP warp_chunk_day(SEXP x, int every, SEXP origin) {
+static SEXP warp_group_day(SEXP x, int every, SEXP origin) {
   switch (time_class_type(x)) {
-  case timeslide_class_date: return date_warp_chunk_day(x, every, origin);
-  case timeslide_class_posixct: return posixct_warp_chunk_day(x, every, origin);
-  case timeslide_class_posixlt: return posixlt_warp_chunk_day(x, every, origin);
-  default: r_error("warp_chunk_day", "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
+  case timeslide_class_date: return date_warp_group_day(x, every, origin);
+  case timeslide_class_posixct: return posixct_warp_group_day(x, every, origin);
+  case timeslide_class_posixlt: return posixlt_warp_group_day(x, every, origin);
+  default: r_error("warp_group_day", "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
   }
 }
 
 
-static SEXP int_date_warp_chunk_day(SEXP x, int every, SEXP origin);
-static SEXP dbl_date_warp_chunk_day(SEXP x, int every, SEXP origin);
+static SEXP int_date_warp_group_day(SEXP x, int every, SEXP origin);
+static SEXP dbl_date_warp_group_day(SEXP x, int every, SEXP origin);
 
-static SEXP date_warp_chunk_day(SEXP x, int every, SEXP origin) {
+static SEXP date_warp_group_day(SEXP x, int every, SEXP origin) {
   switch (TYPEOF(x)) {
-  case INTSXP: return int_date_warp_chunk_day(x, every, origin);
-  case REALSXP: return dbl_date_warp_chunk_day(x, every, origin);
-  default: r_error("date_warp_chunk_day", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
+  case INTSXP: return int_date_warp_group_day(x, every, origin);
+  case REALSXP: return dbl_date_warp_group_day(x, every, origin);
+  default: r_error("date_warp_group_day", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
   }
 }
 
 
-static SEXP int_posixct_warp_chunk_day(SEXP x, int every, SEXP origin);
-static SEXP dbl_posixct_warp_chunk_day(SEXP x, int every, SEXP origin);
+static SEXP int_posixct_warp_group_day(SEXP x, int every, SEXP origin);
+static SEXP dbl_posixct_warp_group_day(SEXP x, int every, SEXP origin);
 
-static SEXP posixct_warp_chunk_day(SEXP x, int every, SEXP origin) {
+static SEXP posixct_warp_group_day(SEXP x, int every, SEXP origin) {
   switch (TYPEOF(x)) {
-  case INTSXP: return int_posixct_warp_chunk_day(x, every, origin);
-  case REALSXP: return dbl_posixct_warp_chunk_day(x, every, origin);
-  default: r_error("posixct_warp_chunk_day", "Unknown `POSIXct` type %s.", Rf_type2char(TYPEOF(x)));
+  case INTSXP: return int_posixct_warp_group_day(x, every, origin);
+  case REALSXP: return dbl_posixct_warp_group_day(x, every, origin);
+  default: r_error("posixct_warp_group_day", "Unknown `POSIXct` type %s.", Rf_type2char(TYPEOF(x)));
   }
 }
 
 
-static SEXP posixlt_warp_chunk_day(SEXP x, int every, SEXP origin) {
+static SEXP posixlt_warp_group_day(SEXP x, int every, SEXP origin) {
   x = PROTECT(as_datetime(x));
-  SEXP out = PROTECT(posixct_warp_chunk_day(x, every, origin));
+  SEXP out = PROTECT(posixct_warp_group_day(x, every, origin));
 
   UNPROTECT(2);
   return out;
 }
 
 
-static SEXP int_date_warp_chunk_day(SEXP x, int every, SEXP origin) {
+static SEXP int_date_warp_group_day(SEXP x, int every, SEXP origin) {
   SEXP out = PROTECT(r_maybe_duplicate(x));
   SET_ATTRIB(out, R_NilValue);
   SET_OBJECT(out, 0);
@@ -278,7 +278,7 @@ static SEXP int_date_warp_chunk_day(SEXP x, int every, SEXP origin) {
   return out;
 }
 
-static SEXP dbl_date_warp_chunk_day(SEXP x, int every, SEXP origin) {
+static SEXP dbl_date_warp_group_day(SEXP x, int every, SEXP origin) {
   R_xlen_t x_size = Rf_xlength(x);
 
   double* p_x = REAL(x);
@@ -334,7 +334,7 @@ static SEXP dbl_date_warp_chunk_day(SEXP x, int every, SEXP origin) {
 
 #define SECONDS_IN_DAY 86400
 
-static SEXP int_posixct_warp_chunk_day(SEXP x, int every, SEXP origin) {
+static SEXP int_posixct_warp_group_day(SEXP x, int every, SEXP origin) {
   R_xlen_t x_size = Rf_xlength(x);
 
   bool needs_every = (every != 1);
@@ -388,7 +388,7 @@ static SEXP int_posixct_warp_chunk_day(SEXP x, int every, SEXP origin) {
   return out;
 }
 
-static SEXP dbl_posixct_warp_chunk_day(SEXP x, int every, SEXP origin) {
+static SEXP dbl_posixct_warp_group_day(SEXP x, int every, SEXP origin) {
   R_xlen_t x_size = Rf_xlength(x);
 
   bool needs_every = (every != 1);
@@ -448,47 +448,47 @@ static SEXP dbl_posixct_warp_chunk_day(SEXP x, int every, SEXP origin) {
 
 // -----------------------------------------------------------------------------
 
-static SEXP date_warp_chunk_hour(SEXP x, int every, SEXP origin);
-static SEXP posixct_warp_chunk_hour(SEXP x, int every, SEXP origin);
-static SEXP posixlt_warp_chunk_hour(SEXP x, int every, SEXP origin);
+static SEXP date_warp_group_hour(SEXP x, int every, SEXP origin);
+static SEXP posixct_warp_group_hour(SEXP x, int every, SEXP origin);
+static SEXP posixlt_warp_group_hour(SEXP x, int every, SEXP origin);
 
-static SEXP warp_chunk_hour(SEXP x, int every, SEXP origin) {
+static SEXP warp_group_hour(SEXP x, int every, SEXP origin) {
   switch (time_class_type(x)) {
-  case timeslide_class_date: return date_warp_chunk_hour(x, every, origin);
-  case timeslide_class_posixct: return posixct_warp_chunk_hour(x, every, origin);
-  case timeslide_class_posixlt: return posixlt_warp_chunk_hour(x, every, origin);
-  default: r_error("warp_chunk_hour", "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
+  case timeslide_class_date: return date_warp_group_hour(x, every, origin);
+  case timeslide_class_posixct: return posixct_warp_group_hour(x, every, origin);
+  case timeslide_class_posixlt: return posixlt_warp_group_hour(x, every, origin);
+  default: r_error("warp_group_hour", "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
   }
 }
 
 
-static SEXP int_date_warp_chunk_hour(SEXP x, int every, SEXP origin);
-static SEXP dbl_date_warp_chunk_hour(SEXP x, int every, SEXP origin);
+static SEXP int_date_warp_group_hour(SEXP x, int every, SEXP origin);
+static SEXP dbl_date_warp_group_hour(SEXP x, int every, SEXP origin);
 
-static SEXP date_warp_chunk_hour(SEXP x, int every, SEXP origin) {
+static SEXP date_warp_group_hour(SEXP x, int every, SEXP origin) {
   switch (TYPEOF(x)) {
-  case INTSXP: return int_date_warp_chunk_hour(x, every, origin);
-  case REALSXP: return dbl_date_warp_chunk_hour(x, every, origin);
-  default: r_error("date_warp_chunk_hour", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
+  case INTSXP: return int_date_warp_group_hour(x, every, origin);
+  case REALSXP: return dbl_date_warp_group_hour(x, every, origin);
+  default: r_error("date_warp_group_hour", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
   }
 }
 
 
-static SEXP int_posixct_warp_chunk_hour(SEXP x, int every, SEXP origin);
-static SEXP dbl_posixct_warp_chunk_hour(SEXP x, int every, SEXP origin);
+static SEXP int_posixct_warp_group_hour(SEXP x, int every, SEXP origin);
+static SEXP dbl_posixct_warp_group_hour(SEXP x, int every, SEXP origin);
 
-static SEXP posixct_warp_chunk_hour(SEXP x, int every, SEXP origin) {
+static SEXP posixct_warp_group_hour(SEXP x, int every, SEXP origin) {
   switch (TYPEOF(x)) {
-  case INTSXP: return int_posixct_warp_chunk_hour(x, every, origin);
-  case REALSXP: return dbl_posixct_warp_chunk_hour(x, every, origin);
-  default: r_error("posixct_warp_chunk_hour", "Unknown `POSIXct` type %s.", Rf_type2char(TYPEOF(x)));
+  case INTSXP: return int_posixct_warp_group_hour(x, every, origin);
+  case REALSXP: return dbl_posixct_warp_group_hour(x, every, origin);
+  default: r_error("posixct_warp_group_hour", "Unknown `POSIXct` type %s.", Rf_type2char(TYPEOF(x)));
   }
 }
 
 
-static SEXP posixlt_warp_chunk_hour(SEXP x, int every, SEXP origin) {
+static SEXP posixlt_warp_group_hour(SEXP x, int every, SEXP origin) {
   x = PROTECT(as_datetime(x));
-  SEXP out = PROTECT(posixct_warp_chunk_hour(x, every, origin));
+  SEXP out = PROTECT(posixct_warp_group_hour(x, every, origin));
 
   UNPROTECT(2);
   return out;
@@ -497,7 +497,7 @@ static SEXP posixlt_warp_chunk_hour(SEXP x, int every, SEXP origin) {
 
 #define HOURS_IN_DAY 24
 
-static SEXP int_date_warp_chunk_hour(SEXP x, int every, SEXP origin) {
+static SEXP int_date_warp_group_hour(SEXP x, int every, SEXP origin) {
   R_xlen_t x_size = Rf_xlength(x);
 
   int* p_x = INTEGER(x);
@@ -546,7 +546,7 @@ static SEXP int_date_warp_chunk_hour(SEXP x, int every, SEXP origin) {
   return out;
 }
 
-static SEXP dbl_date_warp_chunk_hour(SEXP x, int every, SEXP origin) {
+static SEXP dbl_date_warp_group_hour(SEXP x, int every, SEXP origin) {
   R_xlen_t x_size = Rf_xlength(x);
 
   double* p_x = REAL(x);
@@ -606,7 +606,7 @@ static SEXP dbl_date_warp_chunk_hour(SEXP x, int every, SEXP origin) {
 
 #define SECONDS_IN_HOUR 3600
 
-static SEXP int_posixct_warp_chunk_hour(SEXP x, int every, SEXP origin) {
+static SEXP int_posixct_warp_group_hour(SEXP x, int every, SEXP origin) {
   R_xlen_t x_size = Rf_xlength(x);
 
   bool needs_every = (every != 1);
@@ -660,7 +660,7 @@ static SEXP int_posixct_warp_chunk_hour(SEXP x, int every, SEXP origin) {
   return out;
 }
 
-static SEXP dbl_posixct_warp_chunk_hour(SEXP x, int every, SEXP origin) {
+static SEXP dbl_posixct_warp_group_hour(SEXP x, int every, SEXP origin) {
   R_xlen_t x_size = Rf_xlength(x);
 
   bool needs_every = (every != 1);
@@ -720,47 +720,47 @@ static SEXP dbl_posixct_warp_chunk_hour(SEXP x, int every, SEXP origin) {
 
 // -----------------------------------------------------------------------------
 
-static SEXP date_warp_chunk_minute(SEXP x, int every, SEXP origin);
-static SEXP posixct_warp_chunk_minute(SEXP x, int every, SEXP origin);
-static SEXP posixlt_warp_chunk_minute(SEXP x, int every, SEXP origin);
+static SEXP date_warp_group_minute(SEXP x, int every, SEXP origin);
+static SEXP posixct_warp_group_minute(SEXP x, int every, SEXP origin);
+static SEXP posixlt_warp_group_minute(SEXP x, int every, SEXP origin);
 
-static SEXP warp_chunk_minute(SEXP x, int every, SEXP origin) {
+static SEXP warp_group_minute(SEXP x, int every, SEXP origin) {
   switch (time_class_type(x)) {
-  case timeslide_class_date: return date_warp_chunk_minute(x, every, origin);
-  case timeslide_class_posixct: return posixct_warp_chunk_minute(x, every, origin);
-  case timeslide_class_posixlt: return posixlt_warp_chunk_minute(x, every, origin);
-  default: r_error("warp_chunk_minute", "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
+  case timeslide_class_date: return date_warp_group_minute(x, every, origin);
+  case timeslide_class_posixct: return posixct_warp_group_minute(x, every, origin);
+  case timeslide_class_posixlt: return posixlt_warp_group_minute(x, every, origin);
+  default: r_error("warp_group_minute", "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
   }
 }
 
 
-static SEXP int_date_warp_chunk_minute(SEXP x, int every, SEXP origin);
-static SEXP dbl_date_warp_chunk_minute(SEXP x, int every, SEXP origin);
+static SEXP int_date_warp_group_minute(SEXP x, int every, SEXP origin);
+static SEXP dbl_date_warp_group_minute(SEXP x, int every, SEXP origin);
 
-static SEXP date_warp_chunk_minute(SEXP x, int every, SEXP origin) {
+static SEXP date_warp_group_minute(SEXP x, int every, SEXP origin) {
   switch (TYPEOF(x)) {
-  case INTSXP: return int_date_warp_chunk_minute(x, every, origin);
-  case REALSXP: return dbl_date_warp_chunk_minute(x, every, origin);
-  default: r_error("date_warp_chunk_minute", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
+  case INTSXP: return int_date_warp_group_minute(x, every, origin);
+  case REALSXP: return dbl_date_warp_group_minute(x, every, origin);
+  default: r_error("date_warp_group_minute", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
   }
 }
 
 
-static SEXP int_posixct_warp_chunk_minute(SEXP x, int every, SEXP origin);
-static SEXP dbl_posixct_warp_chunk_minute(SEXP x, int every, SEXP origin);
+static SEXP int_posixct_warp_group_minute(SEXP x, int every, SEXP origin);
+static SEXP dbl_posixct_warp_group_minute(SEXP x, int every, SEXP origin);
 
-static SEXP posixct_warp_chunk_minute(SEXP x, int every, SEXP origin) {
+static SEXP posixct_warp_group_minute(SEXP x, int every, SEXP origin) {
   switch (TYPEOF(x)) {
-  case INTSXP: return int_posixct_warp_chunk_minute(x, every, origin);
-  case REALSXP: return dbl_posixct_warp_chunk_minute(x, every, origin);
-  default: r_error("posixct_warp_chunk_minute", "Unknown `POSIXct` type %s.", Rf_type2char(TYPEOF(x)));
+  case INTSXP: return int_posixct_warp_group_minute(x, every, origin);
+  case REALSXP: return dbl_posixct_warp_group_minute(x, every, origin);
+  default: r_error("posixct_warp_group_minute", "Unknown `POSIXct` type %s.", Rf_type2char(TYPEOF(x)));
   }
 }
 
 
-static SEXP posixlt_warp_chunk_minute(SEXP x, int every, SEXP origin) {
+static SEXP posixlt_warp_group_minute(SEXP x, int every, SEXP origin) {
   x = PROTECT(as_datetime(x));
-  SEXP out = PROTECT(posixct_warp_chunk_minute(x, every, origin));
+  SEXP out = PROTECT(posixct_warp_group_minute(x, every, origin));
 
   UNPROTECT(2);
   return out;
@@ -769,7 +769,7 @@ static SEXP posixlt_warp_chunk_minute(SEXP x, int every, SEXP origin) {
 
 #define MINUTES_IN_DAY 1440
 
-static SEXP int_date_warp_chunk_minute(SEXP x, int every, SEXP origin) {
+static SEXP int_date_warp_group_minute(SEXP x, int every, SEXP origin) {
   R_xlen_t x_size = Rf_xlength(x);
 
   int* p_x = INTEGER(x);
@@ -818,7 +818,7 @@ static SEXP int_date_warp_chunk_minute(SEXP x, int every, SEXP origin) {
   return out;
 }
 
-static SEXP dbl_date_warp_chunk_minute(SEXP x, int every, SEXP origin) {
+static SEXP dbl_date_warp_group_minute(SEXP x, int every, SEXP origin) {
   R_xlen_t x_size = Rf_xlength(x);
 
   double* p_x = REAL(x);
@@ -878,7 +878,7 @@ static SEXP dbl_date_warp_chunk_minute(SEXP x, int every, SEXP origin) {
 
 #define SECONDS_IN_MINUTE 60
 
-static SEXP int_posixct_warp_chunk_minute(SEXP x, int every, SEXP origin) {
+static SEXP int_posixct_warp_group_minute(SEXP x, int every, SEXP origin) {
   R_xlen_t x_size = Rf_xlength(x);
 
   bool needs_every = (every != 1);
@@ -932,7 +932,7 @@ static SEXP int_posixct_warp_chunk_minute(SEXP x, int every, SEXP origin) {
   return out;
 }
 
-static SEXP dbl_posixct_warp_chunk_minute(SEXP x, int every, SEXP origin) {
+static SEXP dbl_posixct_warp_group_minute(SEXP x, int every, SEXP origin) {
   R_xlen_t x_size = Rf_xlength(x);
 
   bool needs_every = (every != 1);
@@ -992,47 +992,47 @@ static SEXP dbl_posixct_warp_chunk_minute(SEXP x, int every, SEXP origin) {
 
 // -----------------------------------------------------------------------------
 
-static SEXP date_warp_chunk_second(SEXP x, int every, SEXP origin);
-static SEXP posixct_warp_chunk_second(SEXP x, int every, SEXP origin);
-static SEXP posixlt_warp_chunk_second(SEXP x, int every, SEXP origin);
+static SEXP date_warp_group_second(SEXP x, int every, SEXP origin);
+static SEXP posixct_warp_group_second(SEXP x, int every, SEXP origin);
+static SEXP posixlt_warp_group_second(SEXP x, int every, SEXP origin);
 
-static SEXP warp_chunk_second(SEXP x, int every, SEXP origin) {
+static SEXP warp_group_second(SEXP x, int every, SEXP origin) {
   switch (time_class_type(x)) {
-  case timeslide_class_date: return date_warp_chunk_second(x, every, origin);
-  case timeslide_class_posixct: return posixct_warp_chunk_second(x, every, origin);
-  case timeslide_class_posixlt: return posixlt_warp_chunk_second(x, every, origin);
-  default: r_error("warp_chunk_second", "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
+  case timeslide_class_date: return date_warp_group_second(x, every, origin);
+  case timeslide_class_posixct: return posixct_warp_group_second(x, every, origin);
+  case timeslide_class_posixlt: return posixlt_warp_group_second(x, every, origin);
+  default: r_error("warp_group_second", "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
   }
 }
 
 
-static SEXP int_date_warp_chunk_second(SEXP x, int every, SEXP origin);
-static SEXP dbl_date_warp_chunk_second(SEXP x, int every, SEXP origin);
+static SEXP int_date_warp_group_second(SEXP x, int every, SEXP origin);
+static SEXP dbl_date_warp_group_second(SEXP x, int every, SEXP origin);
 
-static SEXP date_warp_chunk_second(SEXP x, int every, SEXP origin) {
+static SEXP date_warp_group_second(SEXP x, int every, SEXP origin) {
   switch (TYPEOF(x)) {
-  case INTSXP: return int_date_warp_chunk_second(x, every, origin);
-  case REALSXP: return dbl_date_warp_chunk_second(x, every, origin);
-  default: r_error("date_warp_chunk_second", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
+  case INTSXP: return int_date_warp_group_second(x, every, origin);
+  case REALSXP: return dbl_date_warp_group_second(x, every, origin);
+  default: r_error("date_warp_group_second", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
   }
 }
 
 
-static SEXP int_posixct_warp_chunk_second(SEXP x, int every, SEXP origin);
-static SEXP dbl_posixct_warp_chunk_second(SEXP x, int every, SEXP origin);
+static SEXP int_posixct_warp_group_second(SEXP x, int every, SEXP origin);
+static SEXP dbl_posixct_warp_group_second(SEXP x, int every, SEXP origin);
 
-static SEXP posixct_warp_chunk_second(SEXP x, int every, SEXP origin) {
+static SEXP posixct_warp_group_second(SEXP x, int every, SEXP origin) {
   switch (TYPEOF(x)) {
-  case INTSXP: return int_posixct_warp_chunk_second(x, every, origin);
-  case REALSXP: return dbl_posixct_warp_chunk_second(x, every, origin);
-  default: r_error("posixct_warp_chunk_second", "Unknown `POSIXct` type %s.", Rf_type2char(TYPEOF(x)));
+  case INTSXP: return int_posixct_warp_group_second(x, every, origin);
+  case REALSXP: return dbl_posixct_warp_group_second(x, every, origin);
+  default: r_error("posixct_warp_group_second", "Unknown `POSIXct` type %s.", Rf_type2char(TYPEOF(x)));
   }
 }
 
 
-static SEXP posixlt_warp_chunk_second(SEXP x, int every, SEXP origin) {
+static SEXP posixlt_warp_group_second(SEXP x, int every, SEXP origin) {
   x = PROTECT(as_datetime(x));
-  SEXP out = PROTECT(posixct_warp_chunk_second(x, every, origin));
+  SEXP out = PROTECT(posixct_warp_group_second(x, every, origin));
 
   UNPROTECT(2);
   return out;
@@ -1041,7 +1041,7 @@ static SEXP posixlt_warp_chunk_second(SEXP x, int every, SEXP origin) {
 
 #define SECONDS_IN_DAY 86400
 
-static SEXP int_date_warp_chunk_second(SEXP x, int every, SEXP origin) {
+static SEXP int_date_warp_group_second(SEXP x, int every, SEXP origin) {
   R_xlen_t x_size = Rf_xlength(x);
 
   int* p_x = INTEGER(x);
@@ -1092,7 +1092,7 @@ static SEXP int_date_warp_chunk_second(SEXP x, int every, SEXP origin) {
   return out;
 }
 
-static SEXP dbl_date_warp_chunk_second(SEXP x, int every, SEXP origin) {
+static SEXP dbl_date_warp_group_second(SEXP x, int every, SEXP origin) {
   R_xlen_t x_size = Rf_xlength(x);
 
   double* p_x = REAL(x);
@@ -1148,7 +1148,7 @@ static SEXP dbl_date_warp_chunk_second(SEXP x, int every, SEXP origin) {
 
 #undef SECONDS_IN_DAY
 
-static SEXP int_posixct_warp_chunk_second(SEXP x, int every, SEXP origin) {
+static SEXP int_posixct_warp_group_second(SEXP x, int every, SEXP origin) {
   R_xlen_t x_size = Rf_xlength(x);
 
   bool needs_every = (every != 1);
@@ -1199,7 +1199,7 @@ static SEXP int_posixct_warp_chunk_second(SEXP x, int every, SEXP origin) {
   return out;
 }
 
-static SEXP dbl_posixct_warp_chunk_second(SEXP x, int every, SEXP origin) {
+static SEXP dbl_posixct_warp_group_second(SEXP x, int every, SEXP origin) {
   R_xlen_t x_size = Rf_xlength(x);
 
   bool needs_every = (every != 1);

@@ -7,15 +7,15 @@
 #include <stdbool.h>
 #include <stdarg.h>
 
-enum timeslide_chunk_type {
-  timeslide_chunk_year,
-  timeslide_chunk_month,
-  timeslide_chunk_week,
-  timeslide_chunk_day,
-  timeslide_chunk_hour,
-  timeslide_chunk_minute,
-  timeslide_chunk_second,
-  timeslide_chunk_millisecond
+enum timeslide_group_type {
+  timeslide_group_year,
+  timeslide_group_month,
+  timeslide_group_week,
+  timeslide_group_day,
+  timeslide_group_hour,
+  timeslide_group_minute,
+  timeslide_group_second,
+  timeslide_group_millisecond
 };
 
 enum timeslide_class_type {
@@ -27,7 +27,7 @@ enum timeslide_class_type {
 
 enum timeslide_class_type time_class_type(SEXP x);
 
-enum timeslide_chunk_type as_chunk_type(SEXP by);
+enum timeslide_group_type as_group_type(SEXP by);
 
 void __attribute__((noreturn)) r_error(const char* where, const char* why, ...);
 SEXP r_maybe_duplicate(SEXP x);
