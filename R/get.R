@@ -66,7 +66,14 @@ as_posixlt <- function(x) {
   # `as.POSIXlt.Date()` is SO slow
   if (type == "date") {
     origin <- structure(0, class = "Date")
-    out <- as.POSIXlt(unclass(x) * 86400, tz = "UTC", origin = origin)
+    x <- unclass(x)
+
+    # Ignore fractional Date pieces by truncating towards 0
+    if (typeof(x) == "double") {
+      x <- trunc(x)
+    }
+
+    out <- as.POSIXlt(x * 86400, tz = "UTC", origin = origin)
     return(out)
   }
 

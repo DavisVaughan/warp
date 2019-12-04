@@ -16,7 +16,8 @@ as_date <- function(x) {
     if (typeof(x) == "integer") {
       return(structure(as.double(x), class = "Date"))
     } else {
-      return(structure(floor(unclass(x)), class = "Date"))
+      # Always truncate towards 0 to get rid of fractional date components
+      return(structure(trunc(unclass(x)), class = "Date"))
     }
   }
 
