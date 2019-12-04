@@ -35,6 +35,11 @@ test_that("Date + non-UTC origin converts with a warning", {
   )
 })
 
+test_that("can use integer Dates", {
+  x <- structure(0L, class = "Date")
+  expect_identical(warp_chunk(x, "year"), 0L)
+})
+
 # ------------------------------------------------------------------------------
 # warp_chunk(<POSIXct>, by = "year")
 
@@ -103,6 +108,11 @@ test_that("local time POSIXct + UTC origin converts with a warning", {
   })
 })
 
+test_that("can use integer POSIXct", {
+  x <- structure(-1L, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_identical(warp_chunk(x, "year"), -1L)
+})
+
 # ------------------------------------------------------------------------------
 # warp_chunk(<POSIXlt>, by = "year")
 
@@ -157,6 +167,14 @@ test_that("Date + non-UTC origin converts with a warning", {
     ),
     warp_chunk(x_with_tz, "month", origin)
   )
+})
+
+test_that("can use integer Dates", {
+  x <- structure(0L, class = "Date")
+  expect_identical(warp_chunk(x, "month"), 0L)
+
+  x <- structure(31L, class = "Date")
+  expect_identical(warp_chunk(x, "month"), 1L)
 })
 
 # ------------------------------------------------------------------------------
@@ -225,6 +243,11 @@ test_that("local time POSIXct + UTC origin converts with a warning", {
       0L
     )
   })
+})
+
+test_that("can use integer POSIXct", {
+  x <- structure(-1L, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_identical(warp_chunk(x, "month"), -1L)
 })
 
 # ------------------------------------------------------------------------------
