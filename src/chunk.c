@@ -114,10 +114,13 @@ SEXP warp_chunk(SEXP x, enum timeslide_chunk_type type, int every, SEXP origin) 
 
 // -----------------------------------------------------------------------------
 
+#define EPOCH_YEAR 1970
+#define EPOCH_MONTH 0
+
 static SEXP warp_chunk_year(SEXP x, int every, SEXP origin) {
   int n_prot = 0;
 
-  int origin_year = 1970;
+  int origin_year = EPOCH_YEAR;
 
   if (origin != R_NilValue) {
     SEXP origin_time_df = PROTECT_N(time_get(origin, strings_year), &n_prot);
@@ -165,11 +168,13 @@ static SEXP warp_chunk_year(SEXP x, int every, SEXP origin) {
 
 // -----------------------------------------------------------------------------
 
+#define MONTHS_IN_YEAR 12
+
 static SEXP warp_chunk_month(SEXP x, int every, SEXP origin) {
   int n_prot = 0;
 
-  int origin_year = 1970;
-  int origin_month = 0;
+  int origin_year = EPOCH_YEAR;
+  int origin_month = EPOCH_MONTH;
 
   if (origin != R_NilValue) {
     SEXP origin_time_df = PROTECT_N(time_get(origin, strings_year_month), &n_prot);
@@ -205,7 +210,7 @@ static SEXP warp_chunk_month(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    int elt = (elt_year - origin_year) * 12 + (elt_month - origin_month);
+    int elt = (elt_year - origin_year) * MONTHS_IN_YEAR + (elt_month - origin_month);
 
     if (!needs_every) {
       p_out[i] = elt;
@@ -224,6 +229,10 @@ static SEXP warp_chunk_month(SEXP x, int every, SEXP origin) {
   UNPROTECT(n_prot);
   return out;
 }
+
+#undef EPOCH_YEAR
+#undef EPOCH_MONTH
+#undef MONTHS_IN_YEAR
 
 // -----------------------------------------------------------------------------
 
@@ -351,6 +360,8 @@ static SEXP date_warp_chunk_day(SEXP x, int every, SEXP origin) {
   }
 }
 
+#define SECONDS_IN_DAY 86400
+
 static SEXP int_posixct_warp_chunk_day(SEXP x, int every, SEXP origin) {
   R_xlen_t x_size = Rf_xlength(x);
 
@@ -382,9 +393,9 @@ static SEXP int_posixct_warp_chunk_day(SEXP x, int every, SEXP origin) {
 
     // Integer division, then straight into `elt` with no cast needed
     if (elt < 0) {
-      elt = (elt - (86400 - 1)) / 86400;
+      elt = (elt - (SECONDS_IN_DAY - 1)) / SECONDS_IN_DAY;
     } else {
-      elt = elt / 86400;
+      elt = elt / SECONDS_IN_DAY;
     }
 
     if (!needs_every) {
@@ -438,9 +449,9 @@ static SEXP dbl_posixct_warp_chunk_day(SEXP x, int every, SEXP origin) {
 
     // Double division, then integer cast into `elt`
     if (x_elt < 0) {
-      elt = (floor(x_elt) - (86400 - 1)) / 86400;
+      elt = (floor(x_elt) - (SECONDS_IN_DAY - 1)) / SECONDS_IN_DAY;
     } else {
-      elt = x_elt / 86400;
+      elt = x_elt / SECONDS_IN_DAY;
     }
 
     if (!needs_every) {
@@ -460,6 +471,8 @@ static SEXP dbl_posixct_warp_chunk_day(SEXP x, int every, SEXP origin) {
   UNPROTECT(1);
   return out;
 }
+
+#undef SECONDS_IN_DAY
 
 static SEXP posixct_warp_chunk_day(SEXP x, int every, SEXP origin) {
   switch (TYPEOF(x)) {
