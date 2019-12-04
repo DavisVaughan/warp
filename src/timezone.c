@@ -76,7 +76,6 @@ SEXP convert_timezone(SEXP x, const char* timezone) {
   SEXP strings_tzone = PROTECT(Rf_allocVector(STRSXP, 1));
   SET_STRING_ELT(strings_tzone, 0, Rf_mkChar(timezone));
 
-  // TODO - Is it this simple? Can this break?
   Rf_setAttrib(out, Rf_install("tzone"), strings_tzone);
 
   UNPROTECT(3);
