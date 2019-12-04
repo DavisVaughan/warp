@@ -485,6 +485,42 @@ test_that("can handle `NA` dates", {
   expect_identical(warp_chunk(x, "day"), NA_integer_)
 })
 
+test_that("can handle `every` with default origin - integer Dates", {
+  x <- structure(-3L:3L, class = "Date")
+
+  expect_equal(warp_chunk(x, by = "day", every = 2L), c(-2L, -1L, -1L, 0L, 0L, 1L, 1L))
+  expect_equal(warp_chunk(x, by = "day", every = 3L), c(-1L, -1L, -1L, 0L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, by = "day", every = 4L), c(-1L, -1L, -1L, 0L, 0L, 0L, 0L))
+})
+
+test_that("can handle `every` with altered origin - integer Dates", {
+  x <- structure(-3L:3L, class = "Date")
+
+  origin <- as.Date("1970-01-02")
+
+  expect_equal(warp_chunk(x, by = "day", every = 2L, origin = origin), c(-2L, -2L, -1L, -1L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, by = "day", every = 3L, origin = origin), c(-2L, -1L, -1L, -1L, 0L, 0L, 0L))
+  expect_equal(warp_chunk(x, by = "day", every = 4L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
+})
+
+test_that("can handle `every` with default origin - numeric Dates", {
+  x <- structure(as.numeric(-3:3), class = "Date")
+
+  expect_equal(warp_chunk(x, by = "day", every = 2L), c(-2L, -1L, -1L, 0L, 0L, 1L, 1L))
+  expect_equal(warp_chunk(x, by = "day", every = 3L), c(-1L, -1L, -1L, 0L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, by = "day", every = 4L), c(-1L, -1L, -1L, 0L, 0L, 0L, 0L))
+})
+
+test_that("can handle `every` with altered origin - numeric Dates", {
+  x <- structure(as.numeric(-3:3), class = "Date")
+
+  origin <- as.Date("1970-01-02")
+
+  expect_equal(warp_chunk(x, by = "day", every = 2L, origin = origin), c(-2L, -2L, -1L, -1L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, by = "day", every = 3L, origin = origin), c(-2L, -1L, -1L, -1L, 0L, 0L, 0L))
+  expect_equal(warp_chunk(x, by = "day", every = 4L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
+})
+
 # ------------------------------------------------------------------------------
 # warp_chunk(<POSIXct>, by = "day")
 
@@ -637,6 +673,66 @@ test_that("can handle `NA` dates", {
 
   x <- structure(NA_integer_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
   expect_identical(warp_chunk(x, "day"), NA_integer_)
+})
+
+test_that("can handle `every` with default origin - integer POSIXct", {
+  x <- as.POSIXct(c(
+    "1969-12-29", "1969-12-30",
+    "1969-12-31", "1970-01-01",
+    "1970-01-02", "1970-01-03",
+    "1970-01-04"
+  ), tz = "UTC")
+
+  x <- structure(as.integer(unclass(x)), tzone = "UTC", class = class(x))
+
+  expect_equal(warp_chunk(x, by = "day", every = 2L), c(-2L, -1L, -1L, 0L, 0L, 1L, 1L))
+  expect_equal(warp_chunk(x, by = "day", every = 3L), c(-1L, -1L, -1L, 0L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, by = "day", every = 4L), c(-1L, -1L, -1L, 0L, 0L, 0L, 0L))
+})
+
+test_that("can handle `every` with altered origin - integer POSIXct", {
+  x <- as.POSIXct(c(
+    "1969-12-29", "1969-12-30",
+    "1969-12-31", "1970-01-01",
+    "1970-01-02", "1970-01-03",
+    "1970-01-04"
+  ), tz = "UTC")
+
+  x <- structure(as.integer(unclass(x)), tzone = "UTC", class = class(x))
+
+  origin <- as.Date("1970-01-02")
+
+  expect_equal(warp_chunk(x, by = "day", every = 2L, origin = origin), c(-2L, -2L, -1L, -1L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, by = "day", every = 3L, origin = origin), c(-2L, -1L, -1L, -1L, 0L, 0L, 0L))
+  expect_equal(warp_chunk(x, by = "day", every = 4L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
+})
+
+test_that("can handle `every` with default origin - numeric POSIXct", {
+  x <- as.POSIXct(c(
+    "1969-12-29", "1969-12-30",
+    "1969-12-31", "1970-01-01",
+    "1970-01-02", "1970-01-03",
+    "1970-01-04"
+  ), tz = "UTC")
+
+  expect_equal(warp_chunk(x, by = "day", every = 2L), c(-2L, -1L, -1L, 0L, 0L, 1L, 1L))
+  expect_equal(warp_chunk(x, by = "day", every = 3L), c(-1L, -1L, -1L, 0L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, by = "day", every = 4L), c(-1L, -1L, -1L, 0L, 0L, 0L, 0L))
+})
+
+test_that("can handle `every` with altered origin - numeric POSIXct", {
+  x <- as.POSIXct(c(
+    "1969-12-29", "1969-12-30",
+    "1969-12-31", "1970-01-01",
+    "1970-01-02", "1970-01-03",
+    "1970-01-04"
+  ), tz = "UTC")
+
+  origin <- as.Date("1970-01-02")
+
+  expect_equal(warp_chunk(x, by = "day", every = 2L, origin = origin), c(-2L, -2L, -1L, -1L, 0L, 0L, 1L))
+  expect_equal(warp_chunk(x, by = "day", every = 3L, origin = origin), c(-2L, -1L, -1L, -1L, 0L, 0L, 0L))
+  expect_equal(warp_chunk(x, by = "day", every = 4L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
 })
 
 # ------------------------------------------------------------------------------

@@ -230,25 +230,49 @@ static SEXP int_date_warp_chunk_day(SEXP x, int every, SEXP origin) {
   SET_ATTRIB(out, R_NilValue);
   SET_OBJECT(out, 0);
 
-  if (origin == R_NilValue) {
+  int* p_out = INTEGER(out);
+  R_xlen_t out_size = Rf_xlength(out);
+
+  bool needs_every = (every != 1);
+  bool needs_offset = (origin != R_NilValue);
+
+  // Early exit if no changes are required, the raw `day` is enough
+  if (!needs_every && !needs_offset) {
     UNPROTECT(1);
     return out;
   }
 
-  int* p_out = INTEGER(out);
-  R_xlen_t out_size = Rf_xlength(out);
-
-  double origin_offset = origin_to_days_from_epoch(origin);
+  double origin_offset;
+  if (needs_offset) {
+    origin_offset = origin_to_days_from_epoch(origin);
+  }
 
   for (R_xlen_t i = 0; i < out_size; ++i) {
-    if (p_out[i] == NA_INTEGER) {
+    int elt = p_out[i];
+
+    if (elt == NA_INTEGER) {
       continue;
     }
 
-    p_out[i] -= origin_offset;
+    if (needs_offset) {
+      elt -= origin_offset;
+    }
+
+    if (!needs_every) {
+      p_out[i] = elt;
+      continue;
+    }
+
+    if (elt < 0) {
+      elt = (elt - (every - 1)) / every;
+    } else {
+      elt = elt / every;
+    }
+
+    p_out[i] = elt;
   }
 
-  UNPROTECT(2);
+  UNPROTECT(1);
   return out;
 }
 
@@ -259,6 +283,8 @@ static SEXP dbl_date_warp_chunk_day(SEXP x, int every, SEXP origin) {
 
   SEXP out = PROTECT(Rf_allocVector(INTSXP, x_size));
   int* p_out = INTEGER(out);
+
+  bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
   double origin_offset;
@@ -275,19 +301,39 @@ static SEXP dbl_date_warp_chunk_day(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    int out_elt;
+    int elt;
+
+    // The floor is a guard against potential fractional dates since casting
+    // always goes towards 0, which is not desired because that is forward in time
+    // (int) 1.5 = 1
+    // (int) floor(1.5) = 1
+    // (int) -1.5 = -1
+    // (int) floor(-1.5) = -2
 
     if (x_elt < 0) {
-      out_elt = (int) floor(x_elt);
+      elt = (int) floor(x_elt);
     } else {
-      out_elt = (int) x_elt;
+      elt = (int) x_elt;
     }
 
+    // `origin_offset` should be correct from `as_date()` in
+    // `origin_to_days_from_epoch()`, even if it had fractional parts
     if (needs_offset) {
-      out_elt -= origin_offset;
+      elt -= origin_offset;
     }
 
-    p_out[i] = out_elt;
+    if (!needs_every) {
+      p_out[i] = elt;
+      continue;
+    }
+
+    if (elt < 0) {
+      elt = (elt - (every - 1)) / every;
+    } else {
+      elt = elt / every;
+    }
+
+    p_out[i] = elt;
   }
 
   UNPROTECT(1);
@@ -304,6 +350,8 @@ static SEXP date_warp_chunk_day(SEXP x, int every, SEXP origin) {
 
 static SEXP int_posixct_warp_chunk_day(SEXP x, int every, SEXP origin) {
   R_xlen_t x_size = Rf_xlength(x);
+
+  bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
   double origin_offset;
@@ -325,14 +373,25 @@ static SEXP int_posixct_warp_chunk_day(SEXP x, int every, SEXP origin) {
       continue;
     }
 
+    if (needs_offset) {
+      elt -= origin_offset;
+    }
+
     if (elt < 0) {
-      elt = (elt - 86399) / 86400;
+      elt = (elt - (86400 - 1)) / 86400;
     } else {
       elt = elt / 86400;
     }
 
-    if (needs_offset) {
-      elt -= origin_offset;
+    if (!needs_every) {
+      p_out[i] = elt;
+      continue;
+    }
+
+    if (elt < 0) {
+      elt = (elt - (every - 1)) / every;
+    } else {
+      elt = elt / every;
     }
 
     p_out[i] = elt;
@@ -344,6 +403,8 @@ static SEXP int_posixct_warp_chunk_day(SEXP x, int every, SEXP origin) {
 
 static SEXP dbl_posixct_warp_chunk_day(SEXP x, int every, SEXP origin) {
   R_xlen_t x_size = Rf_xlength(x);
+
+  bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
   double origin_offset;
@@ -369,15 +430,26 @@ static SEXP dbl_posixct_warp_chunk_day(SEXP x, int every, SEXP origin) {
       x_elt -= origin_offset;
     }
 
-    int out_elt;
+    int elt;
 
     if (x_elt < 0) {
-      out_elt = (int64_t) (x_elt - 86399) / 86400;
+      elt = ((int64_t) x_elt - (86400 - 1)) / 86400; // TODO - do we need to `floor(x_elt)`?
     } else {
-      out_elt = (int64_t) x_elt / 86400;
+      elt = (int64_t) x_elt / 86400;
     }
 
-    p_out[i] = out_elt;
+    if (!needs_every) {
+      p_out[i] = elt;
+      continue;
+    }
+
+    if (elt < 0) {
+      elt = (elt - (every - 1)) / every;
+    } else {
+      elt = elt / every;
+    }
+
+    p_out[i] = elt;
   }
 
   UNPROTECT(1);
