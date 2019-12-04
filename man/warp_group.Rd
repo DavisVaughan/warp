@@ -56,6 +56,12 @@ underlying numeric representation. \strong{It is highly advised to specify your 
 \code{origin} value with the same time zone as \code{x}.}
 
 If a \code{Date} is used for \code{x}, its time zone is assumed to be \code{"UTC"}.
+
+The information in the provided \code{origin} is truncated by the \code{by} period
+specified. This means that if you specify \code{by = "month"},
+\code{every = 2}, with an origin of \code{1970-01-15}, the only pieces of information
+that are used are the year and the month, and not the fact that the origin
+starts on the 15th of the month.
 }
 \examples{
 x <- as.Date("1970-01-01") + -4:4

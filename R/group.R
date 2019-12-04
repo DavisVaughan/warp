@@ -22,6 +22,12 @@
 #'
 #' If a `Date` is used for `x`, its time zone is assumed to be `"UTC"`.
 #'
+#' The information in the provided `origin` is truncated by the `by` period
+#' specified. This means that if you specify `by = "month"`,
+#' `every = 2`, with an origin of `1970-01-15`, the only pieces of information
+#' that are used are the year and the month, and not the fact that the origin
+#' starts on the 15th of the month.
+#'
 #' @param x `[Date / POSIXct / POSIXlt]`
 #'
 #'   The vector to compute time groups for.
