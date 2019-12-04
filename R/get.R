@@ -33,7 +33,7 @@ time_get <- function(x, components = NULL) {
 
   names_lt <- map_out_pos_to_posixlt[out_pos]
 
-  out <- as.POSIXlt(x)
+  out <- as_posixlt(x)
   out <- unclass(out)[names_lt]
   names(out) <- names(names_lt)
 
@@ -54,6 +54,28 @@ time_get <- function(x, components = NULL) {
   }
 
   as.data.frame(out)
+}
+
+as_posixlt <- function(x) {
+  type <- time_class_type(x)
+
+  if (type == "posixlt") {
+    return(x)
+  }
+
+  # `as.POSIXlt.Date()` is SO slow
+  if (type == "date") {
+    origin <- structure(0, class = "Date")
+    out <- as.POSIXlt(unclass(x) * 86400, tz = "UTC", origin = origin)
+    return(out)
+  }
+
+  if (type == "posixct") {
+    out <- as.POSIXlt.POSIXct(x)
+    return(out)
+  }
+
+  stop("`x` has an unknown date time class", call. = FALSE)
 }
 
 time_get_template_no_columns <- function(n) {
