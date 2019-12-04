@@ -310,10 +310,11 @@ static SEXP dbl_date_warp_chunk_day(SEXP x, int every, SEXP origin) {
     // (int) -1.5 = -1
     // (int) floor(-1.5) = -2
 
+    // Automatic integer cast into `elt`
     if (x_elt < 0) {
-      elt = (int) floor(x_elt);
+      elt = floor(x_elt);
     } else {
-      elt = (int) x_elt;
+      elt = x_elt;
     }
 
     // `origin_offset` should be correct from `as_date()` in
@@ -377,6 +378,7 @@ static SEXP int_posixct_warp_chunk_day(SEXP x, int every, SEXP origin) {
       elt -= origin_offset;
     }
 
+    // Integer division, then straight into `elt` with no cast needed
     if (elt < 0) {
       elt = (elt - (86400 - 1)) / 86400;
     } else {
@@ -432,10 +434,11 @@ static SEXP dbl_posixct_warp_chunk_day(SEXP x, int every, SEXP origin) {
 
     int elt;
 
+    // Double division, then integer cast into `elt`
     if (x_elt < 0) {
-      elt = ((int64_t) floor(x_elt) - (86400 - 1)) / 86400;
+      elt = (floor(x_elt) - (86400 - 1)) / 86400;
     } else {
-      elt = (int64_t) x_elt / 86400;
+      elt = x_elt / 86400;
     }
 
     if (!needs_every) {
