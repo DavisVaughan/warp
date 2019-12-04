@@ -36,6 +36,9 @@ SEXP time_get(SEXP x, SEXP components);
 SEXP as_posixct_from_posixlt(SEXP x);
 SEXP as_date(SEXP x);
 
+// In `coercion.c`
+SEXP as_datetime(SEXP x);
+
 const char* get_timezone(SEXP x);
 SEXP convert_timezone(SEXP x, const char* timezone);
 

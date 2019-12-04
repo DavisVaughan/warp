@@ -13,9 +13,9 @@
 // Functionality ------------------------------------------------
 
 SEXP warp_group(SEXP x, enum timewarp_group_type type, int every, SEXP origin);
-SEXP breakpoints(SEXP x);
-
-SEXP as_datetime(SEXP x);
+SEXP warp_breaks(SEXP x, enum timewarp_group_type type, int every, SEXP origin);
+SEXP warp_changes(SEXP x);
+SEXP warp_ranges(SEXP x);
 
 // Compatibility ------------------------------------------------
 
