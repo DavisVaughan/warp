@@ -277,7 +277,7 @@ test_that("can handle `NA` dates", {
 # ------------------------------------------------------------------------------
 # warp_chunk(<POSIXlt>, by = "month")
 
-test_that("can warp_chunk() by year with POSIXlt", {
+test_that("can warp_chunk() by month with POSIXlt", {
   x <- as.POSIXct("1970-01-01", tz = "UTC")
   x <- as.POSIXlt(x)
   expect_identical(warp_chunk(x, "month"), 0L)
