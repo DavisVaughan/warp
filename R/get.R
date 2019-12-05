@@ -174,7 +174,7 @@ validate_components <- function(components) {
 
   if (!all(is_allowed)) {
     components <- components[!is_allowed]
-    components <- sQuote(components, q = FALSE)
+    components <- single_quote(components)
     components <- paste0(components, collapse = ", ")
 
     stop("`components` must be an allowed component, not: ", components, call. = FALSE)
