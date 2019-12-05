@@ -37,12 +37,18 @@ The reference value for the groups to be computed from. This is
 particularly important when \code{every > 1} and you need to define when the
 "first" event was to start counting from.}
 }
+\value{
+An integer vector containing the groups, unless \code{by = "second"}, in which
+case a double vector is returned to avoid integer overflow.
+}
 \description{
 \code{warp_group()} is a low level engine for constructing groups by period for a
-date vector. It returns the distance from \code{x} to the \code{origin} in units
+date vector.
+
+It returns the distance from \code{x} to the \code{origin} in units
 defined by the period specified with \code{by}. For example, \code{by = "year"} would
 return the number of years from the \code{origin}, which is the Unix epoch of
-\verb{1970-01-01 00:00:00} by default.
+\verb{1970-01-01 00:00:00 UTC} by default.
 }
 \details{
 The return value of \code{warp_group()} is suitable for use as a grouping column
@@ -103,5 +109,22 @@ warp_group(y, "second", every = 5)
 # [1970-01-01 00:00:11, 1970-01-01 00:00:16) = 2
 origin <- as.POSIXct("1970-01-01 00:00:01", "UTC")
 warp_group(y, "second", every = 5, origin = origin)
+
+# Differing time zones between `x` and `origin` can be particularly
+# problematic. For this reason, if the time zones are different a warning
+# is issued and `x` is coerced to the time zone of `origin`. The default
+# `origin` time zone for the epoch is UTC.
+x_in_nyc <- as.POSIXct("1970-01-01 01:00:00", "America/New_York")
+
+# The default origin is `1970-01-01 00:00:00 UTC`.
+# We passed in a clock time 1 hour after that, but in a different time zone.
+# America/New_York is 5 hours behind UTC, so when it is converted to
+# UTC the value becomes `1970-01-01 06:00:00 UTC`
+warp_group(x_in_nyc, "hour")
+
+# We can use an origin value in our own time zone to fix this
+# (it doesn't have to be 1970-01-01)
+origin <- as.POSIXct("1970-01-01", "America/New_York")
+warp_group(x_in_nyc, "hour", origin = origin)
 
 }
