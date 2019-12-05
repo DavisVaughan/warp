@@ -8,5 +8,4 @@
 ^pkgdown$
 ^codecov\.yml$
 ^\.covrignore$
-^\.github/workflows/R-CMD-check\.yaml$
-^\.github/workflows/pr-commands\.yaml$
+^\.github$
