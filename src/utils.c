@@ -26,7 +26,7 @@ SEXP strings_date = NULL;
 
 // -----------------------------------------------------------------------------
 
-inline void never_reached(const char* fn) {
+void never_reached(const char* fn) {
   Rf_error("Internal error in `%s()`: Reached the unreachable.", fn);
 }
 
