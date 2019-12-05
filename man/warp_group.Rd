@@ -18,6 +18,7 @@ A string defining the period to group by. Valid inputs are:
 \item \code{"year"}
 \item \code{"quarter"}
 \item \code{"month"}
+\item \code{"week"}
 \item \code{"day"}
 \item \code{"hour"}
 \item \code{"minute"}
@@ -62,7 +63,14 @@ The information in the provided \code{origin} is truncated by the \code{by} peri
 specified. This means that if you specify \code{by = "month"},
 \code{every = 2}, with an origin of \code{1970-01-15}, the only pieces of information
 that are used are the year and the month, and not the fact that the origin
-starts on the 15th of the month.
+starts on the 15th of the month. The exceptions to this are \code{"week"} and
+\code{"quarter"}, see below.
+
+For \code{by = "week"}, a week is defined as a 7 day period starting
+from the \code{origin}'s year-month-day value.
+
+For \code{by = "quarter"}, a quarter is defined as a 3 month period starting
+from the \code{origin}'s year-month value.
 }
 \examples{
 x <- as.Date("1970-01-01") + -4:4

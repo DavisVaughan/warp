@@ -13,6 +13,7 @@ double origin_to_seconds_from_epoch(SEXP origin);
 static SEXP warp_group_year(SEXP x, int every, SEXP origin);
 static SEXP warp_group_quarter(SEXP x, int every, SEXP origin);
 static SEXP warp_group_month(SEXP x, int every, SEXP origin);
+static SEXP warp_group_week(SEXP x, int every, SEXP origin);
 static SEXP warp_group_day(SEXP x, int every, SEXP origin);
 static SEXP warp_group_hour(SEXP x, int every, SEXP origin);
 static SEXP warp_group_minute(SEXP x, int every, SEXP origin);
@@ -36,6 +37,7 @@ SEXP warp_group(SEXP x, enum timewarp_group_type type, int every, SEXP origin) {
   case timewarp_group_year: out = PROTECT(warp_group_year(x, every, origin)); break;
   case timewarp_group_quarter: out = PROTECT(warp_group_quarter(x, every, origin)); break;
   case timewarp_group_month: out = PROTECT(warp_group_month(x, every, origin)); break;
+  case timewarp_group_week: out = PROTECT(warp_group_week(x, every, origin)); break;
   case timewarp_group_day: out = PROTECT(warp_group_day(x, every, origin)); break;
   case timewarp_group_hour: out = PROTECT(warp_group_hour(x, every, origin)); break;
   case timewarp_group_minute: out = PROTECT(warp_group_minute(x, every, origin)); break;
@@ -181,6 +183,12 @@ static SEXP warp_group_month(SEXP x, int every, SEXP origin) {
 #undef EPOCH_YEAR
 #undef EPOCH_MONTH
 #undef MONTHS_IN_YEAR
+
+// -----------------------------------------------------------------------------
+
+static SEXP warp_group_week(SEXP x, int every, SEXP origin) {
+  return warp_group_day(x, every * 7, origin);
+}
 
 // -----------------------------------------------------------------------------
 

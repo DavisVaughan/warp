@@ -233,6 +233,16 @@ test_that("can warp_group() by quarter with Date", {
   expect_identical(warp_group(x, "quarter"), c(0L, 0L, 1L))
 })
 
+test_that("can adjust the origin at the month level", {
+  origin <- as.Date("1970-02-01")
+  x <- as.Date(c("1970-01-01", "1970-04-30", "1970-05-01"))
+
+  expect_identical(warp_group(x, "quarter", origin = origin), c(-1L, 0L, 1L))
+})
+
+# ------------------------------------------------------------------------------
+# warp_group(<POSIXct>, by = "quarter")
+
 test_that("can warp_group() by quarter with POSIXct", {
   x <- as.POSIXct(c("1970-01-01 00:00:00", "1970-03-31 23:59:59", "1970-04-01 00:00:00"), "UTC")
 
@@ -462,6 +472,33 @@ test_that("can warp_group() by month with POSIXlt", {
   x <- as.POSIXct("1971-01-01", tz = "UTC")
   x <- as.POSIXlt(x)
   expect_identical(warp_group(x, "month"), 12L)
+})
+
+# ------------------------------------------------------------------------------
+# warp_group(<Date>, by = "week")
+
+# This uses `by = "day"` with `every = every * 7`, so just do a basic test
+
+test_that("can warp_group() by week with Date", {
+  x <- as.Date(c("1969-12-24", "1969-12-25", "1970-01-01", "1970-01-07", "1970-01-08"))
+
+  expect_identical(warp_group(x, "week"), c(-2L, -1L, 0L, 0L, 1L))
+})
+
+test_that("can adjust the origin at the day level", {
+  origin <- as.Date("1970-01-02")
+  x <- as.Date(c("1969-12-24", "1969-12-25", "1970-01-01", "1970-01-07", "1970-01-08"))
+
+  expect_identical(warp_group(x, "week", origin = origin), c(-2L, -2L, -1L, 0L, 0L))
+})
+
+# ------------------------------------------------------------------------------
+# warp_group(<POSIXct>, by = "week")
+
+test_that("can warp_group() by week with POSIXct", {
+  x <- as.POSIXct(c("1969-12-24", "1969-12-25", "1970-01-01", "1970-01-07", "1970-01-08"), "UTC")
+
+  expect_identical(warp_group(x, "week"), c(-2L, -1L, 0L, 0L, 1L))
 })
 
 # ------------------------------------------------------------------------------

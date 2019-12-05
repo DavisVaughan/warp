@@ -26,7 +26,14 @@
 #' specified. This means that if you specify `by = "month"`,
 #' `every = 2`, with an origin of `1970-01-15`, the only pieces of information
 #' that are used are the year and the month, and not the fact that the origin
-#' starts on the 15th of the month.
+#' starts on the 15th of the month. The exceptions to this are `"week"` and
+#' `"quarter"`, see below.
+#'
+#' For `by = "week"`, a week is defined as a 7 day period starting
+#' from the `origin`'s year-month-day value.
+#'
+#' For `by = "quarter"`, a quarter is defined as a 3 month period starting
+#' from the `origin`'s year-month value.
 #'
 #' @param x `[Date / POSIXct / POSIXlt]`
 #'
@@ -39,6 +46,7 @@
 #'   - `"year"`
 #'   - `"quarter"`
 #'   - `"month"`
+#'   - `"week"`
 #'   - `"day"`
 #'   - `"hour"`
 #'   - `"minute"`
