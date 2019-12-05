@@ -1894,6 +1894,7 @@ test_that("`every` is validated", {
   expect_error(warp_group(new_date(0), every = "x"), "integer-ish, not character")
   expect_error(warp_group(new_date(0), every = c(1, 1)), "size 1, not 2")
   expect_error(warp_group(new_date(0), every = integer()), "size 1, not 0")
+  expect_error(warp_group(new_date(0), every = NA_integer_), "`every` must not be `NA`")
 })
 
 test_that("`by` is validated", {
