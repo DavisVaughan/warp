@@ -117,6 +117,10 @@ enum timewarp_group_type as_group_type(SEXP by) {
     return timewarp_group_year;
   }
 
+  if (str_equal(type, "quarter") || str_equal(type, "quarters") || str_equal(type, "quarterly")) {
+    return timewarp_group_quarter;
+  }
+
   if (str_equal(type, "month") || str_equal(type, "months") || str_equal(type, "monthly")) {
     return timewarp_group_month;
   }

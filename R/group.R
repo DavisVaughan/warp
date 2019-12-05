@@ -37,6 +37,7 @@
 #'   A string defining the period to group by. Valid inputs are:
 #'
 #'   - `"year"`
+#'   - `"quarter"`
 #'   - `"month"`
 #'   - `"day"`
 #'   - `"hour"`

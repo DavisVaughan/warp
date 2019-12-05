@@ -223,6 +223,23 @@ test_that("can warp_group() by year with POSIXlt", {
 })
 
 # ------------------------------------------------------------------------------
+# warp_group(<Date>, by = "quarter")
+
+# This uses `by = "month"` with `every = every * 3`, so just do a basic test
+
+test_that("can warp_group() by quarter with Date", {
+  x <- as.Date(c("1970-01-01", "1970-03-31", "1970-04-01"))
+
+  expect_identical(warp_group(x, "quarter"), c(0L, 0L, 1L))
+})
+
+test_that("can warp_group() by quarter with POSIXct", {
+  x <- as.POSIXct(c("1970-01-01 00:00:00", "1970-03-31 23:59:59", "1970-04-01 00:00:00"), "UTC")
+
+  expect_identical(warp_group(x, "quarter"), c(0L, 0L, 1L))
+})
+
+# ------------------------------------------------------------------------------
 # warp_group(<Date>, by = "month")
 
 test_that("can warp_group() by month with Date", {

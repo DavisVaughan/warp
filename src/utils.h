@@ -9,6 +9,7 @@
 
 enum timewarp_group_type {
   timewarp_group_year,
+  timewarp_group_quarter,
   timewarp_group_month,
   timewarp_group_week,
   timewarp_group_day,

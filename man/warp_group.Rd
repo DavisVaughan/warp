@@ -16,6 +16,7 @@ The vector to compute time groups for.}
 A string defining the period to group by. Valid inputs are:
 \itemize{
 \item \code{"year"}
+\item \code{"quarter"}
 \item \code{"month"}
 \item \code{"day"}
 \item \code{"hour"}
