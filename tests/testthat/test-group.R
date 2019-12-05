@@ -85,6 +85,20 @@ test_that("fractional Date pieces are ignored", {
   expect_equal(warp_group(y), 0L)
 })
 
+test_that("size 0 input works - integer Dates", {
+  x <- structure(integer(), class = "Date")
+
+  expect_equal(warp_group(x, by = "year"), integer())
+  expect_equal(warp_group(x, by = "year", every = 2), integer())
+})
+
+test_that("size 0 input works - numeric Dates", {
+  x <- structure(numeric(), class = "Date")
+
+  expect_equal(warp_group(x, by = "year"), integer())
+  expect_equal(warp_group(x, by = "year", every = 2), integer())
+})
+
 # ------------------------------------------------------------------------------
 # warp_group(<POSIXct>, by = "year")
 
@@ -335,6 +349,20 @@ test_that("fractional Date pieces are ignored", {
 
   # But we really treat this as `new_date(0)`
   expect_equal(warp_group(x, by = "month"), 0L)
+})
+
+test_that("size 0 input works - integer Dates", {
+  x <- structure(integer(), class = "Date")
+
+  expect_equal(warp_group(x, by = "month"), integer())
+  expect_equal(warp_group(x, by = "month", every = 2), integer())
+})
+
+test_that("size 0 input works - numeric Dates", {
+  x <- structure(numeric(), class = "Date")
+
+  expect_equal(warp_group(x, by = "month"), integer())
+  expect_equal(warp_group(x, by = "month", every = 2), integer())
 })
 
 # ------------------------------------------------------------------------------
@@ -600,6 +628,20 @@ test_that("fractional Date pieces are ignored", {
 
   # But we really treat this as `new_date(0)`
   expect_equal(warp_group(x, by = "day"), 0L)
+})
+
+test_that("size 0 input works - integer Dates", {
+  x <- structure(integer(), class = "Date")
+
+  expect_equal(warp_group(x, by = "day"), integer())
+  expect_equal(warp_group(x, by = "day", every = 2), integer())
+})
+
+test_that("size 0 input works - numeric Dates", {
+  x <- structure(numeric(), class = "Date")
+
+  expect_equal(warp_group(x, by = "day"), integer())
+  expect_equal(warp_group(x, by = "day", every = 2), integer())
 })
 
 # ------------------------------------------------------------------------------
@@ -949,6 +991,20 @@ test_that("can ignore fractional pieces in Dates", {
 
   expect_identical(warp_group(x, by = "hour"), 0L)
   expect_identical(warp_group(y, by = "hour"), 0L)
+})
+
+test_that("size 0 input works - integer Dates", {
+  x <- structure(integer(), class = "Date")
+
+  expect_equal(warp_group(x, by = "hour"), integer())
+  expect_equal(warp_group(x, by = "hour", every = 2), integer())
+})
+
+test_that("size 0 input works - numeric Dates", {
+  x <- structure(numeric(), class = "Date")
+
+  expect_equal(warp_group(x, by = "hour"), integer())
+  expect_equal(warp_group(x, by = "hour", every = 2), integer())
 })
 
 # ------------------------------------------------------------------------------
@@ -1306,6 +1362,20 @@ test_that("can ignore fractional pieces in Dates", {
   expect_identical(warp_group(y, by = "minute"), 0L)
 })
 
+test_that("size 0 input works - integer Dates", {
+  x <- structure(integer(), class = "Date")
+
+  expect_equal(warp_group(x, by = "minute"), integer())
+  expect_equal(warp_group(x, by = "minute", every = 2), integer())
+})
+
+test_that("size 0 input works - numeric Dates", {
+  x <- structure(numeric(), class = "Date")
+
+  expect_equal(warp_group(x, by = "minute"), integer())
+  expect_equal(warp_group(x, by = "minute", every = 2), integer())
+})
+
 # ------------------------------------------------------------------------------
 # warp_group(<POSIXct>, by = "minute")
 
@@ -1659,6 +1729,20 @@ test_that("can ignore fractional pieces in Dates", {
 test_that("can handle second values larger than max int value", {
   x <- as.Date("2100-01-01")
   expect_equal(warp_group(x, "second"), 4102444800)
+})
+
+test_that("size 0 input works - integer Dates", {
+  x <- structure(integer(), class = "Date")
+
+  expect_equal(warp_group(x, by = "second"), numeric())
+  expect_equal(warp_group(x, by = "second", every = 2), numeric())
+})
+
+test_that("size 0 input works - numeric Dates", {
+  x <- structure(numeric(), class = "Date")
+
+  expect_equal(warp_group(x, by = "second"), numeric())
+  expect_equal(warp_group(x, by = "second", every = 2), numeric())
 })
 
 # ------------------------------------------------------------------------------
