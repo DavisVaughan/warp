@@ -139,6 +139,7 @@ return the number of years from the <code>origin</code>, which is the Unix epoch
 <li><p><code>"year"</code></p></li>
 <li><p><code>"quarter"</code></p></li>
 <li><p><code>"month"</code></p></li>
+<li><p><code>"week"</code></p></li>
 <li><p><code>"day"</code></p></li>
 <li><p><code>"hour"</code></p></li>
 <li><p><code>"minute"</code></p></li>
@@ -178,7 +179,12 @@ underlying numeric representation. <strong>It is highly advised to specify your 
 specified. This means that if you specify <code>by = "month"</code>,
 <code>every = 2</code>, with an origin of <code>1970-01-15</code>, the only pieces of information
 that are used are the year and the month, and not the fact that the origin
-starts on the 15th of the month.</p>
+starts on the 15th of the month. The exceptions to this are <code>"week"</code> and
+<code>"quarter"</code>, see below.</p>
+<p>For <code>by = "week"</code>, a week is defined as a 7 day period starting
+from the <code>origin</code>'s year-month-day value.</p>
+<p>For <code>by = "quarter"</code>, a quarter is defined as a 3 month period starting
+from the <code>origin</code>'s year-month value.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"1970-01-01"</span>) + -<span class='fl'>4</span>:<span class='fl'>4</span>
