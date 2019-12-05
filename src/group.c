@@ -1,5 +1,6 @@
 #include "timewarp.h"
 #include "utils.h"
+#include <stdint.h> // For int64_t (especially on Windows)
 
 // Helpers defined at the bottom of the file
 void validate_every(int every);
