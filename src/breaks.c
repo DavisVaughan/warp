@@ -6,7 +6,7 @@
 // [[ include("timewarp.h") ]]
 SEXP warp_breaks(SEXP x, enum timewarp_group_type type, int every, SEXP origin) {
   SEXP groups = PROTECT(warp_group(x, type, every, origin));
-  SEXP out = PROTECT(warp_ranges(x));
+  SEXP out = PROTECT(warp_ranges(groups));
   UNPROTECT(2);
   return out;
 }
