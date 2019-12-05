@@ -2,28 +2,10 @@
 #include "utils.h"
 
 // Helpers defined at the bottom of the file
-int pull_every(SEXP every);
 void validate_every(int every);
 void validate_origin(SEXP origin);
 double origin_to_days_from_epoch(SEXP origin);
 double origin_to_seconds_from_epoch(SEXP origin);
-
-// -----------------------------------------------------------------------------
-
-// [[ include("timewarp.h") ]]
-SEXP warp_breaks(SEXP x, enum timewarp_group_type type, int every, SEXP origin) {
-  SEXP groups = PROTECT(warp_group(x, type, every, origin));
-  SEXP out = PROTECT(warp_ranges(x));
-  UNPROTECT(2);
-  return out;
-}
-
-// [[ register() ]]
-SEXP timewarp_warp_breaks(SEXP x, SEXP by, SEXP every, SEXP origin) {
-  enum timewarp_group_type type = as_group_type(by);
-  int every_ = pull_every(every);
-  return warp_breaks(x, type, every_, origin);
-}
 
 // -----------------------------------------------------------------------------
 
@@ -1266,19 +1248,6 @@ static SEXP dbl_posixct_warp_group_second(SEXP x, int every, SEXP origin) {
 }
 
 // -----------------------------------------------------------------------------
-
-// TODO - Could be lossy...really should use vctrs? Callable from C?
-int pull_every(SEXP every) {
-  if (Rf_length(every) != 1) {
-    r_error("pull_every", "`every` must have size 1, not %i", Rf_length(every));
-  }
-
-  switch (TYPEOF(every)) {
-  case INTSXP: return INTEGER(every)[0];
-  case REALSXP: return Rf_asInteger(every);
-  default: r_error("pull_every", "`every` must be integer-ish, not %s", Rf_type2char(TYPEOF(every)));
-  }
-}
 
 void validate_every(int every) {
   if (every == NA_INTEGER) {

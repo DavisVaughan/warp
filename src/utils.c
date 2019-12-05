@@ -86,6 +86,21 @@ static const char* class_type_as_str(enum timewarp_class_type type) {
 
 // -----------------------------------------------------------------------------
 
+// TODO - Could be lossy...really should use vctrs? Callable from C?
+int pull_every(SEXP every) {
+  if (Rf_length(every) != 1) {
+    r_error("pull_every", "`every` must have size 1, not %i", Rf_length(every));
+  }
+
+  switch (TYPEOF(every)) {
+  case INTSXP: return INTEGER(every)[0];
+  case REALSXP: return Rf_asInteger(every);
+  default: r_error("pull_every", "`every` must be integer-ish, not %s", Rf_type2char(TYPEOF(every)));
+  }
+}
+
+// -----------------------------------------------------------------------------
+
 static bool str_equal(const char* x, const char* y) {
   return strcmp(x, y) == 0;
 }

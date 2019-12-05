@@ -29,6 +29,8 @@ enum timewarp_class_type time_class_type(SEXP x);
 
 enum timewarp_group_type as_group_type(SEXP by);
 
+int pull_every(SEXP every);
+
 void __attribute__((noreturn)) r_error(const char* where, const char* why, ...);
 SEXP r_maybe_duplicate(SEXP x);
 
