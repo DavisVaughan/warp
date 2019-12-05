@@ -32,7 +32,9 @@ enum timewarp_group_type as_group_type(SEXP by);
 
 int pull_every(SEXP every);
 
+void __attribute__((noreturn)) never_reached(const char* fn);
 void __attribute__((noreturn)) r_error(const char* where, const char* why, ...);
+
 SEXP r_maybe_duplicate(SEXP x);
 
 SEXP time_get(SEXP x, SEXP components);

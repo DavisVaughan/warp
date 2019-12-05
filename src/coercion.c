@@ -18,8 +18,9 @@ SEXP as_datetime(SEXP x) {
   case timewarp_class_date: return as_datetime_from_date(x);
   case timewarp_class_posixct: return as_datetime_from_posixct(x);
   case timewarp_class_posixlt: return as_datetime_from_posixlt(x);
-  case timewarp_class_unknown: Rf_errorcall(R_NilValue, "Internal error: Unknown date time class.");
+  case timewarp_class_unknown: r_error("as_datetime", "Internal error: Unknown date time class.");
   }
+  never_reached("as_datetime");
 }
 
 #define AS_DATETIME_FROM_DATE_LOOP(CTYPE, CONST_DEREF, NA_VALUE) {   \

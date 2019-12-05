@@ -26,10 +26,6 @@ SEXP strings_date = NULL;
 
 // -----------------------------------------------------------------------------
 
-void never_reached(const char* fn) {
-  Rf_error("Internal error in `%s()`: Reached the unreachable.", fn);
-}
-
 enum timewarp_class_type time_class_type(SEXP x);
 static enum timewarp_class_type time_class_type_impl(SEXP klass);
 static const char* class_type_as_str(enum timewarp_class_type type);
@@ -171,6 +167,11 @@ void __attribute__((noreturn)) r_error(const char* where, const char* why, ...) 
 }
 
 #undef BUFSIZE
+
+// [[ include("utils.h") ]]
+void __attribute__((noreturn)) never_reached(const char* fn) {
+  r_error("never_reached", "Internal error in `%s()`: Reached the unreachable.", fn);
+}
 
 // -----------------------------------------------------------------------------
 
