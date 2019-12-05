@@ -58,7 +58,9 @@ SEXP convert_timezone(SEXP x, const char* timezone) {
 
   Rf_warningcall(
     R_NilValue,
-    "`x` (%s) and `origin` (%s) do not have the same time zone. Converting `x` to the time zone of `origin`.",
+    "`x` (%s) and `origin` (%s) do not have the same time zone. "
+    "Converting `x` to the time zone of `origin`. "
+    "It is highly advised to provide `x` and `origin` with the same time zone.",
     get_printable_timezone(x_timezone),
     get_printable_timezone(timezone)
   );
