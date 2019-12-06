@@ -1,9 +1,23 @@
-# This does everything `locate_changes()` does, but then creates a two column
-# data frame of `starts` and `stops` that can be used to slice `x` into its
-# groups
-# The `stops` are the exact result of `locate_changes()`
-# The `starts` are computed from the `stops`
-
+#' Locate boundaries around changes in a vector
+#'
+#' `locate_boundaries()` returns the running start and stop positions
+#' identifying sections of unchanged values in `x`.
+#'
+#' @param x `[integer / double]`
+#'
+#'   The vector to locate boundaries in. Can only be an integer or double
+#'   vector.
+#'
+#' @return
+#' A two column data frame with double columns `start` and `stop`.
+#'
+#' @details
+#' `1` is always the first `start` position, and `length(x)` is always the last
+#' `stop` position.
+#'
+#' @export
+#' @examples
+#' locate_boundaries(c(2, 2, 2, 3, 5, 5))
 locate_boundaries <- function(x) {
   .Call(timewarp_locate_boundaries, x)
 }
