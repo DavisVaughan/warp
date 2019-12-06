@@ -1,7 +1,7 @@
 #' Locate change points in a vector
 #'
 #' `locate_changes()` determines where an integer or double vector changes
-#' values. It returns an integer vector containing the positions of the last
+#' values. It returns a double vector containing the positions of the last
 #' element before the change. These are the "stop points" used in
 #' [locate_boundaries()] and [warp_boundaries()]. The position of the last
 #' element of `x` is always returned at the end of the vector.
@@ -12,7 +12,7 @@
 #'
 #' @return
 #'
-#'   An integer vector mapping to the last value of `x` before a change is
+#'   A double vector mapping to the last value of `x` before a change is
 #'   detected.
 #'
 #' @export

@@ -12,12 +12,12 @@ locate_changes(x)
 The vector to locate changes in. Can only be an integer or double vector.}
 }
 \value{
-An integer vector mapping to the last value of \code{x} before a change is
+A double vector mapping to the last value of \code{x} before a change is
 detected.
 }
 \description{
 \code{locate_changes()} determines where an integer or double vector changes
-values. It returns an integer vector containing the positions of the last
+values. It returns a double vector containing the positions of the last
 element before the change. These are the "stop points" used in
 \code{\link[=locate_boundaries]{locate_boundaries()}} and \code{\link[=warp_boundaries]{warp_boundaries()}}. The position of the last
 element of \code{x} is always returned at the end of the vector.
