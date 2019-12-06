@@ -14,8 +14,8 @@
 
 SEXP warp_group(SEXP x, enum timewarp_group_type type, int every, SEXP origin);
 SEXP warp_breaks(SEXP x, enum timewarp_group_type type, int every, SEXP origin);
-SEXP warp_changes(SEXP x);
 
+SEXP locate_changes(SEXP x);
 SEXP locate_boundaries(SEXP x);
 
 // Compatibility ------------------------------------------------

@@ -25,11 +25,11 @@
 }
 
 // [[ include("timewarp.h") ]]
-SEXP warp_changes(SEXP x) {
+SEXP locate_changes(SEXP x) {
   SEXPTYPE type = TYPEOF(x);
 
   if (type != INTSXP && type != REALSXP) {
-    r_error("warp_changes", "`x` must be an integer or double vector.");
+    r_error("locate_changes", "`x` must be an integer or double vector.");
   }
 
   R_xlen_t size = Rf_xlength(x);
@@ -52,7 +52,7 @@ SEXP warp_changes(SEXP x) {
   switch (type) {
   case INTSXP: CHANGES_LOOP(int, INTEGER_RO); break;
   case REALSXP: CHANGES_LOOP(double, REAL_RO); break;
-  default: r_error("warp_changes", "Internal error: should have caught this earlier.");
+  default: r_error("locate_changes", "Internal error: should have caught this earlier.");
   }
 
   // Always include the last value
@@ -68,6 +68,6 @@ SEXP warp_changes(SEXP x) {
 }
 
 // [[ register() ]]
-SEXP timewarp_warp_changes(SEXP x) {
-  return warp_changes(x);
+SEXP timewarp_locate_changes(SEXP x) {
+  return locate_changes(x);
 }

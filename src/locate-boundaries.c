@@ -8,7 +8,7 @@ static SEXP compute_starts(SEXP x, R_xlen_t size);
 
 // [[ include("timewarp.h") ]]
 SEXP locate_boundaries(SEXP x) {
-  SEXP stops = PROTECT(warp_changes(x));
+  SEXP stops = PROTECT(locate_changes(x));
 
   R_xlen_t size = Rf_xlength(stops);
 
