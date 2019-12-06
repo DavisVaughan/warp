@@ -12,8 +12,7 @@ locate_changes(x)
 The vector to locate changes in. Can only be an integer or double vector.}
 }
 \value{
-A double vector mapping to the last value of \code{x} before a change is
-detected.
+A double vector mapping to the last value of \code{x} before a change is detected.
 }
 \description{
 \code{locate_changes()} determines where an integer or double vector changes

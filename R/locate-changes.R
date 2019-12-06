@@ -11,9 +11,7 @@
 #'   The vector to locate changes in. Can only be an integer or double vector.
 #'
 #' @return
-#'
-#'   A double vector mapping to the last value of `x` before a change is
-#'   detected.
+#' A double vector mapping to the last value of `x` before a change is detected.
 #'
 #' @export
 #' @examples
