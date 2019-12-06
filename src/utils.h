@@ -7,6 +7,8 @@
 #include <stdbool.h>
 #include <stdarg.h>
 
+// -----------------------------------------------------------------------------
+
 enum timewarp_group_type {
   timewarp_group_year,
   timewarp_group_quarter,
@@ -19,6 +21,10 @@ enum timewarp_group_type {
   timewarp_group_millisecond
 };
 
+enum timewarp_group_type as_group_type(SEXP by);
+
+// -----------------------------------------------------------------------------
+
 enum timewarp_class_type {
   timewarp_class_date,
   timewarp_class_posixct,
@@ -28,7 +34,46 @@ enum timewarp_class_type {
 
 enum timewarp_class_type time_class_type(SEXP x);
 
-enum timewarp_group_type as_group_type(SEXP by);
+// -----------------------------------------------------------------------------
+// Missing values
+
+// Pulled from vctrs
+
+// Annex F of C99 specifies that `double` should conform to the IEEE 754
+// type `binary64`, which is defined as:
+// * 1  bit : sign
+// * 11 bits: exponent
+// * 52 bits: significand
+//
+// R stores the value "1954" in the last 32 bits: this payload marks
+// the value as a NA, not a regular NaN.
+//
+// On big endian systems, this corresponds to the second element of an
+// integer array of size 2. On little endian systems, this is flipped
+// and the NA marker is in the first element.
+//
+// The type assumptions made here are asserted in `vctrs_init_utils()`
+
+#ifdef WORDS_BIGENDIAN
+static const int timewarp_indicator_pos = 1;
+#else
+static const int timewarp_indicator_pos = 0;
+#endif
+
+union timewarp_dbl_indicator {
+  double value;        // 8 bytes
+  unsigned int key[2]; // 4 * 2 bytes
+};
+
+enum timewarp_dbl_class {
+  timewarp_dbl_number,
+  timewarp_dbl_missing,
+  timewarp_dbl_nan
+};
+
+enum timewarp_dbl_class dbl_classify(double x);
+
+// -----------------------------------------------------------------------------
 
 int pull_every(SEXP every);
 

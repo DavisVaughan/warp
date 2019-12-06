@@ -97,6 +97,24 @@ int pull_every(SEXP every) {
 
 // -----------------------------------------------------------------------------
 
+// [[ include("utils.h") ]]
+enum timewarp_dbl_class dbl_classify(double x) {
+  if (!isnan(x)) {
+    return timewarp_dbl_number;
+  }
+
+  union timewarp_dbl_indicator indicator;
+  indicator.value = x;
+
+  if (indicator.key[timewarp_indicator_pos] == 1954) {
+    return timewarp_dbl_missing;
+  } else {
+    return timewarp_dbl_nan;
+  }
+}
+
+// -----------------------------------------------------------------------------
+
 static bool str_equal(const char* x, const char* y) {
   return strcmp(x, y) == 0;
 }
