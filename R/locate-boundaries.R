@@ -4,6 +4,6 @@
 # The `stops` are the exact result of `warp_changes()`
 # The `starts` are computed from the `stops`
 
-warp_ranges <- function(x) {
-  .Call(timewarp_warp_ranges, x)
+locate_boundaries <- function(x) {
+  .Call(timewarp_locate_boundaries, x)
 }

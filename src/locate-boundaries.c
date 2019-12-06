@@ -3,16 +3,16 @@
 
 // -----------------------------------------------------------------------------
 
-static SEXP new_ranges_df(R_len_t size);
+static SEXP new_boundaries_df(R_len_t size);
 static SEXP compute_starts(SEXP x, R_xlen_t size);
 
 // [[ include("timewarp.h") ]]
-SEXP warp_ranges(SEXP x) {
+SEXP locate_boundaries(SEXP x) {
   SEXP stops = PROTECT(warp_changes(x));
 
   R_xlen_t size = Rf_xlength(stops);
 
-  SEXP out = PROTECT(new_ranges_df(size));
+  SEXP out = PROTECT(new_boundaries_df(size));
 
   SET_VECTOR_ELT(out, 0, compute_starts(stops, size));
   SET_VECTOR_ELT(out, 1, stops);
@@ -22,8 +22,8 @@ SEXP warp_ranges(SEXP x) {
 }
 
 // [[ register() ]]
-SEXP timewarp_warp_ranges(SEXP x) {
-  return warp_ranges(x);
+SEXP timewarp_locate_boundaries(SEXP x) {
+  return locate_boundaries(x);
 }
 
 // -----------------------------------------------------------------------------
@@ -64,7 +64,7 @@ static SEXP new_row_name_info(R_len_t size) {
 }
 
 // TODO - Use pregenerated name strings
-static SEXP new_ranges_df(R_len_t size) {
+static SEXP new_boundaries_df(R_len_t size) {
   SEXP out = PROTECT(Rf_allocVector(VECSXP, 2));
 
   SEXP names = PROTECT(Rf_allocVector(STRSXP, 2));
