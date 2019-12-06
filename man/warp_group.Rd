@@ -28,7 +28,7 @@ A string defining the period to group by. Valid inputs are:
 \item{every}{\verb{[positive integer(1)]}
 
 The number of \code{by} periods to lump together when constructing the groups.
-For example, withe the default \code{origin} and \code{by = "year"}, \code{every = 2}
+For example, with the default \code{origin} and \code{by = "year"}, \code{every = 2}
 would put the years \code{1970} and \code{1971} in the same group.}
 
 \item{origin}{\verb{[Date(1) / POSIXct(1) / POSIXlt(1)]}

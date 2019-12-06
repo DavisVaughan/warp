@@ -57,7 +57,7 @@
 #' @param every `[positive integer(1)]`
 #'
 #'   The number of `by` periods to lump together when constructing the groups.
-#'   For example, withe the default `origin` and `by = "year"`, `every = 2`
+#'   For example, with the default `origin` and `by = "year"`, `every = 2`
 #'   would put the years `1970` and `1971` in the same group.
 #'
 #' @param origin `[Date(1) / POSIXct(1) / POSIXlt(1)]`
