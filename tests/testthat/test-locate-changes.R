@@ -6,6 +6,17 @@ test_that("can locate changes in a double vector", {
   expect_equal(locate_changes(c(1, 1, 2)), c(2, 3))
 })
 
+test_that("the last value's position is always included", {
+  x <- c(1, 1, 2, 2)
+  result <- locate_changes(c(1, 1, 2, 2))
+
+  expect_equal(result[length(result)], length(x))
+})
+
+test_that("duplicate non-contiguous values are allowed", {
+  expect_equal(locate_changes(c(1, 1, 2, 1)), c(2, 3, 4))
+})
+
 test_that("`NA_integer_` values look equivalent", {
   expect_equal(locate_changes(c(1, NA_integer_, NA_integer_)), c(1, 3))
 })
