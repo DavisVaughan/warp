@@ -36,3 +36,13 @@ test_that("`NaN` and `NA_real_` values look different", {
 test_that("can only use double / integer", {
   expect_error(locate_changes("x"), "must be an integer or double vector")
 })
+
+test_that("size 0 input works", {
+  expect_equal(locate_changes(integer()), numeric())
+  expect_equal(locate_changes(numeric()), numeric())
+})
+
+test_that("size 1 input works", {
+  expect_equal(locate_changes(2L), 1)
+  expect_equal(locate_changes(2), 1)
+})

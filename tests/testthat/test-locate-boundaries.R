@@ -19,3 +19,15 @@ test_that("duplicate non-contiguous values are allowed, and show up in different
 test_that("can only use an integer or double vector", {
   expect_error(locate_boundaries("x"), "must be an integer or double vector")
 })
+
+test_that("size 0 input works", {
+  expect <- data.frame(start = numeric(), stop = numeric())
+  expect_equal(locate_boundaries(integer()), expect)
+  expect_equal(locate_boundaries(numeric()), expect)
+})
+
+test_that("size 1 input works", {
+  expect <- data.frame(start = 1, stop = 1)
+  expect_equal(locate_boundaries(2L), expect)
+  expect_equal(locate_boundaries(2), expect)
+})
