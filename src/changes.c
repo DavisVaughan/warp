@@ -3,25 +3,25 @@
 
 // -----------------------------------------------------------------------------
 
-#define CHANGEPOINT_LOOP(CTYPE, CONST_DEREF) {                 \
-  const CTYPE* p_x = CONST_DEREF(x);                           \
-                                                               \
-  CTYPE previous = p_x[0];                                     \
-                                                               \
-  for (R_xlen_t i = 1; i < size; ++i) {                        \
-    const CTYPE current = p_x[i];                              \
-                                                               \
-    if (current == previous) {                                 \
-      continue;                                                \
-    }                                                          \
-                                                               \
-    /* R indexed, and really `- 1 + 1` */                      \
-    p_out[count] = i;                                          \
-                                                               \
-    count++;                                                   \
-    pos_last = i;                                              \
-    previous = current;                                        \
-  }                                                            \
+#define CHANGES_LOOP(CTYPE, CONST_DEREF) { \
+  const CTYPE* p_x = CONST_DEREF(x);       \
+                                           \
+  CTYPE previous = p_x[0];                 \
+                                           \
+  for (R_xlen_t i = 1; i < size; ++i) {    \
+    const CTYPE current = p_x[i];          \
+                                           \
+    if (current == previous) {             \
+      continue;                            \
+    }                                      \
+                                           \
+    /* R indexed, and really `- 1 + 1` */  \
+    p_out[count] = i;                      \
+                                           \
+    count++;                               \
+    pos_last = i;                          \
+    previous = current;                    \
+  }                                        \
 }
 
 // [[ include("timewarp.h") ]]
@@ -50,8 +50,8 @@ SEXP warp_changes(SEXP x) {
   double* p_out = REAL(out);
 
   switch (type) {
-  case INTSXP: CHANGEPOINT_LOOP(int, INTEGER_RO); break;
-  case REALSXP: CHANGEPOINT_LOOP(double, REAL_RO); break;
+  case INTSXP: CHANGES_LOOP(int, INTEGER_RO); break;
+  case REALSXP: CHANGES_LOOP(double, REAL_RO); break;
   default: r_error("warp_changes", "Internal error: should have caught this earlier.");
   }
 
