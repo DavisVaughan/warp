@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • timewarp</title>
+<title>Locate boundaries around changes in a vector — locate_boundaries • timewarp</title>
 
 
 <!-- jquery -->
@@ -35,7 +35,10 @@
 
 
 
-<meta property="og:title" content="Function reference" />
+<meta property="og:title" content="Locate boundaries around changes in a vector — locate_boundaries" />
+<meta property="og:description" content="locate_boundaries() returns the running start and stop positions
+identifying sections of unchanged values in x." />
+<meta name="twitter:card" content="summary" />
 
 
 
@@ -54,7 +57,7 @@
   </head>
 
   <body>
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -101,60 +104,54 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Reference</h1>
+    <h1>Locate boundaries around changes in a vector</h1>
+    <small class="dont-index">Source: <a href='https://github.com/DavisVaughan/timewarp/blob/master/R/locate-boundaries.R'><code>R/locate-boundaries.R</code></a></small>
+    <div class="hidden name"><code>locate_boundaries.Rd</code></div>
     </div>
 
-    <table class="ref-index">
+    <div class="ref-description">
+    <p><code>locate_boundaries()</code> returns the running start and stop positions
+identifying sections of unchanged values in <code>x</code>.</p>
+    </div>
 
-    <colgroup>
-      
-      <col class="alias" />
-      <col class="title" />
-    </colgroup>
+    <pre class="usage"><span class='fu'>locate_boundaries</span>(<span class='no'>x</span>)</pre>
 
-    <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      <tr>
-        
-        <td>
-          <p><code><a href="locate_boundaries.html">locate_boundaries()</a></code> </p>
-        </td>
-        <td><p>Locate boundaries around changes in a vector</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="locate_changes.html">locate_changes()</a></code> </p>
-        </td>
-        <td><p>Locate change points in a vector</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="warp_boundaries.html">warp_boundaries()</a></code> </p>
-        </td>
-        <td><p>Locate period boundaries for a date vector</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="warp_group.html">warp_group()</a></code> </p>
-        </td>
-        <td><p>Group a date vector by period</p></td>
-      </tr>
-    </tbody>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>x</th>
+      <td><p><code>[integer / double]</code></p>
+<p>The vector to locate boundaries in. Can only be an integer or double
+vector.</p></td>
+    </tr>
     </table>
-  </div>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A two column data frame with double columns <code>start</code> and <code>stop</code>.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p><code>1</code> is always the first <code>start</code> position, and <code><a href='https://rdrr.io/r/base/length.html'>length(x)</a></code> is always the last
+<code>stop</code> position.</p>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'>locate_boundaries</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>2</span>, <span class='fl'>2</span>, <span class='fl'>2</span>, <span class='fl'>3</span>, <span class='fl'>5</span>, <span class='fl'>5</span>))</div><div class='output co'>#&gt;   start stop
+#&gt; 1     1    3
+#&gt; 2     4    4
+#&gt; 3     5    6</div></pre>
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#section-all-functions">All functions</a></li>
+      <li><a href="#arguments">Arguments</a></li>
+      <li><a href="#value">Value</a></li>
+      <li><a href="#details">Details</a></li>
+      <li><a href="#examples">Examples</a></li>
     </ul>
+
   </div>
 </div>
 

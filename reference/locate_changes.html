@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • timewarp</title>
+<title>Locate change points in a vector — locate_changes • timewarp</title>
 
 
 <!-- jquery -->
@@ -35,7 +35,13 @@
 
 
 
-<meta property="og:title" content="Function reference" />
+<meta property="og:title" content="Locate change points in a vector — locate_changes" />
+<meta property="og:description" content="locate_changes() determines where an integer or double vector changes
+values. It returns a double vector containing the positions of the last
+element before the change. These are the &quot;stop points&quot; used in
+locate_boundaries() and warp_boundaries(). The position of the last
+element of x is always returned at the end of the vector." />
+<meta name="twitter:card" content="summary" />
 
 
 
@@ -54,7 +60,7 @@
   </head>
 
   <body>
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -101,60 +107,52 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Reference</h1>
+    <h1>Locate change points in a vector</h1>
+    <small class="dont-index">Source: <a href='https://github.com/DavisVaughan/timewarp/blob/master/R/locate-changes.R'><code>R/locate-changes.R</code></a></small>
+    <div class="hidden name"><code>locate_changes.Rd</code></div>
     </div>
 
-    <table class="ref-index">
+    <div class="ref-description">
+    <p><code>locate_changes()</code> determines where an integer or double vector changes
+values. It returns a double vector containing the positions of the last
+element before the change. These are the "stop points" used in
+<code><a href='locate_boundaries.html'>locate_boundaries()</a></code> and <code><a href='warp_boundaries.html'>warp_boundaries()</a></code>. The position of the last
+element of <code>x</code> is always returned at the end of the vector.</p>
+    </div>
 
-    <colgroup>
-      
-      <col class="alias" />
-      <col class="title" />
-    </colgroup>
+    <pre class="usage"><span class='fu'>locate_changes</span>(<span class='no'>x</span>)</pre>
 
-    <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      <tr>
-        
-        <td>
-          <p><code><a href="locate_boundaries.html">locate_boundaries()</a></code> </p>
-        </td>
-        <td><p>Locate boundaries around changes in a vector</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="locate_changes.html">locate_changes()</a></code> </p>
-        </td>
-        <td><p>Locate change points in a vector</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="warp_boundaries.html">warp_boundaries()</a></code> </p>
-        </td>
-        <td><p>Locate period boundaries for a date vector</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="warp_group.html">warp_group()</a></code> </p>
-        </td>
-        <td><p>Group a date vector by period</p></td>
-      </tr>
-    </tbody>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>x</th>
+      <td><p><code>[integer / double]</code></p>
+<p>The vector to locate changes in. Can only be an integer or double vector.</p></td>
+    </tr>
     </table>
-  </div>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A double vector mapping to the last value of <code>x</code> before a change is detected.</p>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'>locate_changes</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>1</span>, <span class='fl'>2</span>))</div><div class='output co'>#&gt; [1] 2 3</div><div class='input'>
+<span class='fu'>locate_changes</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1.5</span>, <span class='fl'>1</span>, <span class='fl'>2</span>))</div><div class='output co'>#&gt; [1] 1 2 3</div><div class='input'>
+<span class='co'># NA and NaN values are treated as being equivalent with themselves</span>
+<span class='co'># but not with each other</span>
+<span class='fu'>locate_changes</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>NA_real_</span>, <span class='fl'>NA_real_</span>, <span class='fl'>NaN</span>, <span class='fl'>NaN</span>))</div><div class='output co'>#&gt; [1] 1 3 5</div></pre>
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#section-all-functions">All functions</a></li>
+      <li><a href="#arguments">Arguments</a></li>
+      <li><a href="#value">Value</a></li>
+      <li><a href="#examples">Examples</a></li>
     </ul>
+
   </div>
 </div>
 
