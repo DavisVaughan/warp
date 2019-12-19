@@ -35,45 +35,6 @@ enum warp_class_type {
 enum warp_class_type time_class_type(SEXP x);
 
 // -----------------------------------------------------------------------------
-// Missing values
-
-// Pulled from vctrs
-
-// Annex F of C99 specifies that `double` should conform to the IEEE 754
-// type `binary64`, which is defined as:
-// * 1  bit : sign
-// * 11 bits: exponent
-// * 52 bits: significand
-//
-// R stores the value "1954" in the last 32 bits: this payload marks
-// the value as a NA, not a regular NaN.
-//
-// On big endian systems, this corresponds to the second element of an
-// integer array of size 2. On little endian systems, this is flipped
-// and the NA marker is in the first element.
-//
-// The type assumptions made here are asserted in `vctrs_init_utils()`
-
-#ifdef WORDS_BIGENDIAN
-static const int warp_indicator_pos = 1;
-#else
-static const int warp_indicator_pos = 0;
-#endif
-
-union warp_dbl_indicator {
-  double value;        // 8 bytes
-  unsigned int key[2]; // 4 * 2 bytes
-};
-
-enum warp_dbl_class {
-  warp_dbl_number,
-  warp_dbl_missing,
-  warp_dbl_nan
-};
-
-enum warp_dbl_class dbl_classify(double x);
-
-// -----------------------------------------------------------------------------
 
 int pull_every(SEXP every);
 

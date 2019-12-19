@@ -97,24 +97,6 @@ int pull_every(SEXP every) {
 
 // -----------------------------------------------------------------------------
 
-// [[ include("utils.h") ]]
-enum warp_dbl_class dbl_classify(double x) {
-  if (!isnan(x)) {
-    return warp_dbl_number;
-  }
-
-  union warp_dbl_indicator indicator;
-  indicator.value = x;
-
-  if (indicator.key[warp_indicator_pos] == 1954) {
-    return warp_dbl_missing;
-  } else {
-    return warp_dbl_nan;
-  }
-}
-
-// -----------------------------------------------------------------------------
-
 static bool str_equal(const char* x, const char* y) {
   return strcmp(x, y) == 0;
 }
