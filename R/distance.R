@@ -40,7 +40,7 @@
 #'
 #' @param x `[Date / POSIXct / POSIXlt]`
 #'
-#'   The vector to compute time distances for.
+#'   A date time vector.
 #'
 #' @param by `[character(1)]`
 #'

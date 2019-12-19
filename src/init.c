@@ -5,6 +5,7 @@
 
 /* .Call calls */
 extern SEXP warp_warp_distance(SEXP, SEXP, SEXP, SEXP);
+extern SEXP warp_warp_change(SEXP, SEXP, SEXP, SEXP);
 extern SEXP warp_warp_boundaries(SEXP, SEXP, SEXP, SEXP);
 extern SEXP warp_locate_changes(SEXP);
 extern SEXP warp_locate_boundaries(SEXP);
@@ -15,6 +16,7 @@ SEXP warp_init_library(SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
   {"warp_warp_distance",     (DL_FUNC) &warp_warp_distance, 4},
+  {"warp_warp_change",       (DL_FUNC) &warp_warp_change, 4},
   {"warp_warp_boundaries",   (DL_FUNC) &warp_warp_boundaries, 4},
   {"warp_locate_changes",    (DL_FUNC) &warp_locate_changes, 1},
   {"warp_locate_boundaries", (DL_FUNC) &warp_locate_boundaries, 1},

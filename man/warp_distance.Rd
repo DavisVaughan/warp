@@ -9,7 +9,7 @@ warp_distance(x, by = "year", every = 1L, origin = NULL)
 \arguments{
 \item{x}{\verb{[Date / POSIXct / POSIXlt]}
 
-The vector to compute time distances for.}
+A date time vector.}
 
 \item{by}{\verb{[character(1)]}
 
