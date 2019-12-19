@@ -43,7 +43,7 @@ A double vector of locations right before a change.
 \description{
 \code{warp_change()} detects changes at the period level, using the period
 supplied in \code{by}. It returns the locations of the last value before the
-change. The last value is always returned.
+change. The location of the last value is always returned at the end.
 }
 \examples{
 x <- as.Date("2019-01-01") + 0:5
