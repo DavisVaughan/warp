@@ -68,8 +68,7 @@
 #'   "first" event was to start counting from.
 #'
 #' @return
-#' An integer vector containing the distances, unless `by = "second"`, in which
-#' case a double vector is returned to avoid integer overflow.
+#' A double vector containing the distances.
 #'
 #' @export
 #' @examples

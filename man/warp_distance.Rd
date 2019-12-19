@@ -38,8 +38,7 @@ particularly important when \code{every > 1} and you need to define when the
 "first" event was to start counting from.}
 }
 \value{
-An integer vector containing the distances, unless \code{by = "second"}, in which
-case a double vector is returned to avoid integer overflow.
+A double vector containing the distances.
 }
 \description{
 \code{warp_distance()} is a low level engine for computing date time distances.
