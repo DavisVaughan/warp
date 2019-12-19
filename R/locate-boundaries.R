@@ -19,5 +19,5 @@
 #' @examples
 #' locate_boundaries(c(2, 2, 2, 3, 5, 5))
 locate_boundaries <- function(x) {
-  .Call(timewarp_locate_boundaries, x)
+  .Call(warp_locate_boundaries, x)
 }

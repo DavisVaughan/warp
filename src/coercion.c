@@ -1,4 +1,4 @@
-#include "timewarp.h"
+#include "warp.h"
 #include "utils.h"
 
 // -----------------------------------------------------------------------------
@@ -15,10 +15,10 @@ static SEXP as_datetime_from_posixlt(SEXP x);
 // [[ include("utils.h") ]]
 SEXP as_datetime(SEXP x) {
   switch(time_class_type(x)) {
-  case timewarp_class_date: return as_datetime_from_date(x);
-  case timewarp_class_posixct: return as_datetime_from_posixct(x);
-  case timewarp_class_posixlt: return as_datetime_from_posixlt(x);
-  case timewarp_class_unknown: r_error("as_datetime", "Internal error: Unknown date time class.");
+  case warp_class_date: return as_datetime_from_date(x);
+  case warp_class_posixct: return as_datetime_from_posixct(x);
+  case warp_class_posixlt: return as_datetime_from_posixlt(x);
+  case warp_class_unknown: r_error("as_datetime", "Internal error: Unknown date time class.");
   }
   never_reached("as_datetime");
 }

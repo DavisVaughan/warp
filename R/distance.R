@@ -122,5 +122,5 @@
 #' warp_distance(x_in_nyc, "hour", origin = origin)
 #'
 warp_distance <- function(x, by = "year", every = 1L, origin = NULL) {
-  .Call(timewarp_warp_distance, x, by, every, origin)
+  .Call(warp_warp_distance, x, by, every, origin)
 }

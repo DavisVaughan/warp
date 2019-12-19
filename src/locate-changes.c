@@ -1,4 +1,4 @@
-#include "timewarp.h"
+#include "warp.h"
 #include "utils.h"
 
 // -----------------------------------------------------------------------------
@@ -8,13 +8,13 @@
 // - `current` is not a number. Are they both the same missing type?
 
 static inline bool dbl_equal(const double current, const double previous) {
-  enum timewarp_dbl_class current_dbl_class = dbl_classify(current);
+  enum warp_dbl_class current_dbl_class = dbl_classify(current);
 
-  if (current_dbl_class == timewarp_dbl_number) {
+  if (current_dbl_class == warp_dbl_number) {
     return current == previous;
   }
 
-  enum timewarp_dbl_class previous_dbl_class = dbl_classify(previous);
+  enum warp_dbl_class previous_dbl_class = dbl_classify(previous);
 
   return current_dbl_class == previous_dbl_class;
 }
@@ -49,7 +49,7 @@ static inline bool int_equal(const int current, const int previous) {
   }                                                      \
 }
 
-// [[ include("timewarp.h") ]]
+// [[ include("warp.h") ]]
 SEXP locate_changes(SEXP x) {
   SEXPTYPE type = TYPEOF(x);
 
@@ -93,6 +93,6 @@ SEXP locate_changes(SEXP x) {
 }
 
 // [[ register() ]]
-SEXP timewarp_locate_changes(SEXP x) {
+SEXP warp_locate_changes(SEXP x) {
   return locate_changes(x);
 }

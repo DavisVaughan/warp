@@ -1,5 +1,5 @@
-#ifndef TIMEWARP_UTILS_H
-#define TIMEWARP_UTILS_H
+#ifndef WARP_UTILS_H
+#define WARP_UTILS_H
 
 #define R_NO_REMAP
 #include <R.h>
@@ -9,30 +9,30 @@
 
 // -----------------------------------------------------------------------------
 
-enum timewarp_by_type {
-  timewarp_by_year,
-  timewarp_by_quarter,
-  timewarp_by_month,
-  timewarp_by_week,
-  timewarp_by_day,
-  timewarp_by_hour,
-  timewarp_by_minute,
-  timewarp_by_second,
-  timewarp_by_millisecond
+enum warp_by_type {
+  warp_by_year,
+  warp_by_quarter,
+  warp_by_month,
+  warp_by_week,
+  warp_by_day,
+  warp_by_hour,
+  warp_by_minute,
+  warp_by_second,
+  warp_by_millisecond
 };
 
-enum timewarp_by_type as_by_type(SEXP by);
+enum warp_by_type as_by_type(SEXP by);
 
 // -----------------------------------------------------------------------------
 
-enum timewarp_class_type {
-  timewarp_class_date,
-  timewarp_class_posixct,
-  timewarp_class_posixlt,
-  timewarp_class_unknown
+enum warp_class_type {
+  warp_class_date,
+  warp_class_posixct,
+  warp_class_posixlt,
+  warp_class_unknown
 };
 
-enum timewarp_class_type time_class_type(SEXP x);
+enum warp_class_type time_class_type(SEXP x);
 
 // -----------------------------------------------------------------------------
 // Missing values
@@ -55,23 +55,23 @@ enum timewarp_class_type time_class_type(SEXP x);
 // The type assumptions made here are asserted in `vctrs_init_utils()`
 
 #ifdef WORDS_BIGENDIAN
-static const int timewarp_indicator_pos = 1;
+static const int warp_indicator_pos = 1;
 #else
-static const int timewarp_indicator_pos = 0;
+static const int warp_indicator_pos = 0;
 #endif
 
-union timewarp_dbl_indicator {
+union warp_dbl_indicator {
   double value;        // 8 bytes
   unsigned int key[2]; // 4 * 2 bytes
 };
 
-enum timewarp_dbl_class {
-  timewarp_dbl_number,
-  timewarp_dbl_missing,
-  timewarp_dbl_nan
+enum warp_dbl_class {
+  warp_dbl_number,
+  warp_dbl_missing,
+  warp_dbl_nan
 };
 
-enum timewarp_dbl_class dbl_classify(double x);
+enum warp_dbl_class dbl_classify(double x);
 
 // -----------------------------------------------------------------------------
 

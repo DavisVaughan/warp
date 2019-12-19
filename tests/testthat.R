@@ -1,4 +1,4 @@
 library(testthat)
-library(timewarp)
+library(warp)
 
-test_check("timewarp")
+test_check("warp")

@@ -23,5 +23,5 @@
 #' # but not with each other
 #' locate_changes(c(1, NA_real_, NA_real_, NaN, NaN))
 locate_changes <- function(x) {
-  .Call(timewarp_locate_changes, x)
+  .Call(warp_locate_changes, x)
 }

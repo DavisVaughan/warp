@@ -1,5 +1,5 @@
-#ifndef TIMEWARP_H
-#define TIMEWARP_H
+#ifndef WARP_H
+#define WARP_H
 
 #define R_NO_REMAP
 #include <R.h>
@@ -12,8 +12,8 @@
 
 // Functionality ------------------------------------------------
 
-SEXP warp_distance(SEXP x, enum timewarp_by_type type, int every, SEXP origin);
-SEXP warp_boundaries(SEXP x, enum timewarp_by_type type, int every, SEXP origin);
+SEXP warp_distance(SEXP x, enum warp_by_type type, int every, SEXP origin);
+SEXP warp_boundaries(SEXP x, enum warp_by_type type, int every, SEXP origin);
 
 SEXP locate_changes(SEXP x);
 SEXP locate_boundaries(SEXP x);

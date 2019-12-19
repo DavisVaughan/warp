@@ -34,5 +34,5 @@
 #' # [1970-01-02, 1970-01-07)
 #' warp_boundaries(x, "day", every = 5, origin = origin)
 warp_boundaries <- function(x, by = "year", every = 1L, origin = NULL) {
-  .Call(timewarp_warp_boundaries, x, by, every, origin)
+  .Call(warp_warp_boundaries, x, by, every, origin)
 }

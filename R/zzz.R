@@ -1,3 +1,3 @@
 .onLoad <- function(libname, pkgname) {
-  .Call(timewarp_init_library, asNamespace("timewarp"))
+  .Call(warp_init_library, asNamespace("warp"))
 }

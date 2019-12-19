@@ -1,4 +1,4 @@
-Package: timewarp
+Package: warp
 Title: Group Dates and Datetimes
 Version: 0.0.0.9000
 Authors@R: 
@@ -14,8 +14,8 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.0.2
-URL: https://github.com/DavisVaughan/timewarp
-BugReports: https://github.com/DavisVaughan/timewarp/issues
+URL: https://github.com/DavisVaughan/warp
+BugReports: https://github.com/DavisVaughan/warp/issues
 Suggests: 
     testthat (>= 2.1.0),
     covr

@@ -1,23 +1,22 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# timewarp
+# warp
 
 <!-- badges: start -->
 
 [![Travis build
-status](https://travis-ci.org/DavisVaughan/timewarp.svg?branch=master)](https://travis-ci.org/DavisVaughan/timewarp)
+status](https://travis-ci.org/DavisVaughan/warp.svg?branch=master)](https://travis-ci.org/DavisVaughan/warp)
 [![Codecov test
-coverage](https://codecov.io/gh/DavisVaughan/timewarp/branch/master/graph/badge.svg)](https://codecov.io/gh/DavisVaughan/timewarp?branch=master)
+coverage](https://codecov.io/gh/DavisVaughan/warp/branch/master/graph/badge.svg)](https://codecov.io/gh/DavisVaughan/warp?branch=master)
 [![R build
-status](https://github.com/DavisVaughan/timewarp/workflows/R-CMD-check/badge.svg)](https://github.com/DavisVaughan/timewarp)
+status](https://github.com/DavisVaughan/warp/workflows/R-CMD-check/badge.svg)](https://github.com/DavisVaughan/warp)
 <!-- badges: end -->
 
-The goal of timewarp is to provide tooling to group date times by
-period.
+The goal of warp is to provide tooling to group date times by period.
 
 ``` r
-library(timewarp)
+library(warp)
 ```
 
 ## Installation
@@ -27,13 +26,13 @@ You can install the development version from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("DavisVaughan/timewarp")
+devtools::install_github("DavisVaughan/warp")
 ```
 
 ## Example
 
-One of the core functions in timewarp is `warp_distance()`, which allows
-you to provide a date time vector and compute the “distance” from an
+One of the core functions in warp is `warp_distance()`, which allows you
+to provide a date time vector and compute the “distance” from an
 `origin`. For example, this computes the number of months from the unix
 epoch.
 

@@ -1,5 +1,5 @@
 time_class_type <- function(x) {
-  .Call(timewarp_class_type, x)
+  .Call(warp_class_type, x)
 }
 
 single_quote <- function(x) {

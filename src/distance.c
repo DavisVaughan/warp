@@ -1,4 +1,4 @@
-#include "timewarp.h"
+#include "warp.h"
 #include "utils.h"
 #include <stdint.h> // For int64_t (especially on Windows)
 
@@ -19,12 +19,12 @@ static SEXP warp_distance_hour(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_minute(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_second(SEXP x, int every, SEXP origin);
 
-// [[ include("timewarp.h") ]]
-SEXP warp_distance(SEXP x, enum timewarp_by_type type, int every, SEXP origin) {
+// [[ include("warp.h") ]]
+SEXP warp_distance(SEXP x, enum warp_by_type type, int every, SEXP origin) {
   validate_origin(origin);
   validate_every(every);
 
-  if (time_class_type(x) == timewarp_class_unknown) {
+  if (time_class_type(x) == warp_class_unknown) {
     r_error("warp_distance", "`x` must inherit from 'Date', 'POSIXct', or 'POSIXlt'.");
   }
 
@@ -34,14 +34,14 @@ SEXP warp_distance(SEXP x, enum timewarp_by_type type, int every, SEXP origin) {
   SEXP out;
 
   switch (type) {
-  case timewarp_by_year: out = PROTECT(warp_distance_year(x, every, origin)); break;
-  case timewarp_by_quarter: out = PROTECT(warp_distance_quarter(x, every, origin)); break;
-  case timewarp_by_month: out = PROTECT(warp_distance_month(x, every, origin)); break;
-  case timewarp_by_week: out = PROTECT(warp_distance_week(x, every, origin)); break;
-  case timewarp_by_day: out = PROTECT(warp_distance_day(x, every, origin)); break;
-  case timewarp_by_hour: out = PROTECT(warp_distance_hour(x, every, origin)); break;
-  case timewarp_by_minute: out = PROTECT(warp_distance_minute(x, every, origin)); break;
-  case timewarp_by_second: out = PROTECT(warp_distance_second(x, every, origin)); break;
+  case warp_by_year: out = PROTECT(warp_distance_year(x, every, origin)); break;
+  case warp_by_quarter: out = PROTECT(warp_distance_quarter(x, every, origin)); break;
+  case warp_by_month: out = PROTECT(warp_distance_month(x, every, origin)); break;
+  case warp_by_week: out = PROTECT(warp_distance_week(x, every, origin)); break;
+  case warp_by_day: out = PROTECT(warp_distance_day(x, every, origin)); break;
+  case warp_by_hour: out = PROTECT(warp_distance_hour(x, every, origin)); break;
+  case warp_by_minute: out = PROTECT(warp_distance_minute(x, every, origin)); break;
+  case warp_by_second: out = PROTECT(warp_distance_second(x, every, origin)); break;
   default: r_error("warp_distance", "Internal error: unknown `type`.");
   }
 
@@ -50,8 +50,8 @@ SEXP warp_distance(SEXP x, enum timewarp_by_type type, int every, SEXP origin) {
 }
 
 // [[ register() ]]
-SEXP timewarp_warp_distance(SEXP x, SEXP by, SEXP every, SEXP origin) {
-  enum timewarp_by_type type = as_by_type(by);
+SEXP warp_warp_distance(SEXP x, SEXP by, SEXP every, SEXP origin) {
+  enum warp_by_type type = as_by_type(by);
   int every_ = pull_every(every);
   return warp_distance(x, type, every_, origin);
 }
@@ -198,9 +198,9 @@ static SEXP posixlt_warp_distance_day(SEXP x, int every, SEXP origin);
 
 static SEXP warp_distance_day(SEXP x, int every, SEXP origin) {
   switch (time_class_type(x)) {
-  case timewarp_class_date: return date_warp_distance_day(x, every, origin);
-  case timewarp_class_posixct: return posixct_warp_distance_day(x, every, origin);
-  case timewarp_class_posixlt: return posixlt_warp_distance_day(x, every, origin);
+  case warp_class_date: return date_warp_distance_day(x, every, origin);
+  case warp_class_posixct: return posixct_warp_distance_day(x, every, origin);
+  case warp_class_posixlt: return posixlt_warp_distance_day(x, every, origin);
   default: r_error("warp_distance_day", "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
   }
 }
@@ -466,9 +466,9 @@ static SEXP posixlt_warp_distance_hour(SEXP x, int every, SEXP origin);
 
 static SEXP warp_distance_hour(SEXP x, int every, SEXP origin) {
   switch (time_class_type(x)) {
-  case timewarp_class_date: return date_warp_distance_hour(x, every, origin);
-  case timewarp_class_posixct: return posixct_warp_distance_hour(x, every, origin);
-  case timewarp_class_posixlt: return posixlt_warp_distance_hour(x, every, origin);
+  case warp_class_date: return date_warp_distance_hour(x, every, origin);
+  case warp_class_posixct: return posixct_warp_distance_hour(x, every, origin);
+  case warp_class_posixlt: return posixlt_warp_distance_hour(x, every, origin);
   default: r_error("warp_distance_hour", "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
   }
 }
@@ -738,9 +738,9 @@ static SEXP posixlt_warp_distance_minute(SEXP x, int every, SEXP origin);
 
 static SEXP warp_distance_minute(SEXP x, int every, SEXP origin) {
   switch (time_class_type(x)) {
-  case timewarp_class_date: return date_warp_distance_minute(x, every, origin);
-  case timewarp_class_posixct: return posixct_warp_distance_minute(x, every, origin);
-  case timewarp_class_posixlt: return posixlt_warp_distance_minute(x, every, origin);
+  case warp_class_date: return date_warp_distance_minute(x, every, origin);
+  case warp_class_posixct: return posixct_warp_distance_minute(x, every, origin);
+  case warp_class_posixlt: return posixlt_warp_distance_minute(x, every, origin);
   default: r_error("warp_distance_minute", "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
   }
 }
@@ -1010,9 +1010,9 @@ static SEXP posixlt_warp_distance_second(SEXP x, int every, SEXP origin);
 
 static SEXP warp_distance_second(SEXP x, int every, SEXP origin) {
   switch (time_class_type(x)) {
-  case timewarp_class_date: return date_warp_distance_second(x, every, origin);
-  case timewarp_class_posixct: return posixct_warp_distance_second(x, every, origin);
-  case timewarp_class_posixlt: return posixlt_warp_distance_second(x, every, origin);
+  case warp_class_date: return date_warp_distance_second(x, every, origin);
+  case warp_class_posixct: return posixct_warp_distance_second(x, every, origin);
+  case warp_class_posixlt: return posixlt_warp_distance_second(x, every, origin);
   default: r_error("warp_distance_second", "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
   }
 }
@@ -1287,7 +1287,7 @@ static void validate_origin(SEXP origin) {
     r_error("validate_origin", "`origin` must have size 1, not %i.", n_origin);
   }
 
-  if (time_class_type(origin) == timewarp_class_unknown) {
+  if (time_class_type(origin) == warp_class_unknown) {
     r_error("validate_origin", "`origin` must inherit from 'Date', 'POSIXct', or 'POSIXlt'.");
   }
 }

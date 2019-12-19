@@ -1,4 +1,4 @@
-#include "timewarp.h"
+#include "warp.h"
 #include "utils.h"
 
 // -----------------------------------------------------------------------------
@@ -6,7 +6,7 @@
 static SEXP new_boundaries_df(R_len_t size);
 static SEXP compute_starts(SEXP x, R_xlen_t size);
 
-// [[ include("timewarp.h") ]]
+// [[ include("warp.h") ]]
 SEXP locate_boundaries(SEXP x) {
   SEXP stops = PROTECT(locate_changes(x));
 
@@ -22,7 +22,7 @@ SEXP locate_boundaries(SEXP x) {
 }
 
 // [[ register() ]]
-SEXP timewarp_locate_boundaries(SEXP x) {
+SEXP warp_locate_boundaries(SEXP x) {
   return locate_boundaries(x);
 }
 
