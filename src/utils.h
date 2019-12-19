@@ -9,19 +9,19 @@
 
 // -----------------------------------------------------------------------------
 
-enum timewarp_group_type {
-  timewarp_group_year,
-  timewarp_group_quarter,
-  timewarp_group_month,
-  timewarp_group_week,
-  timewarp_group_day,
-  timewarp_group_hour,
-  timewarp_group_minute,
-  timewarp_group_second,
-  timewarp_group_millisecond
+enum timewarp_by_type {
+  timewarp_by_year,
+  timewarp_by_quarter,
+  timewarp_by_month,
+  timewarp_by_week,
+  timewarp_by_day,
+  timewarp_by_hour,
+  timewarp_by_minute,
+  timewarp_by_second,
+  timewarp_by_millisecond
 };
 
-enum timewarp_group_type as_group_type(SEXP by);
+enum timewarp_by_type as_by_type(SEXP by);
 
 // -----------------------------------------------------------------------------
 

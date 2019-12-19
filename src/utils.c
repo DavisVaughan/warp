@@ -120,7 +120,7 @@ static bool str_equal(const char* x, const char* y) {
 }
 
 // [[ include("utils.h") ]]
-enum timewarp_group_type as_group_type(SEXP by) {
+enum timewarp_by_type as_by_type(SEXP by) {
   if (TYPEOF(by) != STRSXP || Rf_length(by) != 1) {
     Rf_errorcall(R_NilValue, "`by` must be a single string.");
   }
@@ -128,39 +128,39 @@ enum timewarp_group_type as_group_type(SEXP by) {
   const char* type = CHAR(STRING_ELT(by, 0));
 
   if (str_equal(type, "year") || str_equal(type, "years") || str_equal(type, "yearly")) {
-    return timewarp_group_year;
+    return timewarp_by_year;
   }
 
   if (str_equal(type, "quarter") || str_equal(type, "quarters") || str_equal(type, "quarterly")) {
-    return timewarp_group_quarter;
+    return timewarp_by_quarter;
   }
 
   if (str_equal(type, "month") || str_equal(type, "months") || str_equal(type, "monthly")) {
-    return timewarp_group_month;
+    return timewarp_by_month;
   }
 
   if (str_equal(type, "week") || str_equal(type, "weeks") || str_equal(type, "weekly")) {
-    return timewarp_group_week;
+    return timewarp_by_week;
   }
 
   if (str_equal(type, "day") || str_equal(type, "days") || str_equal(type, "daily")) {
-    return timewarp_group_day;
+    return timewarp_by_day;
   }
 
   if (str_equal(type, "hour") || str_equal(type, "hours") || str_equal(type, "hourly")) {
-    return timewarp_group_hour;
+    return timewarp_by_hour;
   }
 
   if (str_equal(type, "minute") || str_equal(type, "minutes") || str_equal(type, "minutely")) {
-    return timewarp_group_minute;
+    return timewarp_by_minute;
   }
 
   if (str_equal(type, "second") || str_equal(type, "seconds") || str_equal(type, "secondly")) {
-    return timewarp_group_second;
+    return timewarp_by_second;
   }
 
   if (str_equal(type, "millisecond") || str_equal(type, "milliseconds")) {
-    return timewarp_group_millisecond;
+    return timewarp_by_millisecond;
   }
 
   Rf_errorcall(R_NilValue, "Unknown `by` value '%s'.", type);

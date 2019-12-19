@@ -33,7 +33,7 @@ would put the years \code{1970} and \code{1971} in the same group.}
 
 \item{origin}{\verb{[Date(1) / POSIXct(1) / POSIXlt(1)]}
 
-The reference value for the groups to be computed from. This is
+The reference value for the distances to be computed from. This is
 particularly important when \code{every > 1} and you need to define when the
 "first" event was to start counting from.}
 }

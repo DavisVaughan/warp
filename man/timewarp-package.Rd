@@ -4,7 +4,7 @@
 \name{timewarp-package}
 \alias{timewarp}
 \alias{timewarp-package}
-\title{timewarp: Group and Manipulate Dates and Datetimes}
+\title{timewarp: Group Dates and Datetimes}
 \description{
 What the package does (one paragraph).
 }
