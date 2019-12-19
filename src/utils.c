@@ -5,14 +5,11 @@
 SEXP warp_ns_env = NULL;
 
 SEXP syms_x = NULL;
-SEXP syms_components = NULL;
 
-SEXP syms_time_get = NULL;
 SEXP syms_as_posixct_from_posixlt = NULL;
 SEXP syms_as_date = NULL;
 SEXP syms_as_posixlt = NULL;
 
-SEXP fns_time_get = NULL;
 SEXP fns_as_posixct_from_posixlt = NULL;
 SEXP fns_as_date = NULL;
 SEXP fns_as_posixlt = NULL;
@@ -20,8 +17,6 @@ SEXP fns_as_posixlt = NULL;
 SEXP classes_data_frame = NULL;
 
 SEXP strings_start_stop = NULL;
-SEXP strings_year = NULL;
-SEXP strings_year_month = NULL;
 
 SEXP chars = NULL;
 SEXP char_posixlt = NULL;
@@ -337,15 +332,6 @@ SEXP warp_dispatch1(SEXP fn_sym, SEXP fn,
 // -----------------------------------------------------------------------------
 
 // [[ include("utils.h") ]]
-SEXP time_get(SEXP x, SEXP components) {
-  return warp_dispatch2(
-    syms_time_get, fns_time_get,
-    syms_x, x,
-    syms_components, components
-  );
-}
-
-// [[ include("utils.h") ]]
 SEXP as_posixct_from_posixlt(SEXP x) {
   return warp_dispatch1(
     syms_as_posixct_from_posixlt, fns_as_posixct_from_posixlt,
@@ -375,7 +361,6 @@ void warp_init_utils(SEXP ns) {
   warp_ns_env = ns;
 
   syms_x = Rf_install("x");
-  syms_components = Rf_install("components");
 
   new_env_call = r_parse_eval("as.call(list(new.env, TRUE, NULL, NULL))", R_BaseEnv);
   R_PreserveObject(new_env_call);
@@ -383,12 +368,10 @@ void warp_init_utils(SEXP ns) {
   new_env__parent_node = CDDR(new_env_call);
   new_env__size_node = CDR(new_env__parent_node);
 
-  syms_time_get = Rf_install("time_get");
   syms_as_posixct_from_posixlt = Rf_install("as_posixct_from_posixlt");
   syms_as_date = Rf_install("as_date");
   syms_as_posixlt = Rf_install("as_posixlt");
 
-  fns_time_get = r_env_get(warp_ns_env, syms_time_get);
   fns_as_posixct_from_posixlt = r_env_get(warp_ns_env, syms_as_posixct_from_posixlt);
   fns_as_date = r_env_get(warp_ns_env, syms_as_date);
   fns_as_posixlt = r_env_get(warp_ns_env, syms_as_posixlt);
@@ -401,15 +384,6 @@ void warp_init_utils(SEXP ns) {
   R_PreserveObject(strings_start_stop);
   SET_STRING_ELT(strings_start_stop, 0, Rf_mkChar("start"));
   SET_STRING_ELT(strings_start_stop, 1, Rf_mkChar("stop"));
-
-  strings_year = Rf_allocVector(STRSXP, 1);
-  R_PreserveObject(strings_year);
-  SET_STRING_ELT(strings_year, 0, Rf_mkChar("year"));
-
-  strings_year_month = Rf_allocVector(STRSXP, 2);
-  R_PreserveObject(strings_year_month);
-  SET_STRING_ELT(strings_year_month, 0, Rf_mkChar("year"));
-  SET_STRING_ELT(strings_year_month, 1, Rf_mkChar("month"));
 
   // Holds the CHARSXP objects because they can be garbage collected
   chars = Rf_allocVector(STRSXP, 4);

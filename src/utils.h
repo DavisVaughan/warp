@@ -43,7 +43,6 @@ void __attribute__((noreturn)) r_error(const char* where, const char* why, ...);
 
 SEXP r_maybe_duplicate(SEXP x);
 
-SEXP time_get(SEXP x, SEXP components);
 SEXP as_posixct_from_posixlt(SEXP x);
 SEXP as_date(SEXP x);
 SEXP as_posixlt(SEXP x);
@@ -61,7 +60,5 @@ SEXP convert_timezone(SEXP x, const char* timezone);
 extern SEXP classes_data_frame;
 
 extern SEXP strings_start_stop;
-extern SEXP strings_year;
-extern SEXP strings_year_month;
 
 #endif

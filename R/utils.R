@@ -61,3 +61,34 @@ tz <- function(x) {
 is_POSIXt <- function(x) {
   inherits(x, "POSIXt")
 }
+
+# Called from C
+as_posixlt <- function(x) {
+  type <- time_class_type(x)
+
+  if (type == "posixlt") {
+    return(x)
+  }
+
+  # `as.POSIXlt.Date()` is SO slow
+  if (type == "date") {
+    origin <- structure(0, class = "Date")
+    x <- unclass(x)
+
+    # Ignore fractional Date pieces by truncating towards 0
+    if (typeof(x) == "double") {
+      x <- trunc(x)
+    }
+
+    out <- as.POSIXlt(x * 86400, tz = "UTC", origin = origin)
+    return(out)
+  }
+
+  if (type == "posixct") {
+    out <- as.POSIXlt.POSIXct(x)
+    return(out)
+  }
+
+  stop("`x` has an unknown date time class", call. = FALSE)
+}
+
