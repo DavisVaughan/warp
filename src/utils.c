@@ -21,11 +21,11 @@ SEXP strings_start_stop = NULL;
 SEXP strings_year = NULL;
 SEXP strings_year_month = NULL;
 
-SEXP strings = NULL;
-SEXP strings_posixlt = NULL;
-SEXP strings_posixct = NULL;
-SEXP strings_posixt = NULL;
-SEXP strings_date = NULL;
+SEXP chars = NULL;
+SEXP char_posixlt = NULL;
+SEXP char_posixct = NULL;
+SEXP char_posixt = NULL;
+SEXP char_date = NULL;
 
 // -----------------------------------------------------------------------------
 
@@ -58,14 +58,14 @@ static enum warp_class_type time_class_type_impl(SEXP klass) {
   SEXP butlast = *p_klass++;
   SEXP last = *p_klass++;
 
-  if (last == strings_date) {
+  if (last == char_date) {
     return warp_class_date;
   }
 
-  if (last == strings_posixt) {
-    if (butlast == strings_posixlt) {
+  if (last == char_posixt) {
+    if (butlast == char_posixlt) {
       return warp_class_posixlt;
-    } else if (butlast == strings_posixct) {
+    } else if (butlast == char_posixct) {
       return warp_class_posixct;
     }
   }
@@ -400,18 +400,18 @@ void warp_init_utils(SEXP ns) {
   SET_STRING_ELT(strings_year_month, 1, Rf_mkChar("month"));
 
   // Holds the CHARSXP objects because they can be garbage collected
-  strings = Rf_allocVector(STRSXP, 4);
-  R_PreserveObject(strings);
+  chars = Rf_allocVector(STRSXP, 4);
+  R_PreserveObject(chars);
 
-  strings_posixlt = Rf_mkChar("POSIXlt");
-  SET_STRING_ELT(strings, 0, strings_posixlt);
+  char_posixlt = Rf_mkChar("POSIXlt");
+  SET_STRING_ELT(chars, 0, char_posixlt);
 
-  strings_posixct = Rf_mkChar("POSIXct");
-  SET_STRING_ELT(strings, 1, strings_posixct);
+  char_posixct = Rf_mkChar("POSIXct");
+  SET_STRING_ELT(chars, 1, char_posixct);
 
-  strings_posixt = Rf_mkChar("POSIXt");
-  SET_STRING_ELT(strings, 2, strings_posixt);
+  char_posixt = Rf_mkChar("POSIXt");
+  SET_STRING_ELT(chars, 2, char_posixt);
 
-  strings_date = Rf_mkChar("Date");
-  SET_STRING_ELT(strings, 3, strings_date);
+  char_date = Rf_mkChar("Date");
+  SET_STRING_ELT(chars, 3, char_date);
 }
