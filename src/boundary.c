@@ -72,21 +72,13 @@ static SEXP new_row_name_info(R_len_t size) {
   return out;
 }
 
-// TODO - Use pregenerated name strings
 static SEXP new_boundaries_df(R_len_t size) {
   SEXP out = PROTECT(Rf_allocVector(VECSXP, 2));
 
-  SEXP names = PROTECT(Rf_allocVector(STRSXP, 2));
-  SET_STRING_ELT(names, 0, Rf_mkChar("start"));
-  SET_STRING_ELT(names, 1, Rf_mkChar("stop"));
-
-  SEXP classes_data_frame = PROTECT(Rf_allocVector(STRSXP, 1));
-  SET_STRING_ELT(classes_data_frame, 0, Rf_mkChar("data.frame"));
-
-  Rf_setAttrib(out, R_NamesSymbol, names);
+  Rf_setAttrib(out, R_NamesSymbol, strings_start_stop);
   Rf_setAttrib(out, R_ClassSymbol, classes_data_frame);
   Rf_setAttrib(out, R_RowNamesSymbol, new_row_name_info(size));
 
-  UNPROTECT(3);
+  UNPROTECT(1);
   return out;
 }

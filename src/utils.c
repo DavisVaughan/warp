@@ -15,6 +15,9 @@ SEXP fns_time_get = NULL;
 SEXP fns_as_posixct_from_posixlt = NULL;
 SEXP fns_as_date = NULL;
 
+SEXP classes_data_frame = NULL;
+
+SEXP strings_start_stop = NULL;
 SEXP strings_year = NULL;
 SEXP strings_year_month = NULL;
 
@@ -377,6 +380,15 @@ void warp_init_utils(SEXP ns) {
   fns_time_get = r_env_get(warp_ns_env, syms_time_get);
   fns_as_posixct_from_posixlt = r_env_get(warp_ns_env, syms_as_posixct_from_posixlt);
   fns_as_date = r_env_get(warp_ns_env, syms_as_date);
+
+  classes_data_frame = Rf_allocVector(STRSXP, 1);
+  R_PreserveObject(classes_data_frame);
+  SET_STRING_ELT(classes_data_frame, 0, Rf_mkChar("data.frame"));
+
+  strings_start_stop = Rf_allocVector(STRSXP, 2);
+  R_PreserveObject(strings_start_stop);
+  SET_STRING_ELT(strings_start_stop, 0, Rf_mkChar("start"));
+  SET_STRING_ELT(strings_start_stop, 1, Rf_mkChar("stop"));
 
   strings_year = Rf_allocVector(STRSXP, 1);
   R_PreserveObject(strings_year);

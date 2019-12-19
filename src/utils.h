@@ -53,6 +53,9 @@ SEXP as_datetime(SEXP x);
 const char* get_timezone(SEXP x);
 SEXP convert_timezone(SEXP x, const char* timezone);
 
+extern SEXP classes_data_frame;
+
+extern SEXP strings_start_stop;
 extern SEXP strings_year;
 extern SEXP strings_year_month;
 
