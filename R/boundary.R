@@ -1,14 +1,19 @@
 #' Locate period boundaries for a date vector
 #'
+#' @description
 #' `warp_boundary()` detects a change in time period along `x`, for example,
 #' rolling from one month to the next. It returns the start and stop positions
 #' for each contiguous period chunk in `x`.
 #'
+#' @details
+#' The stop positions are just the [warp_change()] values, and the start
+#' positions are computed from these.
+#'
 #' @inheritParams warp_distance
 #'
-#' @param x `[Date / POSIXct / POSIXlt]`
-#'
-#'   The vector to compute time boundaries for.
+#' @return
+#' A two column data frame with the columns `start` and `stop`. Both are
+#' double vectors representing boundaries of the date time groups.
 #'
 #' @export
 #' @examples

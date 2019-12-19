@@ -9,7 +9,7 @@ warp_boundary(x, by = "year", every = 1L, origin = NULL)
 \arguments{
 \item{x}{\verb{[Date / POSIXct / POSIXlt]}
 
-The vector to compute time boundaries for.}
+A date time vector.}
 
 \item{by}{\verb{[character(1)]}
 
@@ -37,10 +37,18 @@ The reference value for the distances to be computed from. This is
 particularly important when \code{every > 1} and you need to define when the
 "first" event was to start counting from.}
 }
+\value{
+A two column data frame with the columns \code{start} and \code{stop}. Both are
+double vectors representing boundaries of the date time groups.
+}
 \description{
 \code{warp_boundary()} detects a change in time period along \code{x}, for example,
 rolling from one month to the next. It returns the start and stop positions
 for each contiguous period chunk in \code{x}.
+}
+\details{
+The stop positions are just the \code{\link[=warp_change]{warp_change()}} values, and the start
+positions are computed from these.
 }
 \examples{
 x <- as.Date("1970-01-01") + -4:5
