@@ -78,17 +78,20 @@ static SEXP warp_distance_year(SEXP x, int every, SEXP origin) {
   bool needs_every = (every != 1);
 
   SEXP time_df = PROTECT_N(time_get(x, strings_year), &n_prot);
-  SEXP out = VECTOR_ELT(time_df, 0);
 
-  out = PROTECT_N(r_maybe_duplicate(out), &n_prot);
-  int* p_out = INTEGER(out);
+  x = VECTOR_ELT(time_df, 0);
+  int* p_x = INTEGER(x);
 
-  R_xlen_t n_out = Rf_xlength(out);
+  R_xlen_t n_out = Rf_xlength(x);
+
+  SEXP out = PROTECT_N(Rf_allocVector(REALSXP, n_out), &n_prot);
+  double* p_out = REAL(out);
 
   for (R_xlen_t i = 0; i < n_out; ++i) {
-    int elt = p_out[i];
+    int elt = p_x[i];
 
     if (elt == NA_INTEGER) {
+      p_out[i] = NA_REAL;
       continue;
     }
 
