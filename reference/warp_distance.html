@@ -130,7 +130,7 @@ return the number of years from the <code>origin</code>, which is the Unix epoch
     <tr>
       <th>x</th>
       <td><p><code>[Date / POSIXct / POSIXlt]</code></p>
-<p>The vector to compute time distances for.</p></td>
+<p>A date time vector.</p></td>
     </tr>
     <tr>
       <th>by</th>
@@ -164,8 +164,7 @@ particularly important when <code>every &gt; 1</code> and you need to define whe
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An integer vector containing the distances, unless <code>by = "second"</code>, in which
-case a double vector is returned to avoid integer overflow.</p>
+    <p>A double vector containing the distances.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>The return value of <code>warp_distance()</code> is suitable for use as a grouping
