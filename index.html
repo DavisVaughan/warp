@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Group Dates and Datetimes • timewarp</title>
+<title>Group Dates and Datetimes • warp</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
@@ -30,7 +30,7 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="index.html">timewarp</a>
+        <a class="navbar-link" href="index.html">warp</a>
         <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
       </span>
     </div>
@@ -49,7 +49,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/DavisVaughan/timewarp">
+  <a href="https://github.com/DavisVaughan/warp">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -66,24 +66,24 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="timewarp" class="section level1">
+<div id="warp" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#timewarp" class="anchor"></a>timewarp</h1></div>
+<a href="#warp" class="anchor"></a>warp</h1></div>
 <!-- badges: start -->
 
-<p>The goal of timewarp is to provide tooling to group date times by period.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(timewarp)</a></code></pre></div>
+<p>The goal of warp is to provide tooling to group date times by period.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(warp)</a></code></pre></div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>You can install the development version from <a href="https://github.com/">GitHub</a> with:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="co"># install.packages("devtools")</span></a>
-<a class="sourceLine" id="cb2-2" data-line-number="2">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"DavisVaughan/timewarp"</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb2-2" data-line-number="2">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"DavisVaughan/warp"</span>)</a></code></pre></div>
 </div>
 <div id="example" class="section level2">
 <h2 class="hasAnchor">
 <a href="#example" class="anchor"></a>Example</h2>
-<p>One of the core functions in timewarp is <code><a href="reference/warp_distance.html">warp_distance()</a></code>, which allows you to provide a date time vector and compute the “distance” from an <code>origin</code>. For example, this computes the number of months from the unix epoch.</p>
+<p>One of the core functions in warp is <code><a href="reference/warp_distance.html">warp_distance()</a></code>, which allows you to provide a date time vector and compute the “distance” from an <code>origin</code>. For example, this computes the number of months from the unix epoch.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">x &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span>(<span class="st">"1970-01-01"</span>) <span class="op">+</span><span class="st"> </span><span class="dv">-2</span><span class="op">:</span><span class="dv">2</span></a>
 <a class="sourceLine" id="cb3-2" data-line-number="2">x</a>
 <a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt; [1] "1969-12-30" "1969-12-31" "1970-01-01" "1970-01-02" "1970-01-03"</span></a>
@@ -116,9 +116,9 @@
     <div class="links">
 <h2>Links</h2>
 <ul class="list-unstyled">
-<li>Browse source code at <br><a href="https://github.com/DavisVaughan/timewarp">https://​github.com/​DavisVaughan/​timewarp</a>
+<li>Browse source code at <br><a href="https://github.com/DavisVaughan/warp">https://​github.com/​DavisVaughan/​warp</a>
 </li>
-<li>Report a bug at <br><a href="https://github.com/DavisVaughan/timewarp/issues">https://​github.com/​DavisVaughan/​timewarp/​issues</a>
+<li>Report a bug at <br><a href="https://github.com/DavisVaughan/warp/issues">https://​github.com/​DavisVaughan/​warp/​issues</a>
 </li>
 </ul>
 </div>
@@ -140,9 +140,9 @@
   <div class="dev-status">
 <h2>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://travis-ci.org/DavisVaughan/timewarp"><img src="https://travis-ci.org/DavisVaughan/timewarp.svg?branch=master" alt="Travis build status"></a></li>
-<li><a href="https://codecov.io/gh/DavisVaughan/timewarp?branch=master"><img src="https://codecov.io/gh/DavisVaughan/timewarp/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></li>
-<li><a href="https://github.com/DavisVaughan/timewarp"><img src="https://github.com/DavisVaughan/timewarp/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
+<li><a href="https://travis-ci.org/DavisVaughan/warp"><img src="https://travis-ci.org/DavisVaughan/warp.svg?branch=master" alt="Travis build status"></a></li>
+<li><a href="https://codecov.io/gh/DavisVaughan/warp?branch=master"><img src="https://codecov.io/gh/DavisVaughan/warp/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></li>
+<li><a href="https://github.com/DavisVaughan/warp"><img src="https://github.com/DavisVaughan/warp/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
 </ul>
 </div>
 </div>
