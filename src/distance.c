@@ -151,15 +151,15 @@ static SEXP warp_distance_month(SEXP x, int every, SEXP origin) {
 
   R_xlen_t size = Rf_xlength(year);
 
-  SEXP out = PROTECT_N(Rf_allocVector(INTSXP, size), &n_prot);
-  int* p_out = INTEGER(out);
+  SEXP out = PROTECT_N(Rf_allocVector(REALSXP, size), &n_prot);
+  double* p_out = REAL(out);
 
   for (R_xlen_t i = 0; i < size; ++i) {
     int elt_year = p_year[i];
     int elt_month = p_month[i] - 1;
 
     if (elt_year == NA_INTEGER) {
-      p_out[i] = NA_INTEGER;
+      p_out[i] = NA_REAL;
       continue;
     }
 

@@ -244,14 +244,14 @@ test_that("can warp_distance() by year with POSIXlt", {
 test_that("can warp_distance() by quarter with Date", {
   x <- as.Date(c("1970-01-01", "1970-03-31", "1970-04-01"))
 
-  expect_identical(warp_distance(x, "quarter"), c(0L, 0L, 1L))
+  expect_identical(warp_distance(x, "quarter"), c(0, 0, 1))
 })
 
 test_that("can adjust the origin at the month level", {
   origin <- as.Date("1970-02-01")
   x <- as.Date(c("1970-01-01", "1970-04-30", "1970-05-01"))
 
-  expect_identical(warp_distance(x, "quarter", origin = origin), c(-1L, 0L, 1L))
+  expect_identical(warp_distance(x, "quarter", origin = origin), c(-1, 0, 1))
 })
 
 # ------------------------------------------------------------------------------
@@ -260,7 +260,7 @@ test_that("can adjust the origin at the month level", {
 test_that("can warp_distance() by quarter with POSIXct", {
   x <- as.POSIXct(c("1970-01-01 00:00:00", "1970-03-31 23:59:59", "1970-04-01 00:00:00"), "UTC")
 
-  expect_identical(warp_distance(x, "quarter"), c(0L, 0L, 1L))
+  expect_identical(warp_distance(x, "quarter"), c(0, 0, 1))
 })
 
 # ------------------------------------------------------------------------------
@@ -268,28 +268,28 @@ test_that("can warp_distance() by quarter with POSIXct", {
 
 test_that("can warp_distance() by month with Date", {
   x <- as.Date("1970-01-01")
-  expect_identical(warp_distance(x, "month"), 0L)
+  expect_identical(warp_distance(x, "month"), 0)
 
   x <- as.Date("1970-02-01")
-  expect_identical(warp_distance(x, "month"), 1L)
+  expect_identical(warp_distance(x, "month"), 1)
 
   x <- as.Date("1971-02-01")
-  expect_identical(warp_distance(x, "month"), 13L)
+  expect_identical(warp_distance(x, "month"), 13)
 })
 
 test_that("can warp_distance() by month with 'negative' Dates", {
   x <- as.Date("1969-12-31")
-  expect_identical(warp_distance(x, "month"), -1L)
+  expect_identical(warp_distance(x, "month"), -1)
 
   x <- as.Date("1968-11-30")
-  expect_identical(warp_distance(x, "month"), -14L)
+  expect_identical(warp_distance(x, "month"), -14)
 })
 
 test_that("Date + UTC origin does not emit a warning", {
   x <- as.Date("1971-01-01")
   origin <- as.POSIXct("1971-01-01", tz = "UTC")
 
-  expect_identical(warp_distance(x, "month", origin = origin), 0L)
+  expect_identical(warp_distance(x, "month", origin = origin), 0)
 })
 
 test_that("Date + non-UTC origin converts with a warning", {
@@ -308,10 +308,10 @@ test_that("Date + non-UTC origin converts with a warning", {
 
 test_that("can use integer Dates", {
   x <- structure(0L, class = "Date")
-  expect_identical(warp_distance(x, "month"), 0L)
+  expect_identical(warp_distance(x, "month"), 0)
 
   x <- structure(31L, class = "Date")
-  expect_identical(warp_distance(x, "month"), 1L)
+  expect_identical(warp_distance(x, "month"), 1)
 })
 
 test_that("can handle `every` with default origin", {
@@ -322,9 +322,9 @@ test_that("can handle `every` with default origin", {
     "1970-04-01"
   ))
 
-  expect_equal(warp_distance(x, by = "month", every = 2L), c(-2L, -1L, -1L, 0L, 0L, 1L, 1L))
-  expect_equal(warp_distance(x, by = "month", every = 3L), c(-1L, -1L, -1L, 0L, 0L, 0L, 1L))
-  expect_equal(warp_distance(x, by = "month", every = 4L), c(-1L, -1L, -1L, 0L, 0L, 0L, 0L))
+  expect_equal(warp_distance(x, by = "month", every = 2L), c(-2, -1, -1, 0, 0, 1, 1))
+  expect_equal(warp_distance(x, by = "month", every = 3L), c(-1, -1, -1, 0, 0, 0, 1))
+  expect_equal(warp_distance(x, by = "month", every = 4L), c(-1, -1, -1, 0, 0, 0, 0))
 })
 
 test_that("can handle `every` with altered origin", {
@@ -337,9 +337,9 @@ test_that("can handle `every` with altered origin", {
 
   origin <- as.Date("1970-02-01")
 
-  expect_equal(warp_distance(x, by = "month", every = 2L, origin = origin), c(-2L, -2L, -1L, -1L, 0L, 0L, 1L))
-  expect_equal(warp_distance(x, by = "month", every = 3L, origin = origin), c(-2L, -1L, -1L, -1L, 0L, 0L, 0L))
-  expect_equal(warp_distance(x, by = "month", every = 4L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
+  expect_equal(warp_distance(x, by = "month", every = 2L, origin = origin), c(-2, -2, -1, -1, 0, 0, 1))
+  expect_equal(warp_distance(x, by = "month", every = 3L, origin = origin), c(-2, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, by = "month", every = 4L, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
 })
 
 test_that("fractional Date pieces are ignored", {
@@ -348,21 +348,21 @@ test_that("fractional Date pieces are ignored", {
   x <- structure(-0.0001, class = "Date")
 
   # But we really treat this as `new_date(0)`
-  expect_equal(warp_distance(x, by = "month"), 0L)
+  expect_equal(warp_distance(x, by = "month"), 0)
 })
 
 test_that("size 0 input works - integer Dates", {
   x <- structure(integer(), class = "Date")
 
-  expect_equal(warp_distance(x, by = "month"), integer())
-  expect_equal(warp_distance(x, by = "month", every = 2), integer())
+  expect_equal(warp_distance(x, by = "month"), numeric())
+  expect_equal(warp_distance(x, by = "month", every = 2), numeric())
 })
 
 test_that("size 0 input works - numeric Dates", {
   x <- structure(numeric(), class = "Date")
 
-  expect_equal(warp_distance(x, by = "month"), integer())
-  expect_equal(warp_distance(x, by = "month", every = 2), integer())
+  expect_equal(warp_distance(x, by = "month"), numeric())
+  expect_equal(warp_distance(x, by = "month", every = 2), numeric())
 })
 
 # ------------------------------------------------------------------------------
@@ -370,21 +370,21 @@ test_that("size 0 input works - numeric Dates", {
 
 test_that("can warp_distance() by month with POSIXct", {
   x <- as.POSIXct("1970-01-01", tz = "UTC")
-  expect_identical(warp_distance(x, "month"), 0L)
+  expect_identical(warp_distance(x, "month"), 0)
 
   x <- as.POSIXct("1971-01-01", tz = "UTC")
-  expect_identical(warp_distance(x, "month"), 12L)
+  expect_identical(warp_distance(x, "month"), 12)
 })
 
 test_that("can warp_distance() by month with 'negative' POSIXct", {
   x <- as.POSIXct("1969-12-31 23:59:59", tz = "UTC")
-  expect_identical(warp_distance(x, "month"), -1L)
+  expect_identical(warp_distance(x, "month"), -1)
 
   x <- as.POSIXct("1969-01-01 00:00:00", tz = "UTC")
-  expect_identical(warp_distance(x, "month"), -12L)
+  expect_identical(warp_distance(x, "month"), -12)
 
   x <- as.POSIXct("1968-12-31 23:59:59", tz = "UTC")
-  expect_identical(warp_distance(x, "month"), -13L)
+  expect_identical(warp_distance(x, "month"), -13)
 })
 
 test_that("UTC POSIXct + UTC origin does not emit a warning", {
@@ -392,8 +392,8 @@ test_that("UTC POSIXct + UTC origin does not emit a warning", {
 
   expect_warning(warp_distance(x, "month"), NA)
 
-  expect_identical(warp_distance(x, "month"), 12L)
-  expect_identical(warp_distance(x, "month", origin = x), 0L)
+  expect_identical(warp_distance(x, "month"), 12)
+  expect_identical(warp_distance(x, "month", origin = x), 0)
 })
 
 test_that("UTC POSIXct + Date origin does not emit a warning", {
@@ -403,8 +403,8 @@ test_that("UTC POSIXct + Date origin does not emit a warning", {
 
   expect_warning(warp_distance(x, "month", origin = origin1), NA)
 
-  expect_identical(warp_distance(x, "month", origin = origin1), 0L)
-  expect_identical(warp_distance(x, "month", origin = origin2), -12L)
+  expect_identical(warp_distance(x, "month", origin = origin1), 0)
+  expect_identical(warp_distance(x, "month", origin = origin2), -12)
 })
 
 test_that("UTC POSIXct + non-UTC origin converts with a warning", {
@@ -428,22 +428,22 @@ test_that("local time POSIXct + UTC origin converts with a warning", {
 
     expect_identical(
       expect_warning(warp_distance(x, "month", origin = origin)),
-      0L
+      0
     )
   })
 })
 
 test_that("can use integer POSIXct", {
   x <- structure(-1L, tzone = "UTC", class = c("POSIXct", "POSIXt"))
-  expect_identical(warp_distance(x, "month"), -1L)
+  expect_identical(warp_distance(x, "month"), -1)
 })
 
 test_that("can handle `NA` dates", {
   x <- structure(NA_real_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
-  expect_identical(warp_distance(x, "month"), NA_integer_)
+  expect_identical(warp_distance(x, "month"), NA_real_)
 
   x <- structure(NA_integer_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
-  expect_identical(warp_distance(x, "month"), NA_integer_)
+  expect_identical(warp_distance(x, "month"), NA_real_)
 })
 
 test_that("can handle `every` with default origin", {
@@ -454,9 +454,9 @@ test_that("can handle `every` with default origin", {
     "1970-04-01"
   ), tz = "UTC")
 
-  expect_equal(warp_distance(x, by = "month", every = 2L), c(-2L, -1L, -1L, 0L, 0L, 1L, 1L))
-  expect_equal(warp_distance(x, by = "month", every = 3L), c(-1L, -1L, -1L, 0L, 0L, 0L, 1L))
-  expect_equal(warp_distance(x, by = "month", every = 4L), c(-1L, -1L, -1L, 0L, 0L, 0L, 0L))
+  expect_equal(warp_distance(x, by = "month", every = 2L), c(-2, -1, -1, 0, 0, 1, 1))
+  expect_equal(warp_distance(x, by = "month", every = 3L), c(-1, -1, -1, 0, 0, 0, 1))
+  expect_equal(warp_distance(x, by = "month", every = 4L), c(-1, -1, -1, 0, 0, 0, 0))
 })
 
 test_that("can handle `every` with altered origin", {
@@ -469,9 +469,9 @@ test_that("can handle `every` with altered origin", {
 
   origin <- as.Date("1970-02-01")
 
-  expect_equal(warp_distance(x, by = "month", every = 2L, origin = origin), c(-2L, -2L, -1L, -1L, 0L, 0L, 1L))
-  expect_equal(warp_distance(x, by = "month", every = 3L, origin = origin), c(-2L, -1L, -1L, -1L, 0L, 0L, 0L))
-  expect_equal(warp_distance(x, by = "month", every = 4L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
+  expect_equal(warp_distance(x, by = "month", every = 2L, origin = origin), c(-2, -2, -1, -1, 0, 0, 1))
+  expect_equal(warp_distance(x, by = "month", every = 3L, origin = origin), c(-2, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, by = "month", every = 4L, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
 })
 
 test_that("can handle `every` with altered origin and altered timezone", {
@@ -484,9 +484,9 @@ test_that("can handle `every` with altered origin and altered timezone", {
 
   origin <- as.POSIXct("1970-02-01", tz = "America/New_York")
 
-  expect_equal(warp_distance(x, by = "month", every = 2L, origin = origin), c(-2L, -2L, -1L, -1L, 0L, 0L, 1L))
-  expect_equal(warp_distance(x, by = "month", every = 3L, origin = origin), c(-2L, -1L, -1L, -1L, 0L, 0L, 0L))
-  expect_equal(warp_distance(x, by = "month", every = 4L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
+  expect_equal(warp_distance(x, by = "month", every = 2L, origin = origin), c(-2, -2, -1, -1, 0, 0, 1))
+  expect_equal(warp_distance(x, by = "month", every = 3L, origin = origin), c(-2, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, by = "month", every = 4L, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
 })
 
 # ------------------------------------------------------------------------------
@@ -495,11 +495,11 @@ test_that("can handle `every` with altered origin and altered timezone", {
 test_that("can warp_distance() by month with POSIXlt", {
   x <- as.POSIXct("1970-01-01", tz = "UTC")
   x <- as.POSIXlt(x)
-  expect_identical(warp_distance(x, "month"), 0L)
+  expect_identical(warp_distance(x, "month"), 0)
 
   x <- as.POSIXct("1971-01-01", tz = "UTC")
   x <- as.POSIXlt(x)
-  expect_identical(warp_distance(x, "month"), 12L)
+  expect_identical(warp_distance(x, "month"), 12)
 })
 
 # ------------------------------------------------------------------------------
