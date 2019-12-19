@@ -1,6 +1,6 @@
 #' Locate period boundaries for a date vector
 #'
-#' `warp_boundaries()` detects a change in time period along `x`, for example,
+#' `warp_boundary()` detects a change in time period along `x`, for example,
 #' rolling from one month to the next. It returns the start and stop positions
 #' for each contiguous period chunk in `x`.
 #'
@@ -16,14 +16,14 @@
 #' x
 #'
 #' # Boundaries by month
-#' warp_boundaries(x, "month")
+#' warp_boundary(x, "month")
 #'
 #' # Bound by every 5 days, relative to "1970-01-01"
 #' # Creates boundaries of:
 #' # [1969-12-27, 1970-01-01)
 #' # [1970-01-01, 1970-01-06)
 #' # [1970-01-06, 1970-01-11)
-#' warp_boundaries(x, "day", every = 5)
+#' warp_boundary(x, "day", every = 5)
 #'
 #' # Bound by every 5 days, relative to the smallest value in our vector
 #' origin <- min(x)
@@ -32,7 +32,7 @@
 #' # Creates boundaries of:
 #' # [1969-12-28, 1970-01-02)
 #' # [1970-01-02, 1970-01-07)
-#' warp_boundaries(x, "day", every = 5, origin = origin)
-warp_boundaries <- function(x, by = "year", every = 1L, origin = NULL) {
-  .Call(warp_warp_boundaries, x, by, every, origin)
+#' warp_boundary(x, "day", every = 5, origin = origin)
+warp_boundary <- function(x, by = "year", every = 1L, origin = NULL) {
+  .Call(warp_warp_boundary, x, by, every, origin)
 }

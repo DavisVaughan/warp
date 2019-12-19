@@ -3,13 +3,29 @@
 
 // -----------------------------------------------------------------------------
 
+static SEXP warp_boundary_impl(SEXP stops);
+
+// [[ include("warp.h") ]]
+SEXP warp_boundary(SEXP x, enum warp_by_type type, int every, SEXP origin) {
+  SEXP stops = PROTECT(warp_change(x, type, every, origin));
+  SEXP out = warp_boundary_impl(stops);
+  UNPROTECT(1);
+  return out;
+}
+
+// [[ register() ]]
+SEXP warp_warp_boundary(SEXP x, SEXP by, SEXP every, SEXP origin) {
+  enum warp_by_type type = as_by_type(by);
+  int every_ = pull_every(every);
+  return warp_boundary(x, type, every_, origin);
+}
+
+// -----------------------------------------------------------------------------
+
 static SEXP new_boundaries_df(R_len_t size);
 static SEXP compute_starts(SEXP x, R_xlen_t size);
 
-// [[ include("warp.h") ]]
-SEXP locate_boundaries(SEXP x) {
-  SEXP stops = PROTECT(locate_changes(x));
-
+static SEXP warp_boundary_impl(SEXP stops) {
   R_xlen_t size = Rf_xlength(stops);
 
   SEXP out = PROTECT(new_boundaries_df(size));
@@ -17,16 +33,9 @@ SEXP locate_boundaries(SEXP x) {
   SET_VECTOR_ELT(out, 0, compute_starts(stops, size));
   SET_VECTOR_ELT(out, 1, stops);
 
-  UNPROTECT(2);
+  UNPROTECT(1);
   return out;
 }
-
-// [[ register() ]]
-SEXP warp_locate_boundaries(SEXP x) {
-  return locate_boundaries(x);
-}
-
-// -----------------------------------------------------------------------------
 
 static SEXP compute_starts(SEXP x, R_xlen_t size) {
   if (size == 0) {

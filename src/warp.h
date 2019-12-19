@@ -14,10 +14,7 @@
 
 SEXP warp_distance(SEXP x, enum warp_by_type type, int every, SEXP origin);
 SEXP warp_change(SEXP x, enum warp_by_type type, int every, SEXP origin);
-SEXP warp_boundaries(SEXP x, enum warp_by_type type, int every, SEXP origin);
-
-SEXP locate_changes(SEXP x);
-SEXP locate_boundaries(SEXP x);
+SEXP warp_boundary(SEXP x, enum warp_by_type type, int every, SEXP origin);
 
 // Compatibility ------------------------------------------------
 
