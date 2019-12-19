@@ -12,8 +12,8 @@
 
 // Functionality ------------------------------------------------
 
-SEXP warp_group(SEXP x, enum timewarp_group_type type, int every, SEXP origin);
-SEXP warp_boundaries(SEXP x, enum timewarp_group_type type, int every, SEXP origin);
+SEXP warp_distance(SEXP x, enum timewarp_by_type type, int every, SEXP origin);
+SEXP warp_boundaries(SEXP x, enum timewarp_by_type type, int every, SEXP origin);
 
 SEXP locate_changes(SEXP x);
 SEXP locate_boundaries(SEXP x);

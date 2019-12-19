@@ -1,4 +1,4 @@
-# As this is a thin wrapper around `warp_group()` and `locate_boundaries()`,
+# As this is a thin wrapper around `warp_distance()` and `locate_boundaries()`,
 # we just do a few simple tests here
 
 test_that("warp_boundaries() works", {

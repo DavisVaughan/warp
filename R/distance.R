@@ -1,8 +1,7 @@
-#' Group a date vector by period
+#' Compute distances from a date time origin
 #'
 #' @description
-#' `warp_group()` is a low level engine for constructing groups by period for a
-#' date vector.
+#' `warp_distance()` is a low level engine for computing date time distances.
 #'
 #' It returns the distance from `x` to the `origin` in units
 #' defined by the period specified with `by`. For example, `by = "year"` would
@@ -10,10 +9,12 @@
 #' `1970-01-01 00:00:00 UTC` by default.
 #'
 #' @details
-#' The return value of `warp_group()` is suitable for use as a grouping column
-#' in, for example, a `dplyr::mutate()`. This is especially useful for grouping
-#' by a multitude of a particular period, such as "every 5 months" starting from
-#' your particular `origin` value.
+#' The return value of `warp_distance()` is suitable for use as a grouping
+#' column in, for example, a `dplyr::mutate()`. This is especially useful for
+#' grouping by a multitude of a particular period, such as "every 5 months"
+#' starting from your particular `origin` value. If you want "cleaner" grouping
+#' values, you might consider running `vctrs::vec_group_id()` on the result from
+#' `warp_distance()`.
 #'
 #' When the time zone of `x` differs from the time zone of `origin`, a warning
 #' is issued, and `x` is coerced to the time zone of `origin` without changing
@@ -39,7 +40,7 @@
 #'
 #' @param x `[Date / POSIXct / POSIXlt]`
 #'
-#'   The vector to compute time groups for.
+#'   The vector to compute time distances for.
 #'
 #' @param by `[character(1)]`
 #'
@@ -62,12 +63,12 @@
 #'
 #' @param origin `[Date(1) / POSIXct(1) / POSIXlt(1)]`
 #'
-#'   The reference value for the groups to be computed from. This is
+#'   The reference value for the distances to be computed from. This is
 #'   particularly important when `every > 1` and you need to define when the
 #'   "first" event was to start counting from.
 #'
 #' @return
-#' An integer vector containing the groups, unless `by = "second"`, in which
+#' An integer vector containing the distances, unless `by = "second"`, in which
 #' case a double vector is returned to avoid integer overflow.
 #'
 #' @export
@@ -75,33 +76,33 @@
 #' x <- as.Date("1970-01-01") + -4:4
 #' x
 #'
-#' # Group by month (really, year + month)
-#' warp_group(x, "month")
+#' # Compute monthly distances (really, year + month)
+#' warp_distance(x, "month")
 #'
-#' # Group by every 2 days, relative to "1970-01-01"
-#' warp_group(x, "day", every = 2)
+#' # Compute distances every 2 days, relative to "1970-01-01"
+#' warp_distance(x, "day", every = 2)
 #'
-#' # Group by every 2 days, this time relative to "1970-01-02"
-#' warp_group(x, "day", every = 2, origin = as.Date("1970-01-02"))
+#' # Compute distances every 2 days, this time relative to "1970-01-02"
+#' warp_distance(x, "day", every = 2, origin = as.Date("1970-01-02"))
 #'
 #' y <- as.POSIXct("1970-01-01 00:00:01", "UTC") + c(0, 2, 3, 4, 5, 6, 10)
 #'
-#' # Group by every 5 seconds, starting from the unix epoch of
+#' # Compute distances every 5 seconds, starting from the unix epoch of
 #' # 1970-01-01 00:00:00
 #' # So this buckets:
 #' # [1970-01-01 00:00:00, 1970-01-01 00:00:05) = 0
 #' # [1970-01-01 00:00:05, 1970-01-01 00:00:10) = 1
 #' # [1970-01-01 00:00:10, 1970-01-01 00:00:15) = 2
-#' warp_group(y, "second", every = 5)
+#' warp_distance(y, "second", every = 5)
 #'
-#' # Group by every 5 seconds, starting from the minimum of `x`
+#' # Compute distances every 5 seconds, starting from the minimum of `x`
 #' # 1970-01-01 00:00:01
 #' # So this buckets:
 #' # [1970-01-01 00:00:01, 1970-01-01 00:00:06) = 0
 #' # [1970-01-01 00:00:06, 1970-01-01 00:00:11) = 1
 #' # [1970-01-01 00:00:11, 1970-01-01 00:00:16) = 2
 #' origin <- as.POSIXct("1970-01-01 00:00:01", "UTC")
-#' warp_group(y, "second", every = 5, origin = origin)
+#' warp_distance(y, "second", every = 5, origin = origin)
 #'
 #' # Differing time zones between `x` and `origin` can be particularly
 #' # problematic. For this reason, if the time zones are different a warning
@@ -113,13 +114,13 @@
 #' # We passed in a clock time 1 hour after that, but in a different time zone.
 #' # America/New_York is 5 hours behind UTC, so when it is converted to
 #' # UTC the value becomes `1970-01-01 06:00:00 UTC`
-#' warp_group(x_in_nyc, "hour")
+#' warp_distance(x_in_nyc, "hour")
 #'
 #' # We can use an origin value in our own time zone to fix this
 #' # (it doesn't have to be 1970-01-01)
 #' origin <- as.POSIXct("1970-01-01", "America/New_York")
-#' warp_group(x_in_nyc, "hour", origin = origin)
+#' warp_distance(x_in_nyc, "hour", origin = origin)
 #'
-warp_group <- function(x, by = "year", every = 1L, origin = NULL) {
-  .Call(timewarp_warp_group, x, by, every, origin)
+warp_distance <- function(x, by = "year", every = 1L, origin = NULL) {
+  .Call(timewarp_warp_distance, x, by, every, origin)
 }

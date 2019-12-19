@@ -4,7 +4,7 @@
 #' rolling from one month to the next. It returns the start and stop positions
 #' for each contiguous period chunk in `x`.
 #'
-#' @inheritParams warp_group
+#' @inheritParams warp_distance
 #'
 #' @param x `[Date / POSIXct / POSIXlt]`
 #'
