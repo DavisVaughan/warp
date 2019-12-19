@@ -3,10 +3,10 @@
 #include <stdint.h> // For int64_t (especially on Windows)
 
 // Helpers defined at the bottom of the file
-void validate_every(int every);
-void validate_origin(SEXP origin);
-double origin_to_days_from_epoch(SEXP origin);
-double origin_to_seconds_from_epoch(SEXP origin);
+static void validate_every(int every);
+static void validate_origin(SEXP origin);
+static double origin_to_days_from_epoch(SEXP origin);
+static double origin_to_seconds_from_epoch(SEXP origin);
 
 // -----------------------------------------------------------------------------
 
@@ -1266,7 +1266,7 @@ static SEXP dbl_posixct_warp_group_second(SEXP x, int every, SEXP origin) {
 
 // -----------------------------------------------------------------------------
 
-void validate_every(int every) {
+static void validate_every(int every) {
   if (every == NA_INTEGER) {
     r_error("validate_every", "`every` must not be `NA`");
   }
@@ -1276,7 +1276,7 @@ void validate_every(int every) {
   }
 }
 
-void validate_origin(SEXP origin) {
+static void validate_origin(SEXP origin) {
   if (origin == R_NilValue) {
     return;
   }
@@ -1292,7 +1292,7 @@ void validate_origin(SEXP origin) {
   }
 }
 
-double origin_to_days_from_epoch(SEXP origin) {
+static double origin_to_days_from_epoch(SEXP origin) {
   origin = PROTECT(as_date(origin));
 
   double out = REAL(origin)[0];
@@ -1305,7 +1305,7 @@ double origin_to_days_from_epoch(SEXP origin) {
   return out;
 }
 
-double origin_to_seconds_from_epoch(SEXP origin) {
+static double origin_to_seconds_from_epoch(SEXP origin) {
   origin = PROTECT(as_datetime(origin));
 
   double out = REAL(origin)[0];
