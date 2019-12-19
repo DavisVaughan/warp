@@ -58,7 +58,7 @@ SEXP warp_warp_distance(SEXP x, SEXP by, SEXP every, SEXP origin) {
 
 // -----------------------------------------------------------------------------
 
-#define EPOCH_YEAR 1970
+#define EPOCH_YEAR 0
 #define EPOCH_MONTH 0
 
 static SEXP warp_distance_year(SEXP x, int every, SEXP origin) {
@@ -67,8 +67,8 @@ static SEXP warp_distance_year(SEXP x, int every, SEXP origin) {
   int origin_year = EPOCH_YEAR;
 
   if (origin != R_NilValue) {
-    SEXP origin_time_df = PROTECT_N(time_get(origin, strings_year), &n_prot);
-    origin_year = INTEGER(VECTOR_ELT(origin_time_df, 0))[0];
+    SEXP origin_year_sexp = PROTECT_N(get_year(origin), &n_prot);
+    origin_year = INTEGER(origin_year_sexp)[0];
 
     if (origin_year == NA_INTEGER) {
       r_error("warp_distance_year", "`origin` cannot be `NA`.");
@@ -77,9 +77,7 @@ static SEXP warp_distance_year(SEXP x, int every, SEXP origin) {
 
   bool needs_every = (every != 1);
 
-  SEXP time_df = PROTECT_N(time_get(x, strings_year), &n_prot);
-
-  x = VECTOR_ELT(time_df, 0);
+  x = PROTECT_N(get_year(x), &n_prot);
   int* p_x = INTEGER(x);
 
   R_xlen_t n_out = Rf_xlength(x);
@@ -130,9 +128,9 @@ static SEXP warp_distance_month(SEXP x, int every, SEXP origin) {
   int origin_month = EPOCH_MONTH;
 
   if (origin != R_NilValue) {
-    SEXP origin_time_df = PROTECT_N(time_get(origin, strings_year_month), &n_prot);
-    origin_year = INTEGER(VECTOR_ELT(origin_time_df, 0))[0];
-    origin_month = INTEGER(VECTOR_ELT(origin_time_df, 1))[0] - 1;
+    SEXP origin_time_lst = PROTECT_N(get_year_month(origin), &n_prot);
+    origin_year = INTEGER(VECTOR_ELT(origin_time_lst, 0))[0];
+    origin_month = INTEGER(VECTOR_ELT(origin_time_lst, 1))[0];
 
     if (origin_year == NA_INTEGER) {
       r_error("warp_distance_month", "`origin` cannot be `NA`.");
@@ -141,10 +139,10 @@ static SEXP warp_distance_month(SEXP x, int every, SEXP origin) {
 
   bool needs_every = (every != 1);
 
-  SEXP time_df = PROTECT_N(time_get(x, strings_year_month), &n_prot);
+  SEXP time_lst = PROTECT_N(get_year_month(x), &n_prot);
 
-  SEXP year = VECTOR_ELT(time_df, 0);
-  SEXP month = VECTOR_ELT(time_df, 1);
+  SEXP year = VECTOR_ELT(time_lst, 0);
+  SEXP month = VECTOR_ELT(time_lst, 1);
 
   const int* p_year = INTEGER_RO(year);
   const int* p_month = INTEGER_RO(month);
@@ -156,7 +154,7 @@ static SEXP warp_distance_month(SEXP x, int every, SEXP origin) {
 
   for (R_xlen_t i = 0; i < size; ++i) {
     int elt_year = p_year[i];
-    int elt_month = p_month[i] - 1;
+    int elt_month = p_month[i];
 
     if (elt_year == NA_INTEGER) {
       p_out[i] = NA_REAL;
