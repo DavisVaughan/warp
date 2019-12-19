@@ -243,31 +243,35 @@ static SEXP posixlt_warp_distance_day(SEXP x, int every, SEXP origin) {
 
 
 static SEXP int_date_warp_distance_day(SEXP x, int every, SEXP origin) {
-  SEXP out = PROTECT(r_maybe_duplicate(x));
-  SET_ATTRIB(out, R_NilValue);
-  SET_OBJECT(out, 0);
-
-  int* p_out = INTEGER(out);
-  R_xlen_t out_size = Rf_xlength(out);
-
   bool needs_every = (every != 1);
   bool needs_offset = (origin != R_NilValue);
 
   // Early exit if no changes are required, the raw `day` is enough
   if (!needs_every && !needs_offset) {
+    SEXP out = PROTECT(Rf_coerceVector(x, REALSXP));
+    SET_ATTRIB(out, R_NilValue);
+    SET_OBJECT(out, 0);
     UNPROTECT(1);
     return out;
   }
+
+  R_xlen_t size = Rf_xlength(x);
+
+  int* p_x = INTEGER(x);
+
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, size));
+  double* p_out = REAL(out);
 
   double origin_offset;
   if (needs_offset) {
     origin_offset = origin_to_days_from_epoch(origin);
   }
 
-  for (R_xlen_t i = 0; i < out_size; ++i) {
-    int elt = p_out[i];
+  for (R_xlen_t i = 0; i < size; ++i) {
+    int elt = p_x[i];
 
     if (elt == NA_INTEGER) {
+      p_out[i] = NA_REAL;
       continue;
     }
 
@@ -294,12 +298,12 @@ static SEXP int_date_warp_distance_day(SEXP x, int every, SEXP origin) {
 }
 
 static SEXP dbl_date_warp_distance_day(SEXP x, int every, SEXP origin) {
-  R_xlen_t x_size = Rf_xlength(x);
+  R_xlen_t size = Rf_xlength(x);
 
   double* p_x = REAL(x);
 
-  SEXP out = PROTECT(Rf_allocVector(INTSXP, x_size));
-  int* p_out = INTEGER(out);
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, size));
+  double* p_out = REAL(out);
 
   bool needs_every = (every != 1);
 
@@ -310,11 +314,11 @@ static SEXP dbl_date_warp_distance_day(SEXP x, int every, SEXP origin) {
     origin_offset = origin_to_days_from_epoch(origin);
   }
 
-  for (R_xlen_t i = 0; i < x_size; ++i) {
+  for (R_xlen_t i = 0; i < size; ++i) {
     double x_elt = p_x[i];
 
     if (!R_FINITE(x_elt)) {
-      p_out[i] = NA_INTEGER;
+      p_out[i] = NA_REAL;
       continue;
     }
 
@@ -350,7 +354,7 @@ static SEXP dbl_date_warp_distance_day(SEXP x, int every, SEXP origin) {
 #define SECONDS_IN_DAY 86400
 
 static SEXP int_posixct_warp_distance_day(SEXP x, int every, SEXP origin) {
-  R_xlen_t x_size = Rf_xlength(x);
+  R_xlen_t size = Rf_xlength(x);
 
   bool needs_every = (every != 1);
 
@@ -361,16 +365,16 @@ static SEXP int_posixct_warp_distance_day(SEXP x, int every, SEXP origin) {
     origin_offset = origin_to_seconds_from_epoch(origin);
   }
 
-  SEXP out = PROTECT(Rf_allocVector(INTSXP, x_size));
-  int* p_out = INTEGER(out);
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, size));
+  double* p_out = REAL(out);
 
   int* p_x = INTEGER(x);
 
-  for (R_xlen_t i = 0; i < x_size; ++i) {
+  for (R_xlen_t i = 0; i < size; ++i) {
     int elt = p_x[i];
 
     if (elt == NA_INTEGER) {
-      p_out[i] = NA_INTEGER;
+      p_out[i] = NA_REAL;
       continue;
     }
 
@@ -404,7 +408,7 @@ static SEXP int_posixct_warp_distance_day(SEXP x, int every, SEXP origin) {
 }
 
 static SEXP dbl_posixct_warp_distance_day(SEXP x, int every, SEXP origin) {
-  R_xlen_t x_size = Rf_xlength(x);
+  R_xlen_t size = Rf_xlength(x);
 
   bool needs_every = (every != 1);
 
@@ -415,16 +419,16 @@ static SEXP dbl_posixct_warp_distance_day(SEXP x, int every, SEXP origin) {
     origin_offset = origin_to_seconds_from_epoch(origin);
   }
 
-  SEXP out = PROTECT(Rf_allocVector(INTSXP, x_size));
-  int* p_out = INTEGER(out);
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, size));
+  double* p_out = REAL(out);
 
   double* p_x = REAL(x);
 
-  for (R_xlen_t i = 0; i < x_size; ++i) {
+  for (R_xlen_t i = 0; i < size; ++i) {
     double x_elt = p_x[i];
 
     if (!R_FINITE(x_elt)) {
-      p_out[i] = NA_INTEGER;
+      p_out[i] = NA_REAL;
       continue;
     }
 

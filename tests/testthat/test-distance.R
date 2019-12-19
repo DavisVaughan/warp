@@ -510,14 +510,14 @@ test_that("can warp_distance() by month with POSIXlt", {
 test_that("can warp_distance() by week with Date", {
   x <- as.Date(c("1969-12-24", "1969-12-25", "1970-01-01", "1970-01-07", "1970-01-08"))
 
-  expect_identical(warp_distance(x, "week"), c(-2L, -1L, 0L, 0L, 1L))
+  expect_identical(warp_distance(x, "week"), c(-2, -1, 0, 0, 1))
 })
 
 test_that("can adjust the origin at the day level", {
   origin <- as.Date("1970-01-02")
   x <- as.Date(c("1969-12-24", "1969-12-25", "1970-01-01", "1970-01-07", "1970-01-08"))
 
-  expect_identical(warp_distance(x, "week", origin = origin), c(-2L, -2L, -1L, 0L, 0L))
+  expect_identical(warp_distance(x, "week", origin = origin), c(-2, -2, -1, 0, 0))
 })
 
 # ------------------------------------------------------------------------------
@@ -526,7 +526,7 @@ test_that("can adjust the origin at the day level", {
 test_that("can warp_distance() by week with POSIXct", {
   x <- as.POSIXct(c("1969-12-24", "1969-12-25", "1970-01-01", "1970-01-07", "1970-01-08"), "UTC")
 
-  expect_identical(warp_distance(x, "week"), c(-2L, -1L, 0L, 0L, 1L))
+  expect_identical(warp_distance(x, "week"), c(-2, -1, 0, 0, 1))
 })
 
 # ------------------------------------------------------------------------------
@@ -534,28 +534,28 @@ test_that("can warp_distance() by week with POSIXct", {
 
 test_that("can warp_distance() by day with Date", {
   x <- as.Date("1970-01-01")
-  expect_identical(warp_distance(x, "day"), 0L)
+  expect_identical(warp_distance(x, "day"), 0)
 
   x <- as.Date("1970-01-02")
-  expect_identical(warp_distance(x, "day"), 1L)
+  expect_identical(warp_distance(x, "day"), 1)
 
   x <- as.Date("1971-01-01")
-  expect_identical(warp_distance(x, "day"), 365L)
+  expect_identical(warp_distance(x, "day"), 365)
 })
 
 test_that("can warp_distance() by day with 'negative' Dates", {
   x <- as.Date("1969-12-31")
-  expect_identical(warp_distance(x, "day"), -1L)
+  expect_identical(warp_distance(x, "day"), -1)
 
   x <- as.Date("1969-12-30")
-  expect_identical(warp_distance(x, "day"), -2L)
+  expect_identical(warp_distance(x, "day"), -2)
 })
 
 test_that("Date + UTC origin does not emit a warning", {
   x <- as.Date("1971-01-01")
   origin <- as.POSIXct("1971-01-01", tz = "UTC")
 
-  expect_identical(warp_distance(x, "day", origin = origin), 0L)
+  expect_identical(warp_distance(x, "day", origin = origin), 0)
 })
 
 test_that("Date + non-UTC origin converts with a warning", {
@@ -574,23 +574,23 @@ test_that("Date + non-UTC origin converts with a warning", {
 
 test_that("can use integer Dates", {
   x <- structure(0L, class = "Date")
-  expect_identical(warp_distance(x, "day"), 0L)
+  expect_identical(warp_distance(x, "day"), 0)
 })
 
 test_that("can handle `NA` dates", {
   x <- structure(NA_real_, class = "Date")
-  expect_identical(warp_distance(x, "day"), NA_integer_)
+  expect_identical(warp_distance(x, "day"), NA_real_)
 
   x <- structure(NA_integer_, class = "Date")
-  expect_identical(warp_distance(x, "day"), NA_integer_)
+  expect_identical(warp_distance(x, "day"), NA_real_)
 })
 
 test_that("can handle `every` with default origin - integer Dates", {
   x <- structure(-3L:3L, class = "Date")
 
-  expect_equal(warp_distance(x, by = "day", every = 2L), c(-2L, -1L, -1L, 0L, 0L, 1L, 1L))
-  expect_equal(warp_distance(x, by = "day", every = 3L), c(-1L, -1L, -1L, 0L, 0L, 0L, 1L))
-  expect_equal(warp_distance(x, by = "day", every = 4L), c(-1L, -1L, -1L, 0L, 0L, 0L, 0L))
+  expect_equal(warp_distance(x, by = "day", every = 2L), c(-2, -1, -1, 0, 0, 1, 1))
+  expect_equal(warp_distance(x, by = "day", every = 3L), c(-1, -1, -1, 0, 0, 0, 1))
+  expect_equal(warp_distance(x, by = "day", every = 4L), c(-1, -1, -1, 0, 0, 0, 0))
 })
 
 test_that("can handle `every` with altered origin - integer Dates", {
@@ -598,17 +598,17 @@ test_that("can handle `every` with altered origin - integer Dates", {
 
   origin <- as.Date("1970-01-02")
 
-  expect_equal(warp_distance(x, by = "day", every = 2L, origin = origin), c(-2L, -2L, -1L, -1L, 0L, 0L, 1L))
-  expect_equal(warp_distance(x, by = "day", every = 3L, origin = origin), c(-2L, -1L, -1L, -1L, 0L, 0L, 0L))
-  expect_equal(warp_distance(x, by = "day", every = 4L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
+  expect_equal(warp_distance(x, by = "day", every = 2L, origin = origin), c(-2, -2, -1, -1, 0, 0, 1))
+  expect_equal(warp_distance(x, by = "day", every = 3L, origin = origin), c(-2, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, by = "day", every = 4L, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
 })
 
 test_that("can handle `every` with default origin - numeric Dates", {
   x <- structure(as.numeric(-3:3), class = "Date")
 
-  expect_equal(warp_distance(x, by = "day", every = 2L), c(-2L, -1L, -1L, 0L, 0L, 1L, 1L))
-  expect_equal(warp_distance(x, by = "day", every = 3L), c(-1L, -1L, -1L, 0L, 0L, 0L, 1L))
-  expect_equal(warp_distance(x, by = "day", every = 4L), c(-1L, -1L, -1L, 0L, 0L, 0L, 0L))
+  expect_equal(warp_distance(x, by = "day", every = 2L), c(-2, -1, -1, 0, 0, 1, 1))
+  expect_equal(warp_distance(x, by = "day", every = 3L), c(-1, -1, -1, 0, 0, 0, 1))
+  expect_equal(warp_distance(x, by = "day", every = 4L), c(-1, -1, -1, 0, 0, 0, 0))
 })
 
 test_that("can handle `every` with altered origin - numeric Dates", {
@@ -616,9 +616,9 @@ test_that("can handle `every` with altered origin - numeric Dates", {
 
   origin <- as.Date("1970-01-02")
 
-  expect_equal(warp_distance(x, by = "day", every = 2L, origin = origin), c(-2L, -2L, -1L, -1L, 0L, 0L, 1L))
-  expect_equal(warp_distance(x, by = "day", every = 3L, origin = origin), c(-2L, -1L, -1L, -1L, 0L, 0L, 0L))
-  expect_equal(warp_distance(x, by = "day", every = 4L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
+  expect_equal(warp_distance(x, by = "day", every = 2L, origin = origin), c(-2, -2, -1, -1, 0, 0, 1))
+  expect_equal(warp_distance(x, by = "day", every = 3L, origin = origin), c(-2, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, by = "day", every = 4L, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
 })
 
 test_that("fractional Date pieces are ignored", {
@@ -627,21 +627,21 @@ test_that("fractional Date pieces are ignored", {
   x <- structure(-0.0001, class = "Date")
 
   # But we really treat this as `new_date(0)`
-  expect_equal(warp_distance(x, by = "day"), 0L)
+  expect_equal(warp_distance(x, by = "day"), 0)
 })
 
 test_that("size 0 input works - integer Dates", {
   x <- structure(integer(), class = "Date")
 
-  expect_equal(warp_distance(x, by = "day"), integer())
-  expect_equal(warp_distance(x, by = "day", every = 2), integer())
+  expect_equal(warp_distance(x, by = "day"), numeric())
+  expect_equal(warp_distance(x, by = "day", every = 2), numeric())
 })
 
 test_that("size 0 input works - numeric Dates", {
   x <- structure(numeric(), class = "Date")
 
-  expect_equal(warp_distance(x, by = "day"), integer())
-  expect_equal(warp_distance(x, by = "day", every = 2), integer())
+  expect_equal(warp_distance(x, by = "day"), numeric())
+  expect_equal(warp_distance(x, by = "day", every = 2), numeric())
 })
 
 # ------------------------------------------------------------------------------
@@ -649,13 +649,13 @@ test_that("size 0 input works - numeric Dates", {
 
 test_that("can warp_distance() by day with POSIXct", {
   x <- as.POSIXct("1970-01-01", tz = "UTC")
-  expect_identical(warp_distance(x, "day"), 0L)
+  expect_identical(warp_distance(x, "day"), 0)
 
   x <- as.POSIXct("1970-01-02", tz = "UTC")
-  expect_identical(warp_distance(x, "day"), 1L)
+  expect_identical(warp_distance(x, "day"), 1)
 
   x <- as.POSIXct("1971-01-01", tz = "UTC")
-  expect_identical(warp_distance(x, "day"), 365L)
+  expect_identical(warp_distance(x, "day"), 365)
 })
 
 # In terms of inclusion/exclusion, we define the cutoffs like:
@@ -665,78 +665,78 @@ test_that("can warp_distance() by day with POSIXct", {
 # [1970-01-02 00:00:00 -> 1970-01-03 00:00:00) = 1 days from epoch
 test_that("can warp_distance() by day with 'negative' POSIXct", {
   x <- as.POSIXct("1969-12-30 00:00:00", tz = "UTC")
-  expect_identical(warp_distance(x, "day"), -2L)
+  expect_identical(warp_distance(x, "day"), -2)
 
   x <- as.POSIXct("1969-12-30 23:59:59", tz = "UTC")
-  expect_identical(warp_distance(x, "day"), -2L)
+  expect_identical(warp_distance(x, "day"), -2)
 
   x <- as.POSIXct("1969-12-31 00:00:00", tz = "UTC")
-  expect_identical(warp_distance(x, "day"), -1L)
+  expect_identical(warp_distance(x, "day"), -1)
 
   x <- as.POSIXct("1969-12-31 23:59:59", tz = "UTC")
-  expect_identical(warp_distance(x, "day"), -1L)
+  expect_identical(warp_distance(x, "day"), -1)
 
   x <- as.POSIXct("1970-01-01 00:00:00", tz = "UTC")
-  expect_identical(warp_distance(x, "day"), 0L)
+  expect_identical(warp_distance(x, "day"), 0)
 
   x <- as.POSIXct("1970-01-01 23:59:59", tz = "UTC")
-  expect_identical(warp_distance(x, "day"), 0L)
+  expect_identical(warp_distance(x, "day"), 0)
 
   x <- as.POSIXct("1970-01-02 00:00:00", tz = "UTC")
-  expect_identical(warp_distance(x, "day"), 1L)
+  expect_identical(warp_distance(x, "day"), 1)
 
   x <- as.POSIXct("1969-01-01 00:00:00", tz = "UTC")
-  expect_identical(warp_distance(x, "day"), -365L)
+  expect_identical(warp_distance(x, "day"), -365)
 
   x <- as.POSIXct("1968-12-31 23:59:59", tz = "UTC")
-  expect_identical(warp_distance(x, "day"), -366L)
+  expect_identical(warp_distance(x, "day"), -366)
 })
 
 test_that("can warp_distance() by day with 'negative' POSIXct and different UTC origins", {
   origin <- as.POSIXct("1969-12-31", tz = "UTC")
 
   x <- as.POSIXct("1969-12-30 00:00:00", tz = "UTC")
-  expect_identical(warp_distance(x, "day", origin = origin), -1L)
+  expect_identical(warp_distance(x, "day", origin = origin), -1)
 
   x <- as.POSIXct("1969-12-30 23:59:59", tz = "UTC")
-  expect_identical(warp_distance(x, "day", origin = origin), -1L)
+  expect_identical(warp_distance(x, "day", origin = origin), -1)
 
   x <- as.POSIXct("1969-12-31 00:00:00", tz = "UTC")
-  expect_identical(warp_distance(x, "day", origin = origin), 0L)
+  expect_identical(warp_distance(x, "day", origin = origin), 0)
 
   x <- as.POSIXct("1969-12-31 23:59:59", tz = "UTC")
-  expect_identical(warp_distance(x, "day", origin = origin), 0L)
+  expect_identical(warp_distance(x, "day", origin = origin), 0)
 
   x <- as.POSIXct("1970-01-01 00:00:00", tz = "UTC")
-  expect_identical(warp_distance(x, "day", origin = origin), 1L)
+  expect_identical(warp_distance(x, "day", origin = origin), 1)
 
   x <- as.POSIXct("1970-01-01 23:59:59", tz = "UTC")
-  expect_identical(warp_distance(x, "day", origin = origin), 1L)
+  expect_identical(warp_distance(x, "day", origin = origin), 1)
 })
 
 test_that("can warp_distance() by day with 'negative' POSIXct and non-UTC origins", {
   origin <- as.POSIXct("1970-01-01", tz = "America/New_York")
 
   x <- as.POSIXct("1969-12-30 00:00:00", tz = "America/New_York")
-  expect_identical(warp_distance(x, "day", origin = origin), -2L)
+  expect_identical(warp_distance(x, "day", origin = origin), -2)
 
   x <- as.POSIXct("1969-12-30 23:59:59", tz = "America/New_York")
-  expect_identical(warp_distance(x, "day", origin = origin), -2L)
+  expect_identical(warp_distance(x, "day", origin = origin), -2)
 
   x <- as.POSIXct("1969-12-31 00:00:00", tz = "America/New_York")
-  expect_identical(warp_distance(x, "day", origin = origin), -1L)
+  expect_identical(warp_distance(x, "day", origin = origin), -1)
 
   x <- as.POSIXct("1969-12-31 23:59:59", tz = "America/New_York")
-  expect_identical(warp_distance(x, "day", origin = origin), -1L)
+  expect_identical(warp_distance(x, "day", origin = origin), -1)
 
   x <- as.POSIXct("1970-01-01 00:00:00", tz = "America/New_York")
-  expect_identical(warp_distance(x, "day", origin = origin), 0L)
+  expect_identical(warp_distance(x, "day", origin = origin), 0)
 
   x <- as.POSIXct("1970-01-01 23:59:59", tz = "America/New_York")
-  expect_identical(warp_distance(x, "day", origin = origin), 0L)
+  expect_identical(warp_distance(x, "day", origin = origin), 0)
 
   x <- as.POSIXct("1970-01-02 00:00:00", tz = "America/New_York")
-  expect_identical(warp_distance(x, "day", origin = origin), 1L)
+  expect_identical(warp_distance(x, "day", origin = origin), 1)
 })
 
 test_that("UTC POSIXct + UTC origin does not emit a warning", {
@@ -744,8 +744,8 @@ test_that("UTC POSIXct + UTC origin does not emit a warning", {
 
   expect_warning(warp_distance(x, "day"), NA)
 
-  expect_identical(warp_distance(x, "day"), 365L)
-  expect_identical(warp_distance(x, "day", origin = x), 0L)
+  expect_identical(warp_distance(x, "day"), 365)
+  expect_identical(warp_distance(x, "day", origin = x), 0)
 })
 
 test_that("UTC POSIXct + Date origin does not emit a warning", {
@@ -755,8 +755,8 @@ test_that("UTC POSIXct + Date origin does not emit a warning", {
 
   expect_warning(warp_distance(x, "day", origin = origin1), NA)
 
-  expect_identical(warp_distance(x, "day", origin = origin1), 0L)
-  expect_identical(warp_distance(x, "day", origin = origin2), -365L)
+  expect_identical(warp_distance(x, "day", origin = origin1), 0)
+  expect_identical(warp_distance(x, "day", origin = origin2), -365)
 })
 
 test_that("UTC POSIXct + non-UTC origin converts with a warning", {
@@ -780,22 +780,22 @@ test_that("local time POSIXct + UTC origin converts with a warning", {
 
     expect_identical(
       expect_warning(warp_distance(x, "day", origin = origin)),
-      0L
+      0
     )
   })
 })
 
 test_that("can use integer POSIXct", {
   x <- structure(-1L, tzone = "UTC", class = c("POSIXct", "POSIXt"))
-  expect_identical(warp_distance(x, "day"), -1L)
+  expect_identical(warp_distance(x, "day"), -1)
 })
 
 test_that("can handle `NA` dates", {
   x <- structure(NA_real_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
-  expect_identical(warp_distance(x, "day"), NA_integer_)
+  expect_identical(warp_distance(x, "day"), NA_real_)
 
   x <- structure(NA_integer_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
-  expect_identical(warp_distance(x, "day"), NA_integer_)
+  expect_identical(warp_distance(x, "day"), NA_real_)
 })
 
 test_that("can handle `every` with default origin - integer POSIXct", {
@@ -808,9 +808,9 @@ test_that("can handle `every` with default origin - integer POSIXct", {
 
   x <- structure(as.integer(unclass(x)), tzone = "UTC", class = class(x))
 
-  expect_equal(warp_distance(x, by = "day", every = 2L), c(-2L, -1L, -1L, 0L, 0L, 1L, 1L))
-  expect_equal(warp_distance(x, by = "day", every = 3L), c(-1L, -1L, -1L, 0L, 0L, 0L, 1L))
-  expect_equal(warp_distance(x, by = "day", every = 4L), c(-1L, -1L, -1L, 0L, 0L, 0L, 0L))
+  expect_equal(warp_distance(x, by = "day", every = 2L), c(-2, -1, -1, 0, 0, 1, 1))
+  expect_equal(warp_distance(x, by = "day", every = 3L), c(-1, -1, -1, 0, 0, 0, 1))
+  expect_equal(warp_distance(x, by = "day", every = 4L), c(-1, -1, -1, 0, 0, 0, 0))
 })
 
 test_that("can handle `every` with altered origin - integer POSIXct", {
@@ -825,9 +825,9 @@ test_that("can handle `every` with altered origin - integer POSIXct", {
 
   origin <- as.Date("1970-01-02")
 
-  expect_equal(warp_distance(x, by = "day", every = 2L, origin = origin), c(-2L, -2L, -1L, -1L, 0L, 0L, 1L))
-  expect_equal(warp_distance(x, by = "day", every = 3L, origin = origin), c(-2L, -1L, -1L, -1L, 0L, 0L, 0L))
-  expect_equal(warp_distance(x, by = "day", every = 4L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
+  expect_equal(warp_distance(x, by = "day", every = 2L, origin = origin), c(-2, -2, -1, -1, 0, 0, 1))
+  expect_equal(warp_distance(x, by = "day", every = 3L, origin = origin), c(-2, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, by = "day", every = 4L, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
 })
 
 test_that("can handle `every` with default origin - numeric POSIXct", {
@@ -838,9 +838,9 @@ test_that("can handle `every` with default origin - numeric POSIXct", {
     "1970-01-04"
   ), tz = "UTC")
 
-  expect_equal(warp_distance(x, by = "day", every = 2L), c(-2L, -1L, -1L, 0L, 0L, 1L, 1L))
-  expect_equal(warp_distance(x, by = "day", every = 3L), c(-1L, -1L, -1L, 0L, 0L, 0L, 1L))
-  expect_equal(warp_distance(x, by = "day", every = 4L), c(-1L, -1L, -1L, 0L, 0L, 0L, 0L))
+  expect_equal(warp_distance(x, by = "day", every = 2L), c(-2, -1, -1, 0, 0, 1, 1))
+  expect_equal(warp_distance(x, by = "day", every = 3L), c(-1, -1, -1, 0, 0, 0, 1))
+  expect_equal(warp_distance(x, by = "day", every = 4L), c(-1, -1, -1, 0, 0, 0, 0))
 })
 
 test_that("can handle `every` with altered origin - numeric POSIXct", {
@@ -853,9 +853,9 @@ test_that("can handle `every` with altered origin - numeric POSIXct", {
 
   origin <- as.Date("1970-01-02")
 
-  expect_equal(warp_distance(x, by = "day", every = 2L, origin = origin), c(-2L, -2L, -1L, -1L, 0L, 0L, 1L))
-  expect_equal(warp_distance(x, by = "day", every = 3L, origin = origin), c(-2L, -1L, -1L, -1L, 0L, 0L, 0L))
-  expect_equal(warp_distance(x, by = "day", every = 4L, origin = origin), c(-1L, -1L, -1L, -1L, 0L, 0L, 0L))
+  expect_equal(warp_distance(x, by = "day", every = 2L, origin = origin), c(-2, -2, -1, -1, 0, 0, 1))
+  expect_equal(warp_distance(x, by = "day", every = 3L, origin = origin), c(-2, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, by = "day", every = 4L, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
 })
 
 test_that("can handle fractional seconds before the epoch correctly", {
@@ -870,8 +870,8 @@ test_that("can handle fractional seconds before the epoch correctly", {
   # "1969-12-30T23:59:59.5"
   y <- .POSIXct(-86400.5, "UTC")
 
-  expect_equal(warp_distance(x, "day"), -1)
-  expect_equal(warp_distance(y, "day"), -2)
+  expect_identical(warp_distance(x, "day"), -1)
+  expect_identical(warp_distance(y, "day"), -2)
 })
 
 # ------------------------------------------------------------------------------
@@ -880,11 +880,11 @@ test_that("can handle fractional seconds before the epoch correctly", {
 test_that("can warp_distance() by day with POSIXlt", {
   x <- as.POSIXct("1970-01-01", tz = "UTC")
   x <- as.POSIXlt(x)
-  expect_identical(warp_distance(x, "day"), 0L)
+  expect_identical(warp_distance(x, "day"), 0)
 
   x <- as.POSIXct("1971-01-01", tz = "UTC")
   x <- as.POSIXlt(x)
-  expect_identical(warp_distance(x, "day"), 365L)
+  expect_identical(warp_distance(x, "day"), 365)
 })
 
 # ------------------------------------------------------------------------------
