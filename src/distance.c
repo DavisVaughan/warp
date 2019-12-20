@@ -1439,7 +1439,6 @@ static SEXP dbl_date_warp_distance_millisecond(SEXP x, int every, SEXP origin) {
 #undef MILLISECONDS_IN_DAY
 
 #define MILLISECONDS_IN_SECOND 1000
-
 #define MICROSECONDS_IN_MILLISECOND 1000
 #define MICROSECONDS_IN_SECOND 1000000
 
@@ -1577,9 +1576,8 @@ static SEXP dbl_posixct_warp_distance_millisecond(SEXP x, int every, SEXP origin
 }
 
 #undef MILLISECONDS_IN_SECOND
-
-#undef CENTIMILLISECONDS_IN_MILLISECOND
-#undef CENTIMILLISECONDS_IN_SECOND
+#undef MICROSECONDS_IN_MILLISECOND
+#undef MICROSECONDS_IN_SECOND
 
 // -----------------------------------------------------------------------------
 
