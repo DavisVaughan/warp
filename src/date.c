@@ -216,10 +216,13 @@ static void divmod(int x, int y, int* p_quot, int* p_rem);
 /*
  * `convert_days_to_year_month()`
  *
- * @param n A 0-based number of days since 1970-01-01, i.e. unclass(<Date>).
- * @param p_year A pointer to store the year offset in. This is the number of
+ * @param n
+ *   A 0-based number of days since 1970-01-01, i.e. unclass(<Date>).
+ * @param p_year
+ *   A pointer to store the year offset in. This is the number of
  *   years since 1970.
- * @param p_month A pointer to store the month offset in. This is the month
+ * @param p_month
+ *   A pointer to store the month offset in. This is the month
  *   value mapped to the range of 0-11, where 0 is January.
  */
 
@@ -372,10 +375,14 @@ static void convert_days_to_year_month(int n, int* p_year, int* p_month) {
  * above but would substitute `floor()` for `trunc()`, so `trunc(-0.5) = 0`.
  * Because the remainder is then computed from that, it would also change.
  *
- * @param x The numerator.
- * @param y The denominator.
- * @param p_quot A pointer to place the quotient value of the division in.
- * @param p_rem A pointer to place the remainder value of the division in.
+ * @param x
+ *   The numerator.
+ * @param y
+ *   The denominator.
+ * @param p_quot
+ *   A pointer to place the quotient value of the division in.
+ * @param p_rem
+ *   A pointer to place the remainder value of the division in.
  */
 
 /*
