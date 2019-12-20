@@ -51,6 +51,10 @@ SEXP as_posixlt(SEXP x);
 SEXP get_year(SEXP x);
 SEXP get_year_month(SEXP x);
 
+// In `date.c`
+SEXP date_get_year(SEXP x);
+SEXP date_get_year_month(SEXP x);
+
 // In `coercion.c`
 SEXP as_datetime(SEXP x);
 
