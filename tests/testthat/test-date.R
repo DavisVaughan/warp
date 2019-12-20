@@ -14,7 +14,7 @@ as_posixlt_from_date <- function(x) {
 }
 
 test_that("getting the year is identical to as.POSIXlt - integer Date", {
-  x <- .Date(-1e7:1e7)
+  x <- structure(-1e7:1e7, class = "Date")
 
   expect <- unclass(as_posixlt_from_date(x))
   expect <- expect$year - 70L
@@ -23,7 +23,7 @@ test_that("getting the year is identical to as.POSIXlt - integer Date", {
 })
 
 test_that("getting the year is identical to as.POSIXlt - double Date", {
-  x <- .Date(-1e7:1e7 + 0)
+  x <- structure(-1e7:1e7 + 0, class = "Date")
 
   expect <- unclass(as_posixlt_from_date(x))
   expect <- expect$year - 70L
@@ -32,7 +32,7 @@ test_that("getting the year is identical to as.POSIXlt - double Date", {
 })
 
 test_that("getting the year month is identical to as.POSIXlt - integer Date", {
-  x <- .Date(-1e7:1e7)
+  x <- structure(-1e7:1e7, class = "Date")
 
   expect <- unclass(as_posixlt_from_date(x))
   expect <- list(expect$year - 70L, expect$mon)
@@ -41,7 +41,7 @@ test_that("getting the year month is identical to as.POSIXlt - integer Date", {
 })
 
 test_that("getting the year month is identical to as.POSIXlt - double Date", {
-  x <- .Date(-1e7:1e7 + 0)
+  x <- structure(-1e7:1e7 + 0, class = "Date")
 
   expect <- unclass(as_posixlt_from_date(x))
   expect <- list(expect$year - 70L, expect$mon)
