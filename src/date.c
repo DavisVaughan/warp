@@ -263,7 +263,12 @@ static void convert_days_to_year_month_offset(int n, int* p_year, int* p_month) 
   // The smallest possible value of `n` before overflow from
   // addition of DAYS_FROM_2001_01_01_TO_EPOCH
   if (n < SMALLEST_POSSIBLE_DAYS_FROM_EPOCH) {
-    Rf_errorcall(R_NilValue, "Integer overflow.");
+    r_error(
+      "convert_days_to_year_month_offset",
+      "Integer overflow! "
+      "The smallest possible value for `n` is %i",
+      SMALLEST_POSSIBLE_DAYS_FROM_EPOCH
+    );
   }
 
   // Adjust to be days since 2001-01-01 (so `n = 0 == 2001-01-01`)
