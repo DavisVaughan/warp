@@ -188,12 +188,15 @@ static SEXP dbl_date_get_year_month(SEXP x) {
 // static const int DAYS_IN_MONTH[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 static const int DAYS_UP_TO_MONTH[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
 
-#define YEAR_OFFSET_FROM_EPOCH -1970
+#define YEAR_OFFSET_FROM_EPOCH 30
 
 #define MONTH_ADJUSTMENT_TO_0_TO_11_RANGE -1
 
-// unclass(as.Date("0001-01-01"))
-#define DAYS_FROM_0001_01_01_TO_EPOCH 719162
+// unclass(as.Date("2001-01-01"))
+#define DAYS_FROM_2001_01_01_TO_EPOCH -11323
+
+// -.Machine$integer.max - (DAYS_FROM_2001_01_01_TO_EPOCH)
+#define SMALLEST_POSSIBLE_DAYS_FROM_EPOCH -2147472324
 
 #define DAYS_IN_1_YEAR_CYCLE 365
 
@@ -230,8 +233,9 @@ static void divmod(int x, int y, int* p_quot, int* p_rem);
 /*
  * The challenging thing about finding the year/month is the presence of leap
  * years. The leap year pattern repeats exactly every 400 years. We adjust the
- * date to be the number of days since 0001-01-01 because that is a 400 year
- * boundary.
+ * date to be the number of days since 2001-01-01 because that is the closest
+ * 400 year boundary to 1970-01-01. This is important because it gives us the
+ * maximum amount of values before hitting any integer overflow.
  *
  * The basic strategy is to find the closest 400 year boundary at or _before_
  * `n`, and then work with the offset (in number of days) from that boundary to
@@ -253,14 +257,14 @@ static void convert_days_to_year_month(int n, int* p_year, int* p_month) {
   int n_100_year_cycles;
   int n_400_year_cycles;
 
-  // The largest possible value of `n` before overflow happens would be:
-  // .Machine$integer.max - DAYS_FROM_0001_01_01_TO_EPOCH = 2146764485
-  if (n > 2146764485) {
+  // The smallest possible value of `n` before overflow from
+  // addition of DAYS_FROM_2001_01_01_TO_EPOCH
+  if (n < SMALLEST_POSSIBLE_DAYS_FROM_EPOCH) {
     Rf_errorcall(R_NilValue, "Integer overflow.");
   }
 
-  // Adjust to be days since 0001-01-01 (with n = 0 == 0001-01-01)
-  n = DAYS_FROM_0001_01_01_TO_EPOCH + n;
+  // Adjust to be days since 2001-01-01 (so `n = 0 == 2001-01-01`)
+  n = DAYS_FROM_2001_01_01_TO_EPOCH + n;
 
   divmod(n, DAYS_IN_400_YEAR_CYCLE, &n_400_year_cycles, &n);
   divmod(n, DAYS_IN_100_YEAR_CYCLE, &n_100_year_cycles, &n);
@@ -312,7 +316,9 @@ static void convert_days_to_year_month(int n, int* p_year, int* p_month) {
 
 #undef YEAR_OFFSET_FROM_EPOCH
 
-#undef DAYS_FROM_0001_01_01_TO_EPOCH
+#undef DAYS_FROM_2001_01_01_TO_EPOCH
+
+#undef SMALLEST_POSSIBLE_DAYS_FROM_EPOCH
 
 #undef DAYS_IN_1_YEAR_CYCLE
 #undef DAYS_IN_4_YEAR_CYCLE
@@ -332,11 +338,11 @@ static void convert_days_to_year_month(int n, int* p_year, int* p_month) {
  * sign as `y`.
  *
  * `divmod()` is useful for the calculations when computing the year/month/day
- * components. For example, with `n = -5L`, which is 5 days before `0001-01-01`,
+ * components. For example, with `n = -5L`, which is 5 days before `2001-01-01`,
  * for the first computation we would get:
  * [-1, 146092] = divmod(-5L, DAYS_IN_400_YEAR_CYCLE)
  * which is telling us that we are somewhere between the 0th and -1st 400 year
- * cycle. So somewhere between [-0399-01-01, 0001-01-01). And we are at the
+ * cycle. So somewhere between [1601-01-01, 2001-01-01). And we are at the
  * 146092th day in the cycle. So then we repeat for a 100 year cycle, 4 year
  * cycle, and 1 year cycle to finally end up with an `n` that tells us the
  * position in the year. Then we add that all back together to get the correct
