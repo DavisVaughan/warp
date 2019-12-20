@@ -1,34 +1,34 @@
 #include "utils.h"
 
 /*
- * This file implements a VERY fast getter for year and year-month from a Date
- * object. It does not go through POSIXlt, and uses an algorithm from Python's
- * datetime library for the computation of the year and month components. It
- * is both much faster and highly memory efficient.
+ * This file implements a VERY fast getter for year and year-month offsets for
+ * a Date object. It does not go through POSIXlt, and uses an algorithm from
+ * Python's datetime library for the computation of the year and month
+ * components. It is both much faster and highly memory efficient.
  */
 
-static void convert_days_to_year_month(int n, int* p_year, int* p_month);
+static void convert_days_to_year_month_offset(int n, int* p_year, int* p_month);
 
 // -----------------------------------------------------------------------------
 
-static SEXP int_date_get_year(SEXP x);
-static SEXP dbl_date_get_year(SEXP x);
+static SEXP int_date_get_year_offset(SEXP x);
+static SEXP dbl_date_get_year_offset(SEXP x);
 
 // [[ include("utils.h") ]]
-SEXP date_get_year(SEXP x) {
+SEXP date_get_year_offset(SEXP x) {
   switch (TYPEOF(x)) {
-  case INTSXP: return int_date_get_year(x);
-  case REALSXP: return dbl_date_get_year(x);
-  default: r_error("date_get_year", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
+  case INTSXP: return int_date_get_year_offset(x);
+  case REALSXP: return dbl_date_get_year_offset(x);
+  default: r_error("date_get_year_offset", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
   }
 }
 
 // [[ register() ]]
-SEXP warp_date_get_year(SEXP x) {
-  return date_get_year(x);
+SEXP warp_date_get_year_offset(SEXP x) {
+  return date_get_year_offset(x);
 }
 
-static SEXP int_date_get_year(SEXP x) {
+static SEXP int_date_get_year_offset(SEXP x) {
   int* p_x = INTEGER(x);
 
   R_xlen_t size = Rf_xlength(x);
@@ -47,7 +47,7 @@ static SEXP int_date_get_year(SEXP x) {
       continue;
     }
 
-    convert_days_to_year_month(elt, &temp_year, &temp_month);
+    convert_days_to_year_month_offset(elt, &temp_year, &temp_month);
 
     p_out[i] = temp_year;
   }
@@ -56,7 +56,7 @@ static SEXP int_date_get_year(SEXP x) {
   return out;
 }
 
-static SEXP dbl_date_get_year(SEXP x) {
+static SEXP dbl_date_get_year_offset(SEXP x) {
   double* p_x = REAL(x);
 
   R_xlen_t size = Rf_xlength(x);
@@ -78,7 +78,7 @@ static SEXP dbl_date_get_year(SEXP x) {
     // Truncate fractional pieces towards 0
     int elt = x_elt;
 
-    convert_days_to_year_month(elt, &temp_year, &temp_month);
+    convert_days_to_year_month_offset(elt, &temp_year, &temp_month);
 
     p_out[i] = temp_year;
   }
@@ -89,24 +89,24 @@ static SEXP dbl_date_get_year(SEXP x) {
 
 // -----------------------------------------------------------------------------
 
-static SEXP int_date_get_year_month(SEXP x);
-static SEXP dbl_date_get_year_month(SEXP x);
+static SEXP int_date_get_year_month_offset(SEXP x);
+static SEXP dbl_date_get_year_month_offset(SEXP x);
 
 // [[ include("utils.h") ]]
-SEXP date_get_year_month(SEXP x) {
+SEXP date_get_year_month_offset(SEXP x) {
   switch (TYPEOF(x)) {
-  case INTSXP: return int_date_get_year_month(x);
-  case REALSXP: return dbl_date_get_year_month(x);
-  default: r_error("date_get_year", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
+  case INTSXP: return int_date_get_year_month_offset(x);
+  case REALSXP: return dbl_date_get_year_month_offset(x);
+  default: r_error("date_get_year_month_offset", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
   }
 }
 
 // [[ register() ]]
-SEXP warp_date_get_year_month(SEXP x) {
-  return date_get_year_month(x);
+SEXP warp_date_get_year_month_offset(SEXP x) {
+  return date_get_year_month_offset(x);
 }
 
-static SEXP int_date_get_year_month(SEXP x) {
+static SEXP int_date_get_year_month_offset(SEXP x) {
   int* p_x = INTEGER(x);
 
   R_xlen_t size = Rf_xlength(x);
@@ -129,7 +129,7 @@ static SEXP int_date_get_year_month(SEXP x) {
       continue;
     }
 
-    convert_days_to_year_month(elt, &temp_year, &temp_month);
+    convert_days_to_year_month_offset(elt, &temp_year, &temp_month);
 
     p_year[i] = temp_year;
     p_month[i] = temp_month;
@@ -143,7 +143,7 @@ static SEXP int_date_get_year_month(SEXP x) {
   return out;
 }
 
-static SEXP dbl_date_get_year_month(SEXP x) {
+static SEXP dbl_date_get_year_month_offset(SEXP x) {
   double* p_x = REAL(x);
 
   R_xlen_t size = Rf_xlength(x);
@@ -169,7 +169,7 @@ static SEXP dbl_date_get_year_month(SEXP x) {
     // Truncate fractional pieces towards 0
     int elt = x_elt;
 
-    convert_days_to_year_month(elt, &temp_year, &temp_month);
+    convert_days_to_year_month_offset(elt, &temp_year, &temp_month);
 
     p_year[i] = temp_year;
     p_month[i] = temp_month;
@@ -214,7 +214,7 @@ static void divmod(int x, int y, int* p_quot, int* p_rem);
 // -----------------------------------------------------------------------------
 
 /*
- * `convert_days_to_year_month()`
+ * `convert_days_to_year_month_offset()`
  *
  * @param n
  *   A 0-based number of days since 1970-01-01, i.e. unclass(<Date>).
@@ -254,7 +254,7 @@ static void divmod(int x, int y, int* p_quot, int* p_rem);
  * getting the day of the month, which we don't need.
  */
 
-static void convert_days_to_year_month(int n, int* p_year, int* p_month) {
+static void convert_days_to_year_month_offset(int n, int* p_year, int* p_month) {
   int n_1_year_cycles;
   int n_4_year_cycles;
   int n_100_year_cycles;

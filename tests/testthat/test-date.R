@@ -19,7 +19,7 @@ test_that("getting the year is identical to as.POSIXlt - integer Date", {
   expect <- unclass(as_posixlt_from_date(x))
   expect <- expect$year - 70L
 
-  expect_identical(date_get_year(x), expect)
+  expect_identical(date_get_year_offset(x), expect)
 })
 
 test_that("getting the year is identical to as.POSIXlt - double Date", {
@@ -28,7 +28,7 @@ test_that("getting the year is identical to as.POSIXlt - double Date", {
   expect <- unclass(as_posixlt_from_date(x))
   expect <- expect$year - 70L
 
-  expect_identical(date_get_year(x), expect)
+  expect_identical(date_get_year_offset(x), expect)
 })
 
 test_that("getting the year month is identical to as.POSIXlt - integer Date", {
@@ -37,7 +37,7 @@ test_that("getting the year month is identical to as.POSIXlt - integer Date", {
   expect <- unclass(as_posixlt_from_date(x))
   expect <- list(expect$year - 70L, expect$mon)
 
-  expect_identical(date_get_year_month(x), expect)
+  expect_identical(date_get_year_month_offset(x), expect)
 })
 
 test_that("getting the year month is identical to as.POSIXlt - double Date", {
@@ -46,7 +46,7 @@ test_that("getting the year month is identical to as.POSIXlt - double Date", {
   expect <- unclass(as_posixlt_from_date(x))
   expect <- list(expect$year - 70L, expect$mon)
 
-  expect_identical(date_get_year_month(x), expect)
+  expect_identical(date_get_year_month_offset(x), expect)
 })
 
 test_that("can get the year offset of the maximum integer value", {
@@ -55,7 +55,7 @@ test_that("can get the year offset of the maximum integer value", {
   expect <- unclass(as_posixlt_from_date(x))
   expect <- expect$year - 70L
 
-  expect_identical(date_get_year(x), expect)
+  expect_identical(date_get_year_offset(x), expect)
 })
 
 test_that("can get the year offset of a value close to the minimum integer value", {
@@ -66,7 +66,7 @@ test_that("can get the year offset of a value close to the minimum integer value
   expect <- unclass(as_posixlt_from_date(x))
   expect <- expect$year - 70L
 
-  expect_identical(date_get_year(x), expect)
+  expect_identical(date_get_year_offset(x), expect)
 })
 
 test_that("going below the minimum allowed date is an error", {
@@ -74,5 +74,5 @@ test_that("going below the minimum allowed date is an error", {
 
   x <- structure(minimum_allowed_date_minus_one, class = "Date")
 
-  expect_error(date_get_year(x), "Integer overflow")
+  expect_error(date_get_year_offset(x), "Integer overflow")
 })

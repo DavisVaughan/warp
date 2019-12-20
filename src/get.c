@@ -8,33 +8,33 @@
 
 // -----------------------------------------------------------------------------
 
-static SEXP posixct_get_year(SEXP x);
-static SEXP posixlt_get_year(SEXP x);
+static SEXP posixct_get_year_offset(SEXP x);
+static SEXP posixlt_get_year_offset(SEXP x);
 
 // [[ "utils.h" ]]
-SEXP get_year(SEXP x) {
+SEXP get_year_offset(SEXP x) {
   switch(time_class_type(x)) {
-  case warp_class_date: return date_get_year(x);
-  case warp_class_posixct: return posixct_get_year(x);
-  case warp_class_posixlt: return posixlt_get_year(x);
-  default: r_error("get_year", "Internal error: Unknown date time class.");
+  case warp_class_date: return date_get_year_offset(x);
+  case warp_class_posixct: return posixct_get_year_offset(x);
+  case warp_class_posixlt: return posixlt_get_year_offset(x);
+  default: r_error("get_year_offset", "Internal error: Unknown date time class.");
   }
 }
 
-static SEXP posixct_get_year(SEXP x) {
+static SEXP posixct_get_year_offset(SEXP x) {
   x = PROTECT(as_posixlt_from_posixct(x));
-  SEXP out = posixlt_get_year(x);
+  SEXP out = posixlt_get_year_offset(x);
   UNPROTECT(1);
   return out;
 }
 
-static SEXP posixlt_get_year(SEXP x) {
+static SEXP posixlt_get_year_offset(SEXP x) {
   SEXP out = VECTOR_ELT(x, 5);
   out = PROTECT(r_maybe_duplicate(out));
 
   if (TYPEOF(out) != INTSXP) {
     r_error(
-      "posixlt_get_year",
+      "posixlt_get_year_offset",
       "Internal error: The 6th element of the POSIXlt object should be an integer."
     );
   }
@@ -57,27 +57,27 @@ static SEXP posixlt_get_year(SEXP x) {
 
 // -----------------------------------------------------------------------------
 
-static SEXP posixct_get_year_month(SEXP x);
-static SEXP posixlt_get_year_month(SEXP x);
+static SEXP posixct_get_year_month_offset(SEXP x);
+static SEXP posixlt_get_year_month_offset(SEXP x);
 
 // [[ "utils.h" ]]
-SEXP get_year_month(SEXP x) {
+SEXP get_year_month_offset(SEXP x) {
   switch(time_class_type(x)) {
-  case warp_class_date: return date_get_year_month(x);
-  case warp_class_posixct: return posixct_get_year_month(x);
-  case warp_class_posixlt: return posixlt_get_year_month(x);
-  default: r_error("get_year", "Internal error: Unknown date time class.");
+  case warp_class_date: return date_get_year_month_offset(x);
+  case warp_class_posixct: return posixct_get_year_month_offset(x);
+  case warp_class_posixlt: return posixlt_get_year_month_offset(x);
+  default: r_error("get_year_offset", "Internal error: Unknown date time class.");
   }
 }
 
-static SEXP posixct_get_year_month(SEXP x) {
+static SEXP posixct_get_year_month_offset(SEXP x) {
   x = PROTECT(as_posixlt_from_posixct(x));
-  SEXP out = posixlt_get_year_month(x);
+  SEXP out = posixlt_get_year_month_offset(x);
   UNPROTECT(1);
   return out;
 }
 
-static SEXP posixlt_get_year_month(SEXP x) {
+static SEXP posixlt_get_year_month_offset(SEXP x) {
   SEXP year = VECTOR_ELT(x, 5);
   year = PROTECT(r_maybe_duplicate(year));
 
@@ -85,14 +85,14 @@ static SEXP posixlt_get_year_month(SEXP x) {
 
   if (TYPEOF(year) != INTSXP) {
     r_error(
-      "posixlt_get_year_month",
+      "posixlt_get_year_month_offset",
       "Internal error: The 6th element of the POSIXlt object should be an integer."
     );
   }
 
   if (TYPEOF(month) != INTSXP) {
     r_error(
-      "posixlt_get_year_month",
+      "posixlt_get_year_month_offset",
       "Internal error: The 6th element of the POSIXlt object should be an integer."
     );
   }
