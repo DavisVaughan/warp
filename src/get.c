@@ -72,7 +72,7 @@ SEXP get_year_month_offset(SEXP x) {
   case warp_class_date: return date_get_year_month_offset(x);
   case warp_class_posixct: return posixct_get_year_month_offset(x);
   case warp_class_posixlt: return posixlt_get_year_month_offset(x);
-  default: r_error("get_year_offset", "Internal error: Unknown date time class.");
+  default: r_error("get_year_month_offset", "Internal error: Unknown date time class.");
   }
 }
 
