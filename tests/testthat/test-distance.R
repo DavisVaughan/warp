@@ -1760,10 +1760,10 @@ test_that("can warp_distance() by second with POSIXct", {
 })
 
 # In terms of inclusion/exclusion, we define the cutoffs like:
-# [1969-12-30 00:00:00 -> 1969-12-31 00:00:00) = -2880 seconds from epoch
-# [1969-12-31 00:00:00 -> 1970-01-01 00:00:00) = -1440 seconds from epoch
-# [1970-01-01 00:00:00 -> 1970-01-02 00:00:00) = 0 seconds from epoch
-# [1970-01-02 00:00:00 -> 1970-01-03 00:00:00) = 1440 seconds from epoch
+# [1969-12-30 00:00:00 -> 1969-12-31 00:00:00)
+# [1969-12-31 00:00:00 -> 1970-01-01 00:00:00)
+# [1970-01-01 00:00:00 -> 1970-01-02 00:00:00)
+# [1970-01-02 00:00:00 -> 1970-01-03 00:00:00)
 test_that("can warp_distance() by second with 'negative' POSIXct", {
   x <- as.POSIXct("1969-12-30 00:00:00", tz = "UTC")
   expect_identical(warp_distance(x, "second"), -172800)
@@ -1992,6 +1992,408 @@ test_that("can warp_distance() by second with POSIXlt", {
   x <- as.POSIXct("1971-01-01", tz = "UTC")
   x <- as.POSIXlt(x)
   expect_identical(warp_distance(x, "second"), 31536000)
+})
+
+# ------------------------------------------------------------------------------
+# warp_distance(<Date>, by = "millisecond")
+
+test_that("can warp_distance() by millisecond with Date", {
+  x <- as.Date("1970-01-01")
+  expect_identical(warp_distance(x, "millisecond"), 0)
+
+  x <- as.Date("1970-01-02")
+  expect_identical(warp_distance(x, "millisecond"), 86400 * 1000)
+
+  x <- as.Date("1971-01-01")
+  expect_identical(warp_distance(x, "millisecond"), 60 * 60 * 24 * 365 * 1000)
+})
+
+test_that("can warp_distance() by millisecond with 'negative' Dates", {
+  x <- as.Date("1969-12-31")
+  expect_identical(warp_distance(x, "millisecond"), -86400 * 1000)
+
+  x <- as.Date("1969-12-30")
+  expect_identical(warp_distance(x, "millisecond"), -86400 * 2 * 1000)
+})
+
+test_that("Date + UTC origin does not emit a warning", {
+  x <- as.Date("1971-01-01")
+  origin <- as.POSIXct("1971-01-01", tz = "UTC")
+
+  expect_identical(warp_distance(x, "millisecond", origin = origin), 0)
+})
+
+test_that("Date + non-UTC origin converts with a warning", {
+  # America/New_York is 5 milliseconds before UTC
+  x <- as.Date("1971-01-01")
+  x_with_tz <- structure(unclass(x) * 86400, tzone = "America/New_York", class = c("POSIXct", "POSIXt"))
+  origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
+
+  expect_identical(
+    expect_warning(
+      warp_distance(x, "millisecond", origin = origin),
+      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
+    ),
+    warp_distance(x_with_tz, "millisecond", origin = origin)
+  )
+})
+
+test_that("can use integer Dates", {
+  x <- structure(0L, class = "Date")
+  expect_identical(warp_distance(x, "millisecond"), 0)
+})
+
+test_that("can handle `NA` dates", {
+  x <- structure(NA_real_, class = "Date")
+  expect_identical(warp_distance(x, "millisecond"), NA_real_)
+
+  x <- structure(NA_integer_, class = "Date")
+  expect_identical(warp_distance(x, "millisecond"), NA_real_)
+})
+
+test_that("can handle `every` with default origin - integer Dates", {
+  x <- structure(-3L:3L, class = "Date")
+
+  expect_equal(warp_distance(x, by = "millisecond", every = 172800 * 1000), c(-2, -1, -1, 0, 0, 1, 1))
+  expect_equal(warp_distance(x, by = "millisecond", every = 259200 * 1000), c(-1, -1, -1, 0, 0, 0, 1))
+  expect_equal(warp_distance(x, by = "millisecond", every = 345600 * 1000), c(-1, -1, -1, 0, 0, 0, 0))
+})
+
+test_that("can handle `every` with altered origin - integer Dates", {
+  x <- structure(-3L:3L, class = "Date")
+
+  origin <- as.Date("1970-01-02")
+
+  expect_equal(warp_distance(x, by = "millisecond", every = 172800 * 1000, origin = origin), c(-2, -2, -1, -1, 0, 0, 1))
+  expect_equal(warp_distance(x, by = "millisecond", every = 259200 * 1000, origin = origin), c(-2, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, by = "millisecond", every = 345600 * 1000, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
+})
+
+test_that("can handle `every` with default origin - numeric Dates", {
+  x <- structure(as.numeric(-3:3), class = "Date")
+
+  expect_equal(warp_distance(x, by = "millisecond", every = 172800 * 1000), c(-2, -1, -1, 0, 0, 1, 1))
+  expect_equal(warp_distance(x, by = "millisecond", every = 259200 * 1000), c(-1, -1, -1, 0, 0, 0, 1))
+  expect_equal(warp_distance(x, by = "millisecond", every = 345600 * 1000), c(-1, -1, -1, 0, 0, 0, 0))
+})
+
+test_that("can handle `every` with altered origin - numeric Dates", {
+  x <- structure(as.numeric(-3:3), class = "Date")
+
+  origin <- as.Date("1970-01-02")
+
+  expect_equal(warp_distance(x, by = "millisecond", every = 172800 * 1000, origin = origin), c(-2, -2, -1, -1, 0, 0, 1))
+  expect_equal(warp_distance(x, by = "millisecond", every = 259200 * 1000, origin = origin), c(-2, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, by = "millisecond", every = 345600 * 1000, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
+})
+
+test_that("can ignore fractional pieces in Dates", {
+  # "1970-01-01T00:00:00.432 UTC"
+  # structure(.000005 * 86400, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  x <- structure(.000005, class = "Date")
+
+  # "1969-12-31T23:59:59.568 UTC"
+  # structure(-.005 * 86400, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  y <- structure(-.000005, class = "Date")
+
+  # "1970-01-02T00:00:00.432 UTC"
+  z <- structure(1.000005, class = "Date")
+
+  expect_identical(warp_distance(x, by = "millisecond"), 0)
+  expect_identical(warp_distance(y, by = "millisecond"), 0)
+  expect_identical(warp_distance(z, by = "millisecond"), 86400000)
+})
+
+test_that("can handle millisecond values larger than max int value", {
+  x <- as.Date("2100-01-01")
+  expect_equal(warp_distance(x, "millisecond"), 4102444800 * 1000)
+})
+
+test_that("size 0 input works - integer Dates", {
+  x <- structure(integer(), class = "Date")
+
+  expect_equal(warp_distance(x, by = "millisecond"), numeric())
+  expect_equal(warp_distance(x, by = "millisecond", every = 2), numeric())
+})
+
+test_that("size 0 input works - numeric Dates", {
+  x <- structure(numeric(), class = "Date")
+
+  expect_equal(warp_distance(x, by = "millisecond"), numeric())
+  expect_equal(warp_distance(x, by = "millisecond", every = 2), numeric())
+})
+
+# ------------------------------------------------------------------------------
+# warp_distance(<POSIXct>, by = "millisecond")
+
+test_that("can warp_distance() by millisecond with POSIXct", {
+  x <- as.POSIXct("1970-01-01", tz = "UTC")
+  expect_identical(warp_distance(x, "millisecond"), 0)
+
+  x <- as.POSIXct("1970-01-02", tz = "UTC")
+  expect_identical(warp_distance(x, "millisecond"), 86400 * 1000)
+
+  x <- as.POSIXct("1971-01-01", tz = "UTC")
+  expect_identical(warp_distance(x, "millisecond"), 60 * 60 * 24 * 365 * 1000)
+})
+
+# In terms of inclusion/exclusion, we define the cutoffs like:
+# [1969-12-30 00:00:00 -> 1969-12-31 00:00:00)
+# [1969-12-31 00:00:00 -> 1970-01-01 00:00:00)
+# [1970-01-01 00:00:00 -> 1970-01-02 00:00:00)
+# [1970-01-02 00:00:00 -> 1970-01-03 00:00:00)
+test_that("can warp_distance() by millisecond with 'negative' POSIXct", {
+  x <- as.POSIXct("1969-12-30 00:00:00", tz = "UTC")
+  expect_identical(warp_distance(x, "millisecond"), -172800 * 1000)
+
+  x <- as.POSIXct("1969-12-30 23:59:59", tz = "UTC")
+  expect_identical(warp_distance(x, "millisecond"), -86401 * 1000)
+
+  x <- as.POSIXct("1969-12-31 00:00:00", tz = "UTC")
+  expect_identical(warp_distance(x, "millisecond"), -86400 * 1000)
+
+  x <- as.POSIXct("1969-12-31 23:59:59", tz = "UTC")
+  expect_identical(warp_distance(x, "millisecond"), -1 * 1000)
+
+  x <- as.POSIXct("1970-01-01 00:00:00", tz = "UTC")
+  expect_identical(warp_distance(x, "millisecond"), 0)
+
+  x <- as.POSIXct("1970-01-01 23:59:59", tz = "UTC")
+  expect_identical(warp_distance(x, "millisecond"), 86399 * 1000)
+
+  x <- as.POSIXct("1970-01-02 00:00:00", tz = "UTC")
+  expect_identical(warp_distance(x, "millisecond"), 86400 * 1000)
+
+  x <- as.POSIXct("1969-01-01 00:00:00", tz = "UTC")
+  expect_identical(warp_distance(x, "millisecond"), -(60 * 60 * 24 * 365) * 1000)
+})
+
+test_that("can warp_distance() by millisecond with 'negative' POSIXct and non-UTC origins", {
+  origin <- as.POSIXct("1970-01-01", tz = "America/New_York")
+
+  x <- as.POSIXct("1969-12-30 00:00:00", tz = "America/New_York")
+  expect_identical(warp_distance(x, "millisecond", origin = origin), -172800 * 1000)
+
+  x <- as.POSIXct("1969-12-30 23:59:59", tz = "America/New_York")
+  expect_identical(warp_distance(x, "millisecond", origin = origin), -86401 * 1000)
+
+  x <- as.POSIXct("1969-12-31 00:00:00", tz = "America/New_York")
+  expect_identical(warp_distance(x, "millisecond", origin = origin), -86400 * 1000)
+
+  x <- as.POSIXct("1969-12-31 23:59:59", tz = "America/New_York")
+  expect_identical(warp_distance(x, "millisecond", origin = origin), -1 * 1000)
+
+  x <- as.POSIXct("1970-01-01 00:00:00", tz = "America/New_York")
+  expect_identical(warp_distance(x, "millisecond", origin = origin), 0)
+
+  x <- as.POSIXct("1970-01-01 23:59:59", tz = "America/New_York")
+  expect_identical(warp_distance(x, "millisecond", origin = origin), 86399 * 1000)
+
+  x <- as.POSIXct("1970-01-02 00:00:00", tz = "America/New_York")
+  expect_identical(warp_distance(x, "millisecond", origin = origin), 86400 * 1000)
+})
+
+test_that("UTC POSIXct + UTC origin does not emit a warning", {
+  x <- as.POSIXct("1971-01-01", tz = "UTC")
+
+  expect_warning(warp_distance(x, "millisecond"), NA)
+
+  expect_identical(warp_distance(x, "millisecond"), 31536000 * 1000)
+  expect_identical(warp_distance(x, "millisecond", origin = x), 0)
+})
+
+test_that("UTC POSIXct + Date origin does not emit a warning", {
+  x <- as.POSIXct("1971-01-01", tz = "UTC")
+  origin1 <- as.Date("1971-01-01")
+  origin2 <- as.Date("1972-01-01")
+
+  expect_warning(warp_distance(x, "millisecond", origin = origin1), NA)
+
+  expect_identical(warp_distance(x, "millisecond", origin = origin1), 0)
+  expect_identical(warp_distance(x, "millisecond", origin = origin2), -31536000 * 1000)
+})
+
+test_that("UTC POSIXct + non-UTC origin converts with a warning", {
+  # America/New_York is 5 hours behind UTC, or 300 milliseconds
+  x <- as.POSIXct("1971-01-01", tz = "UTC")
+  x_with_tz <- structure(x, tzone = "America/New_York")
+  origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
+
+  expect_identical(
+    expect_warning(
+      warp_distance(x, "millisecond", origin = origin),
+      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
+    ),
+    warp_distance(x_with_tz, "millisecond", origin = origin)
+  )
+})
+
+test_that("local time POSIXct + UTC origin converts with a warning", {
+  with_envvar(list(TZ = "America/New_York"), {
+    x <- as.POSIXct("1970-12-31 23:00:00") # in UTC this is in 1971-01-01 04:00:00
+    origin <- as.POSIXct("1971-01-01", tz = "UTC")
+
+    expect_identical(
+      expect_warning(warp_distance(x, "millisecond", origin = origin)),
+      14400 * 1000 # 4 hr * 60 min * 60 sec * 1000 milliseconds
+    )
+  })
+})
+
+test_that("can use integer POSIXct", {
+  x <- structure(-1L, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_identical(warp_distance(x, "millisecond"), -1 * 1000)
+})
+
+test_that("can handle `NA` dates", {
+  x <- structure(NA_real_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_identical(warp_distance(x, "millisecond"), NA_real_)
+
+  x <- structure(NA_integer_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_identical(warp_distance(x, "millisecond"), NA_real_)
+})
+
+test_that("can handle `every` with default origin - numeric POSIXct", {
+  x <- as.POSIXct(c(
+    "1969-12-31 23:59:59.997", "1969-12-31 23:59:59.998",
+    "1969-12-31 23:59:59.999", "1970-01-01 00:00:00.000",
+    "1970-01-01 00:00:00.001", "1970-01-01 00:00:00.002",
+    "1970-01-01 00:00:00.003"
+  ), tz = "UTC")
+
+  expect_identical(warp_distance(x, by = "millisecond", every = 2L), c(-2, -1, -1, 0, 0, 1, 1))
+  expect_identical(warp_distance(x, by = "millisecond", every = 3L), c(-1, -1, -1, 0, 0, 0, 1))
+  expect_identical(warp_distance(x, by = "millisecond", every = 4L), c(-1, -1, -1, 0, 0, 0, 0))
+})
+
+test_that("can handle `every` with altered origin - numeric POSIXct", {
+  x <- as.POSIXct(c(
+    "1969-12-31 23:59:59.997", "1969-12-31 23:59:59.998",
+    "1969-12-31 23:59:59.999", "1970-01-01 00:00:00.000",
+    "1970-01-01 00:00:00.001", "1970-01-01 00:00:00.002",
+    "1970-01-01 00:00:00.003"
+  ), tz = "UTC")
+
+  origin <- as.POSIXct("1970-01-01 00:00:00.001", tz = "UTC")
+
+  expect_equal(warp_distance(x, by = "millisecond", every = 2L, origin = origin), c(-2, -2, -1, -1, 0, 0, 1))
+  expect_equal(warp_distance(x, by = "millisecond", every = 3L, origin = origin), c(-2, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, by = "millisecond", every = 4L, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
+})
+
+test_that("can handle fractional pieces with decimilliseconds correctly", {
+  x <- as.POSIXct("1969-12-31 23:59:59.9989", "UTC")
+  expect_identical(warp_distance(x, by = "millisecond"), -2)
+
+  x <- as.POSIXct("1969-12-31 23:59:59.9995", "UTC")
+  expect_identical(warp_distance(x, by = "millisecond"), -1)
+
+  x <- as.POSIXct("1969-12-31 23:59:59.9999", "UTC")
+  expect_identical(warp_distance(x, by = "millisecond"), -1)
+
+  x <- as.POSIXct("1970-01-01 00:00:00.0000", "UTC")
+  expect_identical(warp_distance(x, by = "millisecond"), 0)
+
+  x <- as.POSIXct("1970-01-01 00:00:00.0009", "UTC")
+  expect_identical(warp_distance(x, by = "millisecond"), 0)
+
+  x <- as.POSIXct("1970-01-01 00:00:00.0010", "UTC")
+  expect_identical(warp_distance(x, by = "millisecond"), 1)
+
+  x <- as.POSIXct("1970-01-01 00:00:00.0011", "UTC")
+  expect_identical(warp_distance(x, by = "millisecond"), 1)
+})
+
+test_that("can handle fractional pieces with centimilliseconds correctly", {
+  # Base R is going to print these wrong, use {nanotime} if you need to
+  # print them correctly
+  x <- as.POSIXct("1969-12-31 23:59:59.99809", "UTC")
+  expect_identical(warp_distance(x, by = "millisecond"), -2)
+
+  x <- as.POSIXct("1969-12-31 23:59:59.99905", "UTC")
+  expect_identical(warp_distance(x, by = "millisecond"), -1)
+
+  x <- as.POSIXct("1969-12-31 23:59:59.99909", "UTC")
+  expect_identical(warp_distance(x, by = "millisecond"), -1)
+
+  x <- as.POSIXct("1970-01-01 00:00:00.00000", "UTC")
+  expect_identical(warp_distance(x, by = "millisecond"), 0)
+
+  x <- as.POSIXct("1970-01-01 00:00:00.00009", "UTC")
+  expect_identical(warp_distance(x, by = "millisecond"), 0)
+
+  x <- as.POSIXct("1970-01-01 00:00:00.00100", "UTC")
+  expect_identical(warp_distance(x, by = "millisecond"), 1)
+
+  x <- as.POSIXct("1970-01-01 00:00:00.00101", "UTC")
+  expect_identical(warp_distance(x, by = "millisecond"), 1)
+})
+
+test_that("can handle fractional pieces with microseconds correctly", {
+  # -0.001010000000000843556336
+  # Shift to microseconds
+  # -1010.000000000843556336
+  # Truncate towards 0
+  # -1010
+  # Back to milliseconds
+  # -1.01
+  # Floor
+  # -2
+  x <- as.POSIXct("1969-12-31 23:59:59.99899", "UTC")
+  expect_identical(warp_distance(x, by = "millisecond"), -2)
+
+  # Microseconds are still taken into account
+  # -0.001009000000003368313628
+  # Shift to microseconds
+  # -1009.000000003368313628
+  # Truncate towards 0
+  # -1009
+  # Back to milliseconds
+  # -1.009
+  # Floor
+  # -2
+  x <- as.POSIXct("1969-12-31 23:59:59.998991", "UTC")
+  expect_identical(warp_distance(x, by = "millisecond"), -2)
+})
+
+test_that("pieces past microseconds are dropped", {
+  # -0.001001000000002250089892
+  # Shift to microseconds
+  # -1001.000000002250089892
+  # Truncate towards 0
+  # -1001
+  # Back to milliseconds
+  # -1.001
+  # Floor
+  # -2
+  x <- as.POSIXct("1969-12-31 23:59:59.998999", "UTC")
+  expect_identical(warp_distance(x, by = "millisecond"), -2)
+
+  # Past microseconds, fractional parts are dropped
+  # -0.00100090000000108148015
+  # Shift to microseconds
+  # -1000.90000000108148015
+  # Truncate towards 0
+  # -1000
+  # Back to milliseconds
+  # -1.000
+  # Floor
+  # -1
+  x <- as.POSIXct("1969-12-31 23:59:59.9989991", "UTC")
+  expect_identical(warp_distance(x, by = "millisecond"), -1)
+})
+
+# ------------------------------------------------------------------------------
+# warp_distance(<POSIXlt>, by = "millisecond")
+
+test_that("can warp_distance() by millisecond with POSIXlt", {
+  x <- as.POSIXct("1970-01-01", tz = "UTC")
+  x <- as.POSIXlt(x)
+  expect_identical(warp_distance(x, "millisecond"), 0)
+
+  x <- as.POSIXct("1971-01-01", tz = "UTC")
+  x <- as.POSIXlt(x)
+  expect_identical(warp_distance(x, "millisecond"), 31536000 * 1000)
 })
 
 # ------------------------------------------------------------------------------

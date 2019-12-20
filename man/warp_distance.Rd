@@ -23,6 +23,7 @@ A string defining the period to group by. Valid inputs are:
 \item \code{"hour"}
 \item \code{"minute"}
 \item \code{"second"}
+\item \code{"millisecond"}
 }}
 
 \item{every}{\verb{[positive integer(1)]}

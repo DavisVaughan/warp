@@ -54,6 +54,7 @@
 #'   - `"hour"`
 #'   - `"minute"`
 #'   - `"second"`
+#'   - `"millisecond"`
 #'
 #' @param every `[positive integer(1)]`
 #'

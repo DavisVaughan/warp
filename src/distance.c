@@ -18,6 +18,7 @@ static SEXP warp_distance_day(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_hour(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_minute(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_second(SEXP x, int every, SEXP origin);
+static SEXP warp_distance_millisecond(SEXP x, int every, SEXP origin);
 
 // [[ include("warp.h") ]]
 SEXP warp_distance(SEXP x, enum warp_by_type type, int every, SEXP origin) {
@@ -42,6 +43,7 @@ SEXP warp_distance(SEXP x, enum warp_by_type type, int every, SEXP origin) {
   case warp_by_hour: out = PROTECT(warp_distance_hour(x, every, origin)); break;
   case warp_by_minute: out = PROTECT(warp_distance_minute(x, every, origin)); break;
   case warp_by_second: out = PROTECT(warp_distance_second(x, every, origin)); break;
+  case warp_by_millisecond: out = PROTECT(warp_distance_millisecond(x, every, origin)); break;
   default: r_error("warp_distance", "Internal error: unknown `type`.");
   }
 
@@ -1277,6 +1279,307 @@ static SEXP dbl_posixct_warp_distance_second(SEXP x, int every, SEXP origin) {
   UNPROTECT(1);
   return out;
 }
+
+// -----------------------------------------------------------------------------
+
+static SEXP date_warp_distance_millisecond(SEXP x, int every, SEXP origin);
+static SEXP posixct_warp_distance_millisecond(SEXP x, int every, SEXP origin);
+static SEXP posixlt_warp_distance_millisecond(SEXP x, int every, SEXP origin);
+
+static SEXP warp_distance_millisecond(SEXP x, int every, SEXP origin) {
+  switch (time_class_type(x)) {
+  case warp_class_date: return date_warp_distance_millisecond(x, every, origin);
+  case warp_class_posixct: return posixct_warp_distance_millisecond(x, every, origin);
+  case warp_class_posixlt: return posixlt_warp_distance_millisecond(x, every, origin);
+  default: r_error("warp_distance_millisecond", "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
+  }
+}
+
+
+static SEXP int_date_warp_distance_millisecond(SEXP x, int every, SEXP origin);
+static SEXP dbl_date_warp_distance_millisecond(SEXP x, int every, SEXP origin);
+
+static SEXP date_warp_distance_millisecond(SEXP x, int every, SEXP origin) {
+  switch (TYPEOF(x)) {
+  case INTSXP: return int_date_warp_distance_millisecond(x, every, origin);
+  case REALSXP: return dbl_date_warp_distance_millisecond(x, every, origin);
+  default: r_error("date_warp_distance_millisecond", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
+  }
+}
+
+
+static SEXP int_posixct_warp_distance_millisecond(SEXP x, int every, SEXP origin);
+static SEXP dbl_posixct_warp_distance_millisecond(SEXP x, int every, SEXP origin);
+
+static SEXP posixct_warp_distance_millisecond(SEXP x, int every, SEXP origin) {
+  switch (TYPEOF(x)) {
+  case INTSXP: return int_posixct_warp_distance_millisecond(x, every, origin);
+  case REALSXP: return dbl_posixct_warp_distance_millisecond(x, every, origin);
+  default: r_error("posixct_warp_distance_millisecond", "Unknown `POSIXct` type %s.", Rf_type2char(TYPEOF(x)));
+  }
+}
+
+
+static SEXP posixlt_warp_distance_millisecond(SEXP x, int every, SEXP origin) {
+  x = PROTECT(as_datetime(x));
+  SEXP out = PROTECT(posixct_warp_distance_millisecond(x, every, origin));
+
+  UNPROTECT(2);
+  return out;
+}
+
+
+#define MILLISECONDS_IN_DAY 86400000
+
+static SEXP int_date_warp_distance_millisecond(SEXP x, int every, SEXP origin) {
+  R_xlen_t x_size = Rf_xlength(x);
+
+  int* p_x = INTEGER(x);
+
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, x_size));
+  double* p_out = REAL(out);
+
+  bool needs_every = (every != 1);
+
+  bool needs_offset = (origin != R_NilValue);
+  double origin_offset;
+
+  if (needs_offset) {
+    origin_offset = origin_to_days_from_epoch(origin) * MILLISECONDS_IN_DAY;
+  }
+
+  for (R_xlen_t i = 0; i < x_size; ++i) {
+    int x_elt = p_x[i];
+
+    if (x_elt == NA_INTEGER) {
+      p_out[i] = NA_REAL;
+      continue;
+    }
+
+    // Convert to int64_t here to hold `elt * MILLISECONDS_IN_DAY`
+    // Can't be double because we still need integer division later
+    int64_t elt = x_elt * MILLISECONDS_IN_DAY;
+
+    if (needs_offset) {
+      elt -= origin_offset;
+    }
+
+    if (!needs_every) {
+      p_out[i] = elt;
+      continue;
+    }
+
+    if (elt < 0) {
+      elt = (elt - (every - 1)) / every;
+    } else {
+      elt = elt / every;
+    }
+
+    p_out[i] = elt;
+  }
+
+  UNPROTECT(1);
+  return out;
+}
+
+static SEXP dbl_date_warp_distance_millisecond(SEXP x, int every, SEXP origin) {
+  R_xlen_t x_size = Rf_xlength(x);
+
+  double* p_x = REAL(x);
+
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, x_size));
+  double* p_out = REAL(out);
+
+  bool needs_every = (every != 1);
+
+  bool needs_offset = (origin != R_NilValue);
+  double origin_offset;
+
+  if (needs_offset) {
+    origin_offset = origin_to_days_from_epoch(origin) * MILLISECONDS_IN_DAY;
+  }
+
+  for (R_xlen_t i = 0; i < x_size; ++i) {
+    double x_elt = p_x[i];
+
+    if (!R_FINITE(x_elt)) {
+      p_out[i] = NA_REAL;
+      continue;
+    }
+
+    // Truncate towards 0 to get rid of the fractional pieces
+    int64_t elt = x_elt;
+
+    elt = elt * MILLISECONDS_IN_DAY;
+
+    // `origin_offset` should be correct from `as_date()` in
+    // `origin_to_days_from_epoch()`, even if it had fractional parts
+    if (needs_offset) {
+      elt -= origin_offset;
+    }
+
+    if (!needs_every) {
+      p_out[i] = elt;
+      continue;
+    }
+
+    if (elt < 0) {
+      elt = (elt - (every - 1)) / every;
+    } else {
+      elt = elt / every;
+    }
+
+    p_out[i] = elt;
+  }
+
+  UNPROTECT(1);
+  return out;
+}
+
+#undef MILLISECONDS_IN_DAY
+
+#define MILLISECONDS_IN_SECOND 1000
+
+#define MICROSECONDS_IN_MILLISECOND 1000
+#define MICROSECONDS_IN_SECOND 1000000
+
+static SEXP int_posixct_warp_distance_millisecond(SEXP x, int every, SEXP origin) {
+  R_xlen_t x_size = Rf_xlength(x);
+
+  bool needs_every = (every != 1);
+
+  bool needs_offset = (origin != R_NilValue);
+  double origin_offset;
+
+  if (needs_offset) {
+    origin_offset = origin_to_seconds_from_epoch(origin);
+    origin_offset = origin_offset * MICROSECONDS_IN_SECOND;
+    origin_offset = (int64_t) origin_offset;
+    origin_offset = origin_offset / MICROSECONDS_IN_MILLISECOND;
+  }
+
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, x_size));
+  double* p_out = REAL(out);
+
+  int* p_x = INTEGER(x);
+
+  for (R_xlen_t i = 0; i < x_size; ++i) {
+    // Starts as `int`, since that is what `x` is
+    int x_elt = p_x[i];
+
+    if (x_elt == NA_INTEGER) {
+      p_out[i] = NA_REAL;
+      continue;
+    }
+
+    // Convert to `int64_t` to guard against overflow
+    // No need to worry about precision issues here
+    int64_t elt = x_elt * MILLISECONDS_IN_SECOND;
+
+    if (needs_offset) {
+      elt -= origin_offset;
+    }
+
+    if (!needs_every) {
+      p_out[i] = elt;
+      continue;
+    }
+
+    if (elt < 0) {
+      elt = (elt - (every - 1)) / every;
+    } else {
+      elt = elt / every;
+    }
+
+    p_out[i] = elt;
+  }
+
+  UNPROTECT(1);
+  return out;
+}
+
+static SEXP dbl_posixct_warp_distance_millisecond(SEXP x, int every, SEXP origin) {
+  R_xlen_t x_size = Rf_xlength(x);
+
+  bool needs_every = (every != 1);
+
+  bool needs_offset = (origin != R_NilValue);
+  double origin_offset;
+
+  if (needs_offset) {
+    origin_offset = origin_to_seconds_from_epoch(origin);
+    origin_offset = origin_offset * MICROSECONDS_IN_SECOND;
+    origin_offset = (int64_t) origin_offset;
+    origin_offset = origin_offset / MICROSECONDS_IN_MILLISECOND;
+  }
+
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, x_size));
+  double* p_out = REAL(out);
+
+  double* p_x = REAL(x);
+
+  for (R_xlen_t i = 0; i < x_size; ++i) {
+    double x_elt = p_x[i];
+
+    if (!R_FINITE(x_elt)) {
+      p_out[i] = NA_REAL;
+      continue;
+    }
+
+    // Have to be very careful about precision issues. For example:
+    // `unclass(as.POSIXct("1969-12-31 23:59:59.998", "UTC"))` looks like
+    // -0.00200000000000244 because of floating point problems. If we shift
+    // to milliseconds then floor we'd have `floor(-2.00000000000244) = -3`
+    // which is wrong. So we assume the values are correct through the
+    // microsecond resolution (any further and we get into floating point
+    // randomness), and floor it there, then recover our milliseconds
+    // and floor again.
+    // https://stackoverflow.com/questions/38151757/convert-a-date-to-nanoseconds-in-r
+
+    x_elt = x_elt * MICROSECONDS_IN_SECOND;
+
+    // Go through `int64_t` to drop fractional parts after microsecond
+    // which I'd say are unreliable. Not flooring, because that would rely
+    // on the unreliable parts to decide the rounding direction. Then back
+    // into a double for division afterwards.
+    x_elt = (int64_t) x_elt;
+
+    // Convert back to milliseconds, with some fractional parts
+    x_elt = x_elt / MICROSECONDS_IN_MILLISECOND;
+
+    if (needs_offset) {
+      x_elt -= origin_offset;
+    }
+
+    // Always floor() to get rid of fractional pieces in the range between
+    // milliseconds -> microsecond, whether `x_elt` is
+    // negative or positive. Need int64_t here because of the integer
+    // division later. Flooring takes the fractional part lower than
+    // milliseconds into account, which we want to do to round the right way.
+    int64_t elt = floor(x_elt);
+
+    if (!needs_every) {
+      p_out[i] = elt;
+      continue;
+    }
+
+    if (elt < 0) {
+      elt = (elt - (every - 1)) / every;
+    } else {
+      elt = elt / every;
+    }
+
+    p_out[i] = elt;
+  }
+
+  UNPROTECT(1);
+  return out;
+}
+
+#undef MILLISECONDS_IN_SECOND
+
+#undef CENTIMILLISECONDS_IN_MILLISECOND
+#undef CENTIMILLISECONDS_IN_SECOND
 
 // -----------------------------------------------------------------------------
 
