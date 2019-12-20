@@ -163,7 +163,7 @@ void __attribute__((noreturn)) r_error(const char* where, const char* why, ...) 
 
   buf[BUFSIZE - 1] = '\0';
 
-  Rf_errorcall(R_NilValue, "In C function `%s()`:, %s", where, buf);
+  Rf_errorcall(R_NilValue, "In C function `%s()`: %s", where, buf);
 }
 
 #undef BUFSIZE
