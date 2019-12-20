@@ -1,10 +1,16 @@
 #include "warp.h"
 #include "utils.h"
 
-// - We need the year to be the number of years since 1970, so we need to
-//   subtract 70 from the result we get from as.POSIXlt() (it gives it to us
-//   from 1900).
-// - For months, 0-11 is useful as the range.
+/*
+ * `get_year_offset()`
+ *   Extract the number of years offset from 1970.
+ *   Returns an integer vector.
+ *
+ * `get_year_month_offset()`
+ *   Extract the number of years offset from 1970.
+ *   Extract the month offset as an integer in the range of 0-11.
+ *   Return a list of both.
+ */
 
 // -----------------------------------------------------------------------------
 
