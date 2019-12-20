@@ -36,8 +36,8 @@ static SEXP int_date_get_year(SEXP x) {
   SEXP out = PROTECT(Rf_allocVector(INTSXP, size));
   int* p_out = INTEGER(out);
 
-  int year;
-  int month;
+  int temp_year;
+  int temp_month;
 
   for (R_xlen_t i = 0; i < size; ++i) {
     int elt = p_x[i];
@@ -47,9 +47,9 @@ static SEXP int_date_get_year(SEXP x) {
       continue;
     }
 
-    days_to_year_month(elt, &year, &month);
+    days_to_year_month(elt, &temp_year, &temp_month);
 
-    p_out[i] = year;
+    p_out[i] = temp_year;
   }
 
   UNPROTECT(1);
@@ -64,8 +64,8 @@ static SEXP dbl_date_get_year(SEXP x) {
   SEXP out = PROTECT(Rf_allocVector(INTSXP, size));
   int* p_out = INTEGER(out);
 
-  int year;
-  int month;
+  int temp_year;
+  int temp_month;
 
   for (R_xlen_t i = 0; i < size; ++i) {
     double x_elt = p_x[i];
@@ -78,9 +78,9 @@ static SEXP dbl_date_get_year(SEXP x) {
     // Truncate fractional pieces towards 0
     int elt = x_elt;
 
-    days_to_year_month(elt, &year, &month);
+    days_to_year_month(elt, &temp_year, &temp_month);
 
-    p_out[i] = year;
+    p_out[i] = temp_year;
   }
 
   UNPROTECT(1);
