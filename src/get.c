@@ -1,22 +1,40 @@
 #include "warp.h"
 #include "utils.h"
 
-// We almost want the results that as.POSIXlt() gives us.
 // - We need the year to be the number of years since 1970, so we need to
 //   subtract 70 from the result we get from as.POSIXlt() (it gives it to us
 //   from 1900).
 // - For months, 0-11 is useful as the range.
 
+// -----------------------------------------------------------------------------
+
+static SEXP posixct_get_year(SEXP x);
+static SEXP posixlt_get_year(SEXP x);
+
 // [[ "utils.h" ]]
 SEXP get_year(SEXP x) {
-  SEXP x_lt = PROTECT(as_posixlt(x));
+  switch(time_class_type(x)) {
+  case warp_class_date: return date_get_year(x);
+  case warp_class_posixct: return posixct_get_year(x);
+  case warp_class_posixlt: return posixlt_get_year(x);
+  default: r_error("get_year", "Internal error: Unknown date time class.");
+  }
+}
 
-  SEXP out = VECTOR_ELT(x_lt, 5);
+static SEXP posixct_get_year(SEXP x) {
+  x = PROTECT(as_posixlt_from_posixct(x));
+  SEXP out = posixlt_get_year(x);
+  UNPROTECT(1);
+  return out;
+}
+
+static SEXP posixlt_get_year(SEXP x) {
+  SEXP out = VECTOR_ELT(x, 5);
   out = PROTECT(r_maybe_duplicate(out));
 
   if (TYPEOF(out) != INTSXP) {
     r_error(
-      "get_year",
+      "posixlt_get_year",
       "Internal error: The 6th element of the POSIXlt object should be an integer."
     );
   }
@@ -29,32 +47,52 @@ SEXP get_year(SEXP x) {
     if (p_out[i] == NA_INTEGER) {
       continue;
     }
+
     p_out[i] -= 70;
   }
 
-  UNPROTECT(2);
+  UNPROTECT(1);
   return out;
 }
 
+// -----------------------------------------------------------------------------
+
+static SEXP posixct_get_year_month(SEXP x);
+static SEXP posixlt_get_year_month(SEXP x);
+
 // [[ "utils.h" ]]
 SEXP get_year_month(SEXP x) {
-  SEXP x_lt = PROTECT(as_posixlt(x));
+  switch(time_class_type(x)) {
+  case warp_class_date: return date_get_year_month(x);
+  case warp_class_posixct: return posixct_get_year_month(x);
+  case warp_class_posixlt: return posixlt_get_year_month(x);
+  default: r_error("get_year", "Internal error: Unknown date time class.");
+  }
+}
 
-  SEXP year = VECTOR_ELT(x_lt, 5);
+static SEXP posixct_get_year_month(SEXP x) {
+  x = PROTECT(as_posixlt_from_posixct(x));
+  SEXP out = posixlt_get_year_month(x);
+  UNPROTECT(1);
+  return out;
+}
+
+static SEXP posixlt_get_year_month(SEXP x) {
+  SEXP year = VECTOR_ELT(x, 5);
   year = PROTECT(r_maybe_duplicate(year));
 
-  SEXP month = VECTOR_ELT(x_lt, 4);
+  SEXP month = VECTOR_ELT(x, 4);
 
   if (TYPEOF(year) != INTSXP) {
     r_error(
-      "get_year_month",
+      "posixlt_get_year_month",
       "Internal error: The 6th element of the POSIXlt object should be an integer."
     );
   }
 
   if (TYPEOF(month) != INTSXP) {
     r_error(
-      "get_year_month",
+      "posixlt_get_year_month",
       "Internal error: The 6th element of the POSIXlt object should be an integer."
     );
   }
@@ -67,6 +105,7 @@ SEXP get_year_month(SEXP x) {
     if (p_year[i] == NA_INTEGER) {
       continue;
     }
+
     p_year[i] -= 70;
   }
 
@@ -74,6 +113,6 @@ SEXP get_year_month(SEXP x) {
   SET_VECTOR_ELT(out, 0, year);
   SET_VECTOR_ELT(out, 1, month);
 
-  UNPROTECT(3);
+  UNPROTECT(2);
   return out;
 }

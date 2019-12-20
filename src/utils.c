@@ -7,12 +7,12 @@ SEXP warp_ns_env = NULL;
 SEXP syms_x = NULL;
 
 SEXP syms_as_posixct_from_posixlt = NULL;
+SEXP syms_as_posixlt_from_posixct = NULL;
 SEXP syms_as_date = NULL;
-SEXP syms_as_posixlt = NULL;
 
 SEXP fns_as_posixct_from_posixlt = NULL;
+SEXP fns_as_posixlt_from_posixct = NULL;
 SEXP fns_as_date = NULL;
-SEXP fns_as_posixlt = NULL;
 
 SEXP classes_data_frame = NULL;
 
@@ -340,17 +340,17 @@ SEXP as_posixct_from_posixlt(SEXP x) {
 }
 
 // [[ include("utils.h") ]]
-SEXP as_date(SEXP x) {
+SEXP as_posixlt_from_posixct(SEXP x) {
   return warp_dispatch1(
-    syms_as_date, fns_as_date,
+    syms_as_posixlt_from_posixct, fns_as_posixlt_from_posixct,
     syms_x, x
   );
 }
 
 // [[ include("utils.h") ]]
-SEXP as_posixlt(SEXP x) {
+SEXP as_date(SEXP x) {
   return warp_dispatch1(
-    syms_as_posixlt, fns_as_posixlt,
+    syms_as_date, fns_as_date,
     syms_x, x
   );
 }
@@ -369,12 +369,12 @@ void warp_init_utils(SEXP ns) {
   new_env__size_node = CDR(new_env__parent_node);
 
   syms_as_posixct_from_posixlt = Rf_install("as_posixct_from_posixlt");
+  syms_as_posixlt_from_posixct = Rf_install("as_posixlt_from_posixct");
   syms_as_date = Rf_install("as_date");
-  syms_as_posixlt = Rf_install("as_posixlt");
 
   fns_as_posixct_from_posixlt = r_env_get(warp_ns_env, syms_as_posixct_from_posixlt);
+  fns_as_posixlt_from_posixct = r_env_get(warp_ns_env, syms_as_posixlt_from_posixct);
   fns_as_date = r_env_get(warp_ns_env, syms_as_date);
-  fns_as_posixlt = r_env_get(warp_ns_env, syms_as_posixlt);
 
   classes_data_frame = Rf_allocVector(STRSXP, 1);
   R_PreserveObject(classes_data_frame);

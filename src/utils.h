@@ -44,8 +44,8 @@ void __attribute__((noreturn)) r_error(const char* where, const char* why, ...);
 SEXP r_maybe_duplicate(SEXP x);
 
 SEXP as_posixct_from_posixlt(SEXP x);
+SEXP as_posixlt_from_posixct(SEXP x);
 SEXP as_date(SEXP x);
-SEXP as_posixlt(SEXP x);
 
 // In `get.c`
 SEXP get_year(SEXP x);
