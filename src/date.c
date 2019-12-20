@@ -1,5 +1,12 @@
 #include "utils.h"
 
+/*
+ * This file implements a VERY fast getter for year and year-month from a Date
+ * object. It does not go through POSIXlt, and uses an algorithm from Python's
+ * datetime library for the computation of the year and month components. It
+ * is both much faster and highly memory efficient.
+ */
+
 static void days_to_year_month(int n, int* p_year, int* p_month);
 
 // -----------------------------------------------------------------------------
