@@ -78,6 +78,15 @@ from the \code{origin}'s year-month-day value.
 
 For \code{by = "quarter"}, a quarter is defined as a 3 month period starting
 from the \code{origin}'s year-month value.
+
+To support \code{by = "millisecond"}, care has to be taken with the impreciseness
+of floating point arithmetic. With values at that frequency,
+\code{warp_distance()} will drop all fractional values past the \emph{microsecond}
+resolution, as that is approximately as far as POSIXct will support
+consistently. It will then uses any fractional values between the millisecond
+and microsecond places to determine the period groupings. In practice, this
+means that grouping POSIXct objects with values up to the microsecond
+frequency should be safe, but going beyond that will likely cause issues.
 }
 \examples{
 x <- as.Date("1970-01-01") + -4:4
