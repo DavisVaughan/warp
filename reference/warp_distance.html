@@ -144,6 +144,7 @@ return the number of years from the <code>origin</code>, which is the Unix epoch
 <li><p><code>"hour"</code></p></li>
 <li><p><code>"minute"</code></p></li>
 <li><p><code>"second"</code></p></li>
+<li><p><code>"millisecond"</code></p></li>
 </ul></td>
     </tr>
     <tr>
@@ -190,6 +191,14 @@ starts on the 15th of the month. The exceptions to this are <code>"week"</code> 
 from the <code>origin</code>'s year-month-day value.</p>
 <p>For <code>by = "quarter"</code>, a quarter is defined as a 3 month period starting
 from the <code>origin</code>'s year-month value.</p>
+<p>To support <code>by = "millisecond"</code>, care has to be taken with the impreciseness
+of floating point arithmetic. With values at that frequency,
+<code>warp_distance()</code> will drop all fractional values past the <em>microsecond</em>
+resolution, as that is approximately as far as POSIXct will support
+consistently. It will then uses any fractional values between the millisecond
+and microsecond places to determine the period groupings. In practice, this
+means that grouping POSIXct objects with values up to the microsecond
+frequency should be safe, but going beyond that will likely cause issues.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"1970-01-01"</span>) + -<span class='fl'>4</span>:<span class='fl'>4</span>
