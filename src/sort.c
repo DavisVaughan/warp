@@ -317,7 +317,6 @@ static bool int_is_sorted_nonstrictly_increasing_na_smallest(SEXP x, R_xlen_t si
 
 #define IS_SORTED_STRICTLY_DECREASING_NA_LARGEST(CTYPE, CONST_DEREF, IS_NA) { \
   const CTYPE* p_x = CONST_DEREF(x);                                          \
-                                                                              \
   CTYPE previous = p_x[0];                                                    \
                                                                               \
   for (R_xlen_t i = 1; i < size; ++i) {                                       \
