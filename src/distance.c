@@ -1439,8 +1439,6 @@ static SEXP dbl_date_warp_distance_millisecond(SEXP x, int every, SEXP origin) {
 #undef MILLISECONDS_IN_DAY
 
 #define MILLISECONDS_IN_SECOND 1000
-#define MICROSECONDS_IN_MILLISECOND 1000
-#define MICROSECONDS_IN_SECOND 1000000
 
 static SEXP int_posixct_warp_distance_millisecond(SEXP x, int every, SEXP origin) {
   R_xlen_t x_size = Rf_xlength(x);
@@ -1452,9 +1450,6 @@ static SEXP int_posixct_warp_distance_millisecond(SEXP x, int every, SEXP origin
 
   if (needs_offset) {
     origin_offset = origin_to_seconds_from_epoch(origin);
-    origin_offset = origin_offset * MICROSECONDS_IN_SECOND;
-    origin_offset = (int64_t) origin_offset;
-    origin_offset = origin_offset / MICROSECONDS_IN_MILLISECOND;
   }
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, x_size));
@@ -1506,10 +1501,7 @@ static SEXP dbl_posixct_warp_distance_millisecond(SEXP x, int every, SEXP origin
   double origin_offset;
 
   if (needs_offset) {
-    origin_offset = origin_to_seconds_from_epoch(origin);
-    origin_offset = origin_offset * MICROSECONDS_IN_SECOND;
-    origin_offset = (int64_t) origin_offset;
-    origin_offset = origin_offset / MICROSECONDS_IN_MILLISECOND;
+    origin_offset = origin_to_seconds_from_epoch(origin) * MILLISECONDS_IN_SECOND;
   }
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, x_size));
@@ -1525,36 +1517,13 @@ static SEXP dbl_posixct_warp_distance_millisecond(SEXP x, int every, SEXP origin
       continue;
     }
 
-    // Have to be very careful about precision issues. For example:
-    // `unclass(as.POSIXct("1969-12-31 23:59:59.998", "UTC"))` looks like
-    // -0.00200000000000244 because of floating point problems. If we shift
-    // to milliseconds then floor we'd have `floor(-2.00000000000244) = -3`
-    // which is wrong. So we assume the values are correct through the
-    // microsecond resolution (any further and we get into floating point
-    // randomness), and floor it there, then recover our milliseconds
-    // and floor again.
-    // https://stackoverflow.com/questions/38151757/convert-a-date-to-nanoseconds-in-r
-
-    x_elt = x_elt * MICROSECONDS_IN_SECOND;
-
-    // Go through `int64_t` to drop fractional parts after microsecond
-    // which I'd say are unreliable. Not flooring, because that would rely
-    // on the unreliable parts to decide the rounding direction. Then back
-    // into a double for division afterwards.
-    x_elt = (int64_t) x_elt;
-
-    // Convert back to milliseconds, with some fractional parts
-    x_elt = x_elt / MICROSECONDS_IN_MILLISECOND;
+    x_elt = x_elt * MILLISECONDS_IN_SECOND;
 
     if (needs_offset) {
       x_elt -= origin_offset;
     }
 
-    // Always floor() to get rid of fractional pieces in the range between
-    // milliseconds -> microsecond, whether `x_elt` is
-    // negative or positive. Need int64_t here because of the integer
-    // division later. Flooring takes the fractional part lower than
-    // milliseconds into account, which we want to do to round the right way.
+    // Always floor() to get rid of fractional pieces
     int64_t elt = floor(x_elt);
 
     if (!needs_every) {
@@ -1576,8 +1545,6 @@ static SEXP dbl_posixct_warp_distance_millisecond(SEXP x, int every, SEXP origin
 }
 
 #undef MILLISECONDS_IN_SECOND
-#undef MICROSECONDS_IN_MILLISECOND
-#undef MICROSECONDS_IN_SECOND
 
 // -----------------------------------------------------------------------------
 
