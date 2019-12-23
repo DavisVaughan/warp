@@ -1607,6 +1607,13 @@ test_that("can handle fractional seconds before the epoch correctly", {
   expect_identical(warp_distance(y, "minute"), -61)
 })
 
+test_that("`origin` could have fractional components - integer POSIXct", {
+  origin <- as.POSIXct("1969-12-31 23:59:59.998", "UTC")
+  x <- structure(c(-120L, -60L, 0L, 58L, 59L, 60L), tzone = "UTC", class = c("POSIXct", "POSIXt"))
+
+  expect_identical(warp_distance(x, "minute", origin = origin), c(-2, -1, 0, 0, 1, 1))
+})
+
 # ------------------------------------------------------------------------------
 # warp_distance(<POSIXlt>, by = "minute")
 
@@ -1981,6 +1988,13 @@ test_that("can handle second values larger than max int value", {
   expect_equal(warp_distance(x, "second"), 4102444800)
 })
 
+test_that("`origin` could have fractional components (ignore them) - integer POSIXct", {
+  origin <- as.POSIXct("1969-12-31 23:59:59.998", "UTC")
+  x <- structure(c(-2L, -1L, 0L, 1L), tzone = "UTC", class = c("POSIXct", "POSIXt"))
+
+  expect_identical(warp_distance(x, "second", origin = origin), c(-1, 0, 1, 2))
+})
+
 # ------------------------------------------------------------------------------
 # warp_distance(<POSIXlt>, by = "second")
 
@@ -2254,8 +2268,6 @@ test_that("can handle `NA` dates", {
 })
 
 test_that("can handle `every` with default origin - numeric POSIXct", {
-  skip("Until we have a complete solution for floating point floor() issues")
-
   x <- as.POSIXct(c(
     "1969-12-31 23:59:59.997", "1969-12-31 23:59:59.998",
     "1969-12-31 23:59:59.999", "1970-01-01 00:00:00.000",
@@ -2269,8 +2281,6 @@ test_that("can handle `every` with default origin - numeric POSIXct", {
 })
 
 test_that("can handle `every` with altered origin - numeric POSIXct", {
-  skip("Until we have a complete solution for floating point floor() issues")
-
   x <- as.POSIXct(c(
     "1969-12-31 23:59:59.997", "1969-12-31 23:59:59.998",
     "1969-12-31 23:59:59.999", "1970-01-01 00:00:00.000",
@@ -2333,60 +2343,29 @@ test_that("can handle fractional pieces with centimilliseconds correctly", {
   expect_identical(warp_distance(x, by = "millisecond"), 1)
 })
 
-test_that("can handle fractional pieces with microseconds correctly", {
-  # -0.001010000000000843556336
-  # Shift to microseconds
-  # -1010.000000000843556336
-  # Truncate towards 0
-  # -1010
-  # Back to milliseconds
-  # -1.01
-  # Floor
-  # -2
-  x <- as.POSIXct("1969-12-31 23:59:59.99899", "UTC")
-  expect_identical(warp_distance(x, by = "millisecond"), -2)
+test_that("`origin` could have floating point error values that need guarding - numeric POSIXct", {
+  x <- as.POSIXct(c(
+    "1969-12-31 23:59:59.997", "1969-12-31 23:59:59.998",
+    "1969-12-31 23:59:59.999", "1970-01-01 00:00:00.000",
+    "1970-01-01 00:00:00.001", "1970-01-01 00:00:00.002",
+    "1970-01-01 00:00:00.003"
+  ), tz = "UTC")
 
-  # Microseconds are still taken into account
-  # -0.001009000000003368313628
-  # Shift to microseconds
-  # -1009.000000003368313628
-  # Truncate towards 0
-  # -1009
-  # Back to milliseconds
-  # -1.009
-  # Floor
-  # -2
-  x <- as.POSIXct("1969-12-31 23:59:59.998991", "UTC")
-  expect_identical(warp_distance(x, by = "millisecond"), -2)
+  # We know this one can't be represented exactly in floating point
+  origin <- as.POSIXct("1969-12-31 23:59:59.998", "UTC")
+
+  expect_identical(warp_distance(x, by = "millisecond", every = 1L, origin = origin), c(-1, 0, 1, 2, 3, 4, 5))
+  expect_identical(warp_distance(x, by = "millisecond", every = 2L, origin = origin), c(-1, 0, 0, 1, 1, 2, 2))
 })
 
-test_that("pieces past microseconds are dropped", {
-  skip("Until we have a complete solution for floating point floor() issues")
+test_that("`origin` could have floating point error values that need guarding - integer POSIXct", {
+  # "1970-01-01 00:00:00 UTC" "1969-12-31 23:59:59 UTC"
+  x <- structure(c(0L, -1L), tzone = "UTC", class = c("POSIXct", "POSIXt"))
 
-  # -0.001001000000002250089892
-  # Shift to microseconds
-  # -1001.000000002250089892
-  # Truncate towards 0
-  # -1001
-  # Back to milliseconds
-  # -1.001
-  # Floor
-  # -2
-  x <- as.POSIXct("1969-12-31 23:59:59.998999", "UTC")
-  expect_identical(warp_distance(x, by = "millisecond"), -2)
+  # We know this one can't be represented exactly in floating point
+  origin <- as.POSIXct("1969-12-31 23:59:59.998", "UTC")
 
-  # Past microseconds, fractional parts are dropped
-  # -0.00100090000000108148015
-  # Shift to microseconds
-  # -1000.90000000108148015
-  # Truncate towards 0
-  # -1000
-  # Back to milliseconds
-  # -1.000
-  # Floor
-  # -1
-  x <- as.POSIXct("1969-12-31 23:59:59.9989991", "UTC")
-  expect_identical(warp_distance(x, by = "millisecond"), -1)
+  expect_identical(warp_distance(x, by = "millisecond", every = 1L, origin = origin), c(2, -998))
 })
 
 # ------------------------------------------------------------------------------
