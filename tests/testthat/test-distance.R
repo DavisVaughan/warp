@@ -874,6 +874,14 @@ test_that("can handle fractional seconds before the epoch correctly", {
   expect_identical(warp_distance(y, "day"), -2)
 })
 
+test_that("values past microseconds are ignored", {
+  x <- structure(-.000002, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  y <- structure(-.0000002, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+
+  expect_equal(warp_distance(x, "day"), -1)
+  expect_equal(warp_distance(y, "day"), 0)
+})
+
 # ------------------------------------------------------------------------------
 # warp_distance(<POSIXlt>, by = "day")
 
@@ -1241,6 +1249,14 @@ test_that("can handle fractional seconds before the epoch correctly", {
 
   expect_identical(warp_distance(x, "hour"), -1)
   expect_identical(warp_distance(y, "hour"), -2)
+})
+
+test_that("values past microseconds are ignored", {
+  x <- structure(-.000002, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  y <- structure(-.0000002, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+
+  expect_equal(warp_distance(x, "hour"), -1)
+  expect_equal(warp_distance(y, "hour"), 0)
 })
 
 # ------------------------------------------------------------------------------
@@ -1612,6 +1628,14 @@ test_that("`origin` could have fractional components - integer POSIXct", {
   x <- structure(c(-120L, -60L, 0L, 58L, 59L, 60L), tzone = "UTC", class = c("POSIXct", "POSIXt"))
 
   expect_identical(warp_distance(x, "minute", origin = origin), c(-2, -1, 0, 0, 1, 1))
+})
+
+test_that("values past microseconds are essentially ignored", {
+  x <- structure(-.000002, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  y <- structure(-.0000002, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+
+  expect_equal(warp_distance(x, "minute"), -1)
+  expect_equal(warp_distance(y, "minute"), 0)
 })
 
 # ------------------------------------------------------------------------------
@@ -1995,6 +2019,14 @@ test_that("`origin` could have fractional components (ignore them) - integer POS
   expect_identical(warp_distance(x, "second", origin = origin), c(-1, 0, 1, 2))
 })
 
+test_that("values past microseconds are essentially ignored", {
+  x <- structure(-.000002, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  y <- structure(-.0000002, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+
+  expect_equal(warp_distance(x, "second"), -1)
+  expect_equal(warp_distance(y, "second"), 0)
+})
+
 # ------------------------------------------------------------------------------
 # warp_distance(<POSIXlt>, by = "second")
 
@@ -2366,6 +2398,45 @@ test_that("`origin` could have floating point error values that need guarding - 
   origin <- as.POSIXct("1969-12-31 23:59:59.998", "UTC")
 
   expect_identical(warp_distance(x, by = "millisecond", every = 1L, origin = origin), c(2, -998))
+})
+
+test_that("values past microseconds are essentially ignored", {
+  x <- structure(-.000002, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  y <- structure(-.0000002, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+
+  expect_equal(warp_distance(x, "millisecond"), -1)
+  expect_equal(warp_distance(y, "millisecond"), 0)
+
+  x <- structure(-.001002, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  y <- structure(-.0010002, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+
+  expect_equal(warp_distance(x, "millisecond"), -2)
+  expect_equal(warp_distance(y, "millisecond"), -1)
+})
+
+test_that("proof that the +1e-7 guard is necessary", {
+  # Found this through trial and error
+  # I was looking for a place where the scaling up then down by 1e6
+  # produces a value that is represented as being `< x`
+  # Here we get:
+
+  # 1.000000001327000021935e+09 (start)
+  # *1e6
+  # 1.000000001327000000000e+15
+  # trunc
+  # 1.000000001327000000000e+15
+  # *1e-6
+  # 1.000000001326999902725e+09 (here is the problem! guard required!)
+  # +1e-7
+  # 1.000000001327000021935e+09 (no guard: 1.000000001326999902725e+09)
+  # *1e3
+  # 1.000000001327000000000e+12 (no guard: 1.000000001326999877930e+12)
+  # floor
+  # 1.000000001327000000000e+12 (no guard: 1.000000001326000000000e+12)
+
+  x <- structure(1000000001.327, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+
+  expect_identical(warp_distance(x, "millisecond"), 1000000001327)
 })
 
 # ------------------------------------------------------------------------------

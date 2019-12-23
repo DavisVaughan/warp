@@ -1613,7 +1613,7 @@ static int64_t origin_to_milliseconds_from_epoch(SEXP origin) {
  * - 52 significand bits
  *
  * The 52 significand bits are the ones that store the true value, this
- * corresponds to about 15 stable significand digits, with everything after
+ * corresponds to about ~16 significand digits, with everything after
  * that being garbage.
  *
  * Internally doubles are represented with scientific notation to put them in
@@ -1625,14 +1625,14 @@ static int64_t origin_to_milliseconds_from_epoch(SEXP origin) {
  * 1304286923.1234560013
  * =
  * 1.3042869231234560013e+09
- *                ^ 15th digit
+ *                 ^ 16th digit
  *
- * Because only 15 digits are stable, this is where we draw the line on
+ * Because only ~16 digits are stable, this is where we draw the line on
  * assuming that the user might have some valuable information stored here.
- * This corresponds to the place right before microseconds. Sure, we could use
+ * This corresponds to microseconds. Sure, we could use
  * a date that has less digits before the decimal to get more fractional
  * precision (see below) but most dates are in this form: 10 digits before
- * the decimal representing whole seconds, meaning 5 stable digits after it.
+ * the decimal representing whole seconds, meaning 6 stable digits after it.
  *
  * The other part of the story is that not all floating point numbers can be
  * represented exactly in binary. For example:
@@ -1650,33 +1650,42 @@ static int64_t origin_to_milliseconds_from_epoch(SEXP origin) {
  * best way I can come up with is to add a small value before flooring, which
  * would push us into the -1.9999999 range, which would floor correctly.
  *
- * I chose the value of 1 microsecond because that is generally where the 16th
- * digit falls for most dates (10 digits of whole seconds, 5 of stable
- * fractional seconds). This seems to work well for the millisecond grouping,
- * and we apply it to anywhere that uses seconds "just in case", but it is hard
- * to come up with tests for them.
+ * I chose the value of just beyond 1 microsecond because that is generally
+ * where the 17th digit falls for most dates
+ * (10 digits of whole seconds, 5 of stable fractional seconds). This seems to
+ * work well for the millisecond grouping, and we apply it to anywhere that
+ * uses seconds "just in case", but it is hard to come up with tests for them.
  */
-static inline double guard_with_microsecond(double x) {
-  return x + 0.000001;
-}
 
 static inline int64_t guarded_floor(double x) {
-  x = guard_with_microsecond(x);
+  // Scale and trim past microseconds
+  x *= 1e6;
+  x = trunc(x);
+  x *= 1e-6;
+
+  // Add guard and floor
+  x += 1e-7;
   x = floor(x);
+
   return (int64_t) x;
 }
 
 // The order here is slightly different. We want to convert
 // seconds to milliseconds while still guarding correctly.
-// - Apply the guard to the seconds first at the correct decimal place
-// - Then scale up to milliseconds and floor
-#define MILLISECONDS_IN_SECOND 1000
+// - Scale and trim past microseconds
+// - Guard while still at the second level to put it on the right decimal
+// - Now scale to millisecond and floor
 
 static inline int64_t guarded_floor_to_millisecond(double x) {
-  x = guard_with_microsecond(x);
-  x *= MILLISECONDS_IN_SECOND;
+  // Scale and trim past microseconds
+  x *= 1e6;
+  x = trunc(x);
+  x *= 1e-6;
+
+  // Add guard, scale to milliseconds, and floor
+  x += 1e-7;
+  x *= 1e3;
   x = floor(x);
+
   return (int64_t) x;
 }
-
-#undef MILLISECONDS_IN_SECOND
