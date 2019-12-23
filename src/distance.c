@@ -913,10 +913,13 @@ static SEXP int_posixct_warp_distance_minute(SEXP x, int every, SEXP origin) {
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset;
+  double origin_offset_dbl;
+  int64_t origin_offset;
 
   if (needs_offset) {
-    origin_offset = origin_to_seconds_from_epoch(origin);
+    origin_offset_dbl = origin_to_seconds_from_epoch(origin);
+    origin_offset_dbl = guard_with_microsecond(origin_offset_dbl);
+    origin_offset = floor(origin_offset_dbl);
   }
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, size));
@@ -925,12 +928,15 @@ static SEXP int_posixct_warp_distance_minute(SEXP x, int every, SEXP origin) {
   int* p_x = INTEGER(x);
 
   for (R_xlen_t i = 0; i < size; ++i) {
-    int elt = p_x[i];
+    int x_elt = p_x[i];
 
-    if (elt == NA_INTEGER) {
+    if (x_elt == NA_INTEGER) {
       p_out[i] = NA_REAL;
       continue;
     }
+
+    // Avoid overflow from `elt -= origin_offset`
+    int64_t elt = x_elt;
 
     if (needs_offset) {
       elt -= origin_offset;
@@ -967,10 +973,13 @@ static SEXP dbl_posixct_warp_distance_minute(SEXP x, int every, SEXP origin) {
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset;
+  double origin_offset_dbl;
+  int64_t origin_offset;
 
   if (needs_offset) {
-    origin_offset = origin_to_seconds_from_epoch(origin);
+    origin_offset_dbl = origin_to_seconds_from_epoch(origin);
+    origin_offset_dbl = guard_with_microsecond(origin_offset_dbl);
+    origin_offset = floor(origin_offset_dbl);
   }
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, size));
@@ -986,17 +995,19 @@ static SEXP dbl_posixct_warp_distance_minute(SEXP x, int every, SEXP origin) {
       continue;
     }
 
+    x_elt = guard_with_microsecond(x_elt);
+
+    int64_t elt = floor(x_elt);
+
     if (needs_offset) {
-      x_elt -= origin_offset;
+      elt -= origin_offset;
     }
 
-    int elt;
-
     // Double division, then integer cast into `elt`
-    if (x_elt < 0) {
-      elt = (floor(x_elt) - (SECONDS_IN_MINUTE - 1)) / SECONDS_IN_MINUTE;
+    if (elt < 0) {
+      elt = (elt - (SECONDS_IN_MINUTE - 1)) / SECONDS_IN_MINUTE;
     } else {
-      elt = x_elt / SECONDS_IN_MINUTE;
+      elt = elt / SECONDS_IN_MINUTE;
     }
 
     if (!needs_every) {

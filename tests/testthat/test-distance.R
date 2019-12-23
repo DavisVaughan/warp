@@ -1607,6 +1607,13 @@ test_that("can handle fractional seconds before the epoch correctly", {
   expect_identical(warp_distance(y, "minute"), -61)
 })
 
+test_that("`origin` could have fractional components - integer POSIXct", {
+  origin <- as.POSIXct("1969-12-31 23:59:59.998", "UTC")
+  x <- structure(c(-120L, -60L, 0L, 58L, 59L, 60L), tzone = "UTC", class = c("POSIXct", "POSIXt"))
+
+  expect_identical(warp_distance(x, "minute", origin = origin), c(-2, -1, 0, 0, 1, 1))
+})
+
 # ------------------------------------------------------------------------------
 # warp_distance(<POSIXlt>, by = "minute")
 
