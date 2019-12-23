@@ -1084,7 +1084,7 @@ static SEXP int_date_warp_distance_second(SEXP x, int every, SEXP origin) {
   double origin_offset;
 
   if (needs_offset) {
-    origin_offset = origin_to_days_from_epoch(origin) * SECONDS_IN_DAY;
+    origin_offset = origin_to_days_from_epoch(origin);
   }
 
   for (R_xlen_t i = 0; i < x_size; ++i) {
@@ -1097,11 +1097,13 @@ static SEXP int_date_warp_distance_second(SEXP x, int every, SEXP origin) {
 
     // Convert to int64_t here to hold `elt * SECONDS_IN_DAY`
     // Can't be double because we still need integer division later
-    int64_t elt = x_elt * SECONDS_IN_DAY;
+    int64_t elt = x_elt;
 
     if (needs_offset) {
       elt -= origin_offset;
     }
+
+    elt *= SECONDS_IN_DAY;
 
     if (!needs_every) {
       p_out[i] = elt;
@@ -1135,7 +1137,7 @@ static SEXP dbl_date_warp_distance_second(SEXP x, int every, SEXP origin) {
   double origin_offset;
 
   if (needs_offset) {
-    origin_offset = origin_to_days_from_epoch(origin) * SECONDS_IN_DAY;
+    origin_offset = origin_to_days_from_epoch(origin);
   }
 
   for (R_xlen_t i = 0; i < x_size; ++i) {
@@ -1149,13 +1151,12 @@ static SEXP dbl_date_warp_distance_second(SEXP x, int every, SEXP origin) {
     // Truncate towards 0 to get rid of the fractional pieces
     int64_t elt = x_elt;
 
-    elt = elt * SECONDS_IN_DAY;
-
-    // `origin_offset` should be correct from `as_date()` in
-    // `origin_to_days_from_epoch()`, even if it had fractional parts
+    // `origin_offset` will have no fractional parts
     if (needs_offset) {
       elt -= origin_offset;
     }
+
+    elt *= SECONDS_IN_DAY;
 
     if (!needs_every) {
       p_out[i] = elt;
