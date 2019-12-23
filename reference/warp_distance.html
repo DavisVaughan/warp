@@ -181,24 +181,42 @@ of <code>x</code> is directly changed to the time zone of <code>origin</code> wi
 underlying numeric representation. <strong>It is highly advised to specify your own
 <code>origin</code> value with the same time zone as <code>x</code>.</strong></p>
 <p>If a <code>Date</code> is used for <code>x</code>, its time zone is assumed to be <code>"UTC"</code>.</p>
-<p>The information in the provided <code>origin</code> is truncated by the <code>by</code> period
-specified. This means that if you specify <code>by = "month"</code>,
-<code>every = 2</code>, with an origin of <code>1970-01-15</code>, the only pieces of information
-that are used are the year and the month, and not the fact that the origin
-starts on the 15th of the month. The exceptions to this are <code>"week"</code> and
-<code>"quarter"</code>, see below.</p>
-<p>For <code>by = "week"</code>, a week is defined as a 7 day period starting
-from the <code>origin</code>'s year-month-day value.</p>
-<p>For <code>by = "quarter"</code>, a quarter is defined as a 3 month period starting
-from the <code>origin</code>'s year-month value.</p>
-<p>To support <code>by = "millisecond"</code>, care has to be taken with the impreciseness
-of floating point arithmetic. With values at that frequency,
-<code>warp_distance()</code> will drop all fractional values past the <em>microsecond</em>
-resolution, as that is approximately as far as POSIXct will support
-consistently. It will then uses any fractional values between the millisecond
-and microsecond places to determine the period groupings. In practice, this
-means that grouping POSIXct objects with values up to the microsecond
-frequency should be safe, but going beyond that will likely cause issues.</p>
+    <h2 class="hasAnchor" id="origin-truncation"><a class="anchor" href="#origin-truncation"></a><code>origin</code> Truncation</h2>
+
+    
+
+
+<p>For <code>by</code> values of <code>"year"</code> and <code>"month"</code>, the information provided in
+<code>origin</code> is truncated. Practically this means that if you specify:</p><pre>warp_distance(by = "month", every = 2, origin = as.Date("1970-01-15"))
+</pre>
+
+<p>then only <code>1970-01</code> will be used, and not the fact that the origin starts
+on the 15th of the month.</p>
+<p>The <code>by</code> value of <code>"quarter"</code> is internally <code>by = "month", every = every * 3</code>.
+This means that for <code>"quarter"</code> the month specified for the <code>origin</code> will
+be used as the month to start counting from to generate the 3 month quarter.</p>
+<p>The <code>by</code> value of <code>"week"</code> is internally <code>by = "day", every = every * 7</code>.
+This means that for <code>"week"</code> the day of the month specified for the <code>origin</code>
+will be used to start counting out the 7 day week. It can be useful to
+set the origin to, say, a Monday to generate week groups that start on
+Monday.</p>
+<p>For by values of <code>"day"</code> and below with <code>POSIXct</code> objects, the internal
+calculations are done on the number of seconds from the unix origin. For
+<code>"day"</code> this means that you could use an <code>origin</code> value in the middle of
+the day, and daily distances would be computed from that exact time point.</p>
+    <h2 class="hasAnchor" id="precision"><a class="anchor" href="#precision"></a>Precision</h2>
+
+    
+
+
+<p>With <code>POSIXct</code>, the limit of precision is approximately the microsecond
+level. Only dates that are very close to the unix origin of 1970-01-01 can
+possibly represent microsecond resolution correctly (close being within
+about 40 years on either side). Otherwise, the values past the microsecond
+resolution are essentially random, and can cause problems for the distance
+calculations. Because of this, decimal digits past the microsecond range are
+zeroed out, so please do not attempt to rely on them. It should still be safe
+to work with microseconds, by, say, bucketing them by millisecond distances.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"1970-01-01"</span>) + -<span class='fl'>4</span>:<span class='fl'>4</span>
@@ -250,6 +268,8 @@ frequency should be safe, but going beyond that will likely cause issues.</p>
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
       <li><a href="#details">Details</a></li>
+      <li><a href="#origin-truncation"><code>origin</code> Truncation</a></li>
+      <li><a href="#precision">Precision</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 
