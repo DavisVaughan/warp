@@ -7,6 +7,7 @@ static void validate_every(int every);
 static void validate_origin(SEXP origin);
 static double origin_to_days_from_epoch(SEXP origin);
 static double origin_to_seconds_from_epoch(SEXP origin);
+static inline double guard_with_microsecond(double x);
 
 // -----------------------------------------------------------------------------
 
@@ -1466,13 +1467,20 @@ static SEXP int_posixct_warp_distance_millisecond(SEXP x, int every, SEXP origin
       continue;
     }
 
-    // Convert to `int64_t` to guard against overflow
-    // No need to worry about precision issues here
-    int64_t elt = x_elt * MILLISECONDS_IN_SECOND;
+    // Convert to `double` to guard against overflow in
+    // `x_elt_dbl - origin_offset` and preserve offset fractional pieces
+    double x_elt_dbl = x_elt;
 
     if (needs_offset) {
-      elt -= origin_offset;
+      x_elt_dbl -= origin_offset;
     }
+
+    // Must guard in case the origin offset had fractional pieces
+    x_elt_dbl = guard_with_microsecond(x_elt_dbl);
+
+    x_elt_dbl = x_elt_dbl * MILLISECONDS_IN_SECOND;
+
+    int64_t elt = floor(x_elt_dbl);
 
     if (!needs_every) {
       p_out[i] = elt;
@@ -1501,7 +1509,7 @@ static SEXP dbl_posixct_warp_distance_millisecond(SEXP x, int every, SEXP origin
   double origin_offset;
 
   if (needs_offset) {
-    origin_offset = origin_to_seconds_from_epoch(origin) * MILLISECONDS_IN_SECOND;
+    origin_offset = origin_to_seconds_from_epoch(origin);
   }
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, x_size));
@@ -1517,11 +1525,15 @@ static SEXP dbl_posixct_warp_distance_millisecond(SEXP x, int every, SEXP origin
       continue;
     }
 
-    x_elt = x_elt * MILLISECONDS_IN_SECOND;
-
     if (needs_offset) {
       x_elt -= origin_offset;
     }
+
+    // Guard before flooring. Must guard before converting to millisecond
+    // as well, otherwise it would put the guard in the wrong decimal place
+    x_elt = guard_with_microsecond(x_elt);
+
+    x_elt = x_elt * MILLISECONDS_IN_SECOND;
 
     // Always floor() to get rid of fractional pieces
     int64_t elt = floor(x_elt);
@@ -1599,3 +1611,59 @@ static double origin_to_seconds_from_epoch(SEXP origin) {
   UNPROTECT(1);
   return out;
 }
+
+
+/*
+ * `double` values are represented with 64 bits:
+ * - 1 sign bit
+ * - 11 exponent bits
+ * - 52 significand bits
+ *
+ * The 52 significand bits are the ones that store the true value, this
+ * corresponds to about 15 stable significand digits, with everything after
+ * that being garbage.
+ *
+ * Internally doubles are represented with scientific notation to put them in
+ * the exponent-significand representation. So the following date, which
+ * is represented as a double, really looks like this in scientific notation:
+ *
+ * unclass(as.POSIXct("2011-05-01 17:55:23.123456"))
+ * =
+ * 1304286923.1234560013
+ * =
+ * 1.3042869231234560013e+09
+ *                ^ 15th digit
+ *
+ * Because only 15 digits are stable, this is where we draw the line on
+ * assuming that the user might have some valuable information stored here.
+ * This corresponds to the place right before microseconds. Sure, we could use
+ * a date that has less digits before the decimal to get more fractional
+ * precision (see below) but most dates are in this form: 10 digits before
+ * the decimal representing whole seconds, meaning 5 stable digits after it.
+ *
+ * The other part of the story is that not all floating point numbers can be
+ * represented exactly in binary. For example:
+ *
+ * unclass(as.POSIXct("1969-12-31 23:59:59.998", "UTC"))
+ * =
+ * -0.002000000000002444267
+ *
+ * Because of this, `floor()` will give results that (to us) are incorrect if
+ * we were to try and floor to milliseconds. We would first times by 1000 to
+ * get milliseconds of `-2.000000000002444267`, and then `floor()` would give
+ * us -3, not -2 which is the correct group.
+ *
+ * To get around this, we need to guard against this floating point error. The
+ * best way I can come up with is to add a small value before flooring, which
+ * would push us into the -1.9999999 range, which would floor correctly.
+ *
+ * I chose the value of 1 microsecond because that is generally where the 16th
+ * digit falls for most dates (10 digits of whole seconds, 5 of stable
+ * fractional seconds). This seems to work well for the millisecond grouping,
+ * and we apply it to anywhere that uses seconds "just in case", but it is hard
+ * to come up with tests for them.
+ */
+static inline double guard_with_microsecond(double x) {
+  return x + 0.000001;
+}
+
