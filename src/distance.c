@@ -1346,7 +1346,7 @@ static SEXP int_date_warp_distance_millisecond(SEXP x, int every, SEXP origin) {
   double origin_offset;
 
   if (needs_offset) {
-    origin_offset = origin_to_days_from_epoch(origin) * MILLISECONDS_IN_DAY;
+    origin_offset = origin_to_days_from_epoch(origin);
   }
 
   for (R_xlen_t i = 0; i < x_size; ++i) {
@@ -1357,13 +1357,16 @@ static SEXP int_date_warp_distance_millisecond(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    // Convert to int64_t here to hold `elt * MILLISECONDS_IN_DAY`
+    // Convert to int64_t here to avoid overflow and
+    // hold `elt * MILLISECONDS_IN_DAY`
     // Can't be double because we still need integer division later
-    int64_t elt = x_elt * MILLISECONDS_IN_DAY;
+    int64_t elt = x_elt;
 
     if (needs_offset) {
       elt -= origin_offset;
     }
+
+    elt = elt * MILLISECONDS_IN_DAY;
 
     if (!needs_every) {
       p_out[i] = elt;
@@ -1397,7 +1400,7 @@ static SEXP dbl_date_warp_distance_millisecond(SEXP x, int every, SEXP origin) {
   double origin_offset;
 
   if (needs_offset) {
-    origin_offset = origin_to_days_from_epoch(origin) * MILLISECONDS_IN_DAY;
+    origin_offset = origin_to_days_from_epoch(origin);
   }
 
   for (R_xlen_t i = 0; i < x_size; ++i) {
@@ -1411,13 +1414,13 @@ static SEXP dbl_date_warp_distance_millisecond(SEXP x, int every, SEXP origin) {
     // Truncate towards 0 to get rid of the fractional pieces
     int64_t elt = x_elt;
 
-    elt = elt * MILLISECONDS_IN_DAY;
-
     // `origin_offset` should be correct from `as_date()` in
     // `origin_to_days_from_epoch()`, even if it had fractional parts
     if (needs_offset) {
       elt -= origin_offset;
     }
+
+    elt = elt * MILLISECONDS_IN_DAY;
 
     if (!needs_every) {
       p_out[i] = elt;
@@ -1586,6 +1589,7 @@ static void validate_origin(SEXP origin) {
   }
 }
 
+// This will always return a double with no fractional component
 static double origin_to_days_from_epoch(SEXP origin) {
   origin = PROTECT(as_date(origin));
 
