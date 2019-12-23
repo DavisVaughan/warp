@@ -66,29 +66,29 @@ static SEXP warp_distance_year(SEXP x, int every, SEXP origin) {
 
   bool needs_offset = (origin != R_NilValue);
 
-  int origin_offset;
+  int origin_offset_year;
 
   if (needs_offset) {
     SEXP origin_offset_sexp = PROTECT_N(get_year_offset(origin), &n_prot);
-    origin_offset = INTEGER(origin_offset_sexp)[0];
+    origin_offset_year = INTEGER(origin_offset_sexp)[0];
 
-    if (origin_offset == NA_INTEGER) {
+    if (origin_offset_year == NA_INTEGER) {
       r_error("warp_distance_year", "`origin` cannot be `NA`.");
     }
   }
 
   bool needs_every = (every != 1);
 
-  x = PROTECT_N(get_year_offset(x), &n_prot);
-  int* p_x = INTEGER(x);
+  SEXP year = PROTECT_N(get_year_offset(x), &n_prot);
+  int* p_year = INTEGER(year);
 
-  R_xlen_t n_out = Rf_xlength(x);
+  R_xlen_t n_out = Rf_xlength(year);
 
   SEXP out = PROTECT_N(Rf_allocVector(REALSXP, n_out), &n_prot);
   double* p_out = REAL(out);
 
   for (R_xlen_t i = 0; i < n_out; ++i) {
-    int elt = p_x[i];
+    int elt = p_year[i];
 
     if (elt == NA_INTEGER) {
       p_out[i] = NA_REAL;
@@ -96,7 +96,7 @@ static SEXP warp_distance_year(SEXP x, int every, SEXP origin) {
     }
 
     if (needs_offset) {
-      elt -= origin_offset;
+      elt -= origin_offset_year;
     }
 
     if (!needs_every) {
@@ -145,10 +145,10 @@ static SEXP warp_distance_month(SEXP x, int every, SEXP origin) {
 
   bool needs_every = (every != 1);
 
-  SEXP offset_lst = PROTECT_N(get_year_month_offset(x), &n_prot);
+  SEXP x_offset_lst = PROTECT_N(get_year_month_offset(x), &n_prot);
 
-  SEXP year = VECTOR_ELT(offset_lst, 0);
-  SEXP month = VECTOR_ELT(offset_lst, 1);
+  SEXP year = VECTOR_ELT(x_offset_lst, 0);
+  SEXP month = VECTOR_ELT(x_offset_lst, 1);
 
   const int* p_year = INTEGER_RO(year);
   const int* p_month = INTEGER_RO(month);
@@ -369,10 +369,13 @@ static SEXP int_posixct_warp_distance_day(SEXP x, int every, SEXP origin) {
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset;
+  double origin_offset_dbl;
+  int64_t origin_offset;
 
   if (needs_offset) {
-    origin_offset = origin_to_seconds_from_epoch(origin);
+    origin_offset_dbl = origin_to_seconds_from_epoch(origin);
+    origin_offset_dbl = guard_with_microsecond(origin_offset_dbl);
+    origin_offset = floor(origin_offset_dbl);
   }
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, size));
@@ -381,12 +384,15 @@ static SEXP int_posixct_warp_distance_day(SEXP x, int every, SEXP origin) {
   int* p_x = INTEGER(x);
 
   for (R_xlen_t i = 0; i < size; ++i) {
-    int elt = p_x[i];
+    int x_elt = p_x[i];
 
-    if (elt == NA_INTEGER) {
+    if (x_elt == NA_INTEGER) {
       p_out[i] = NA_REAL;
       continue;
     }
+
+    // Convert to avoid overflow
+    int64_t elt = x_elt;
 
     if (needs_offset) {
       elt -= origin_offset;
@@ -423,10 +429,13 @@ static SEXP dbl_posixct_warp_distance_day(SEXP x, int every, SEXP origin) {
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset;
+  double origin_offset_dbl;
+  int64_t origin_offset;
 
   if (needs_offset) {
-    origin_offset = origin_to_seconds_from_epoch(origin);
+    origin_offset_dbl = origin_to_seconds_from_epoch(origin);
+    origin_offset_dbl = guard_with_microsecond(origin_offset_dbl);
+    origin_offset = floor(origin_offset_dbl);
   }
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, size));
@@ -442,17 +451,18 @@ static SEXP dbl_posixct_warp_distance_day(SEXP x, int every, SEXP origin) {
       continue;
     }
 
+    x_elt = guard_with_microsecond(x_elt);
+
+    int64_t elt = floor(x_elt);
+
     if (needs_offset) {
-      x_elt -= origin_offset;
+      elt -= origin_offset;
     }
 
-    int elt;
-
-    // Double division, then integer cast into `elt`
-    if (x_elt < 0) {
-      elt = (floor(x_elt) - (SECONDS_IN_DAY - 1)) / SECONDS_IN_DAY;
+    if (elt < 0) {
+      elt = (elt - (SECONDS_IN_DAY - 1)) / SECONDS_IN_DAY;
     } else {
-      elt = x_elt / SECONDS_IN_DAY;
+      elt = elt / SECONDS_IN_DAY;
     }
 
     if (!needs_every) {
