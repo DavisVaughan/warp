@@ -1981,6 +1981,13 @@ test_that("can handle second values larger than max int value", {
   expect_equal(warp_distance(x, "second"), 4102444800)
 })
 
+test_that("`origin` could have fractional components (ignore them) - integer POSIXct", {
+  origin <- as.POSIXct("1969-12-31 23:59:59.998", "UTC")
+  x <- structure(c(-2L, -1L, 0L, 1L), tzone = "UTC", class = c("POSIXct", "POSIXt"))
+
+  expect_identical(warp_distance(x, "second", origin = origin), c(-1, 0, 1, 2))
+})
+
 # ------------------------------------------------------------------------------
 # warp_distance(<POSIXlt>, by = "second")
 

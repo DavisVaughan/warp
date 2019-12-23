@@ -1183,10 +1183,13 @@ static SEXP int_posixct_warp_distance_second(SEXP x, int every, SEXP origin) {
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset;
+  double origin_offset_dbl;
+  int64_t origin_offset;
 
   if (needs_offset) {
-    origin_offset = origin_to_seconds_from_epoch(origin);
+    origin_offset_dbl = origin_to_seconds_from_epoch(origin);
+    origin_offset_dbl = guard_with_microsecond(origin_offset_dbl);
+    origin_offset = floor(origin_offset_dbl);
   }
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, x_size));
@@ -1203,17 +1206,12 @@ static SEXP int_posixct_warp_distance_second(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    // Convert to `double` in case `x_elt_dbl -= origin_offset` goes OOB
-    double x_elt_dbl = x_elt;
+    // Convert to `int64_t` to avoid overflow
+    int64_t elt = x_elt;
 
     if (needs_offset) {
-      x_elt_dbl -= origin_offset;
+      elt -= origin_offset;
     }
-
-    // Guard and floor in case `origin` had fractional components
-    x_elt_dbl = guard_with_microsecond(x_elt_dbl);
-
-    int64_t elt = floor(x_elt_dbl);
 
     if (!needs_every) {
       p_out[i] = elt;
@@ -1239,10 +1237,13 @@ static SEXP dbl_posixct_warp_distance_second(SEXP x, int every, SEXP origin) {
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset;
+  double origin_offset_dbl;
+  int64_t origin_offset;
 
   if (needs_offset) {
-    origin_offset = origin_to_seconds_from_epoch(origin);
+    origin_offset_dbl = origin_to_seconds_from_epoch(origin);
+    origin_offset_dbl = guard_with_microsecond(origin_offset_dbl);
+    origin_offset = floor(origin_offset_dbl);
   }
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, x_size));
@@ -1258,17 +1259,17 @@ static SEXP dbl_posixct_warp_distance_second(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    if (needs_offset) {
-      x_elt -= origin_offset;
-    }
-
-    x_elt = guard_with_microsecond(x_elt);
-
     // Always floor() to get rid of fractional seconds, whether `x_elt` is
     // negative or positive. Need int64_t here because of the integer
     // division later. Flooring takes the fractional seconds into account,
     // which we want to do.
+    x_elt = guard_with_microsecond(x_elt);
+
     int64_t elt = floor(x_elt);
+
+    if (needs_offset) {
+      elt -= origin_offset;
+    }
 
     if (!needs_every) {
       p_out[i] = elt;
@@ -1457,10 +1458,14 @@ static SEXP int_posixct_warp_distance_millisecond(SEXP x, int every, SEXP origin
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset;
+  double origin_offset_dbl;
+  int64_t origin_offset;
 
   if (needs_offset) {
-    origin_offset = origin_to_seconds_from_epoch(origin);
+    origin_offset_dbl = origin_to_seconds_from_epoch(origin);
+    origin_offset_dbl = guard_with_microsecond(origin_offset_dbl);
+    origin_offset_dbl *= MILLISECONDS_IN_SECOND;
+    origin_offset = floor(origin_offset_dbl);
   }
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, x_size));
@@ -1477,20 +1482,12 @@ static SEXP int_posixct_warp_distance_millisecond(SEXP x, int every, SEXP origin
       continue;
     }
 
-    // Convert to `double` to guard against overflow in
-    // `x_elt_dbl - origin_offset` and preserve offset fractional pieces
-    double x_elt_dbl = x_elt;
+    // Convert to int64_t to guard against overflow
+    int64_t elt = x_elt * MILLISECONDS_IN_SECOND;
 
     if (needs_offset) {
-      x_elt_dbl -= origin_offset;
+      elt -= origin_offset;
     }
-
-    // Must guard in case the origin offset had fractional pieces
-    x_elt_dbl = guard_with_microsecond(x_elt_dbl);
-
-    x_elt_dbl = x_elt_dbl * MILLISECONDS_IN_SECOND;
-
-    int64_t elt = floor(x_elt_dbl);
 
     if (!needs_every) {
       p_out[i] = elt;
@@ -1516,10 +1513,14 @@ static SEXP dbl_posixct_warp_distance_millisecond(SEXP x, int every, SEXP origin
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset;
+  double origin_offset_dbl;
+  int64_t origin_offset;
 
   if (needs_offset) {
-    origin_offset = origin_to_seconds_from_epoch(origin);
+    origin_offset_dbl = origin_to_seconds_from_epoch(origin);
+    origin_offset_dbl = guard_with_microsecond(origin_offset_dbl);
+    origin_offset_dbl *= MILLISECONDS_IN_SECOND;
+    origin_offset = floor(origin_offset_dbl);
   }
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, x_size));
@@ -1535,10 +1536,6 @@ static SEXP dbl_posixct_warp_distance_millisecond(SEXP x, int every, SEXP origin
       continue;
     }
 
-    if (needs_offset) {
-      x_elt -= origin_offset;
-    }
-
     // Guard before flooring. Must guard before converting to millisecond
     // as well, otherwise it would put the guard in the wrong decimal place
     x_elt = guard_with_microsecond(x_elt);
@@ -1547,6 +1544,10 @@ static SEXP dbl_posixct_warp_distance_millisecond(SEXP x, int every, SEXP origin
 
     // Always floor() to get rid of fractional pieces
     int64_t elt = floor(x_elt);
+
+    if (needs_offset) {
+      elt -= origin_offset;
+    }
 
     if (!needs_every) {
       p_out[i] = elt;
