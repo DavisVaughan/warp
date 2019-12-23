@@ -1203,12 +1203,17 @@ static SEXP int_posixct_warp_distance_second(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    // Convert to `int64_t` in case `elt -= origin_offset` goes OOB
-    int64_t elt = x_elt;
+    // Convert to `double` in case `x_elt_dbl -= origin_offset` goes OOB
+    double x_elt_dbl = x_elt;
 
     if (needs_offset) {
-      elt -= origin_offset;
+      x_elt_dbl -= origin_offset;
     }
+
+    // Guard and floor in case `origin` had fractional components
+    x_elt_dbl = guard_with_microsecond(x_elt_dbl);
+
+    int64_t elt = floor(x_elt_dbl);
 
     if (!needs_every) {
       p_out[i] = elt;
@@ -1256,6 +1261,8 @@ static SEXP dbl_posixct_warp_distance_second(SEXP x, int every, SEXP origin) {
     if (needs_offset) {
       x_elt -= origin_offset;
     }
+
+    x_elt = guard_with_microsecond(x_elt);
 
     // Always floor() to get rid of fractional seconds, whether `x_elt` is
     // negative or positive. Need int64_t here because of the integer
