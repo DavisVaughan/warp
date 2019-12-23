@@ -5,9 +5,11 @@
 // Helpers defined at the bottom of the file
 static void validate_every(int every);
 static void validate_origin(SEXP origin);
-static double origin_to_days_from_epoch(SEXP origin);
-static double origin_to_seconds_from_epoch(SEXP origin);
-static inline double guard_with_microsecond(double x);
+static int origin_to_days_from_epoch(SEXP origin);
+static int64_t origin_to_seconds_from_epoch(SEXP origin);
+static int64_t origin_to_milliseconds_from_epoch(SEXP origin);
+static inline int64_t guarded_floor(double x);
+static inline int64_t guarded_floor_to_millisecond(double x);
 
 // -----------------------------------------------------------------------------
 
@@ -272,7 +274,8 @@ static SEXP int_date_warp_distance_day(SEXP x, int every, SEXP origin) {
   SEXP out = PROTECT(Rf_allocVector(REALSXP, size));
   double* p_out = REAL(out);
 
-  double origin_offset;
+  int origin_offset;
+
   if (needs_offset) {
     origin_offset = origin_to_days_from_epoch(origin);
   }
@@ -318,7 +321,7 @@ static SEXP dbl_date_warp_distance_day(SEXP x, int every, SEXP origin) {
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset;
+  int origin_offset;
 
   if (needs_offset) {
     origin_offset = origin_to_days_from_epoch(origin);
@@ -332,13 +335,9 @@ static SEXP dbl_date_warp_distance_day(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    // Truncate towards 0 to get rid of any fractional date pieces.
-    // We ignore them completely, you should just uses a POSIXct if you
-    // need them
+    // Truncate to completely ignore fractional Date parts
     int elt = x_elt;
 
-    // `origin_offset` should be correct from `as_date()` in
-    // `origin_to_days_from_epoch()`, even if it had fractional parts
     if (needs_offset) {
       elt -= origin_offset;
     }
@@ -369,13 +368,10 @@ static SEXP int_posixct_warp_distance_day(SEXP x, int every, SEXP origin) {
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset_dbl;
   int64_t origin_offset;
 
   if (needs_offset) {
-    origin_offset_dbl = origin_to_seconds_from_epoch(origin);
-    origin_offset_dbl = guard_with_microsecond(origin_offset_dbl);
-    origin_offset = floor(origin_offset_dbl);
+    origin_offset = origin_to_seconds_from_epoch(origin);
   }
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, size));
@@ -391,14 +387,13 @@ static SEXP int_posixct_warp_distance_day(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    // Convert to avoid overflow
+    // Avoid overflow
     int64_t elt = x_elt;
 
     if (needs_offset) {
       elt -= origin_offset;
     }
 
-    // Integer division, then straight into `elt` with no cast needed
     if (elt < 0) {
       elt = (elt - (SECONDS_IN_DAY - 1)) / SECONDS_IN_DAY;
     } else {
@@ -429,13 +424,10 @@ static SEXP dbl_posixct_warp_distance_day(SEXP x, int every, SEXP origin) {
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset_dbl;
   int64_t origin_offset;
 
   if (needs_offset) {
-    origin_offset_dbl = origin_to_seconds_from_epoch(origin);
-    origin_offset_dbl = guard_with_microsecond(origin_offset_dbl);
-    origin_offset = floor(origin_offset_dbl);
+    origin_offset = origin_to_seconds_from_epoch(origin);
   }
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, size));
@@ -451,9 +443,7 @@ static SEXP dbl_posixct_warp_distance_day(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    x_elt = guard_with_microsecond(x_elt);
-
-    int64_t elt = floor(x_elt);
+    int64_t elt = guarded_floor(x_elt);
 
     if (needs_offset) {
       elt -= origin_offset;
@@ -547,7 +537,7 @@ static SEXP int_date_warp_distance_hour(SEXP x, int every, SEXP origin) {
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset;
+  int origin_offset;
 
   if (needs_offset) {
     origin_offset = origin_to_days_from_epoch(origin);
@@ -596,7 +586,7 @@ static SEXP dbl_date_warp_distance_hour(SEXP x, int every, SEXP origin) {
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset;
+  int origin_offset;
 
   if (needs_offset) {
     origin_offset = origin_to_days_from_epoch(origin);
@@ -610,11 +600,9 @@ static SEXP dbl_date_warp_distance_hour(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    // Truncate towards 0 to get rid of any fractional date pieces.
+    // Truncate to completely ignore fractional Date parts
     int elt = x_elt;
 
-    // `origin_offset` should be correct from `as_date()` in
-    // `origin_to_days_from_epoch()`, even if it had fractional parts
     if (needs_offset) {
       elt -= origin_offset;
     }
@@ -649,13 +637,10 @@ static SEXP int_posixct_warp_distance_hour(SEXP x, int every, SEXP origin) {
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset_dbl;
   int64_t origin_offset;
 
   if (needs_offset) {
-    origin_offset_dbl = origin_to_seconds_from_epoch(origin);
-    origin_offset_dbl = guard_with_microsecond(origin_offset_dbl);
-    origin_offset = floor(origin_offset_dbl);
+    origin_offset = origin_to_seconds_from_epoch(origin);
   }
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, size));
@@ -671,14 +656,13 @@ static SEXP int_posixct_warp_distance_hour(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    // Convert to avoid overflow in `elt -= origin_offset`
+    // Avoid overflow
     int64_t elt = x_elt;
 
     if (needs_offset) {
       elt -= origin_offset;
     }
 
-    // Integer division, then straight into `elt` with no cast needed
     if (elt < 0) {
       elt = (elt - (SECONDS_IN_HOUR - 1)) / SECONDS_IN_HOUR;
     } else {
@@ -709,13 +693,10 @@ static SEXP dbl_posixct_warp_distance_hour(SEXP x, int every, SEXP origin) {
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset_dbl;
   int64_t origin_offset;
 
   if (needs_offset) {
-    origin_offset_dbl = origin_to_seconds_from_epoch(origin);
-    origin_offset_dbl = guard_with_microsecond(origin_offset_dbl);
-    origin_offset = floor(origin_offset_dbl);
+    origin_offset = origin_to_seconds_from_epoch(origin);
   }
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, size));
@@ -731,15 +712,12 @@ static SEXP dbl_posixct_warp_distance_hour(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    x_elt = guard_with_microsecond(x_elt);
-
-    int64_t elt = floor(x_elt);
+    int64_t elt = guarded_floor(x_elt);
 
     if (needs_offset) {
       elt -= origin_offset;
     }
 
-    // Double division, then integer cast into `elt`
     if (elt < 0) {
       elt = (elt - (SECONDS_IN_HOUR - 1)) / SECONDS_IN_HOUR;
     } else {
@@ -828,7 +806,7 @@ static SEXP int_date_warp_distance_minute(SEXP x, int every, SEXP origin) {
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset;
+  int origin_offset;
 
   if (needs_offset) {
     origin_offset = origin_to_days_from_epoch(origin);
@@ -877,7 +855,7 @@ static SEXP dbl_date_warp_distance_minute(SEXP x, int every, SEXP origin) {
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset;
+  int origin_offset;
 
   if (needs_offset) {
     origin_offset = origin_to_days_from_epoch(origin);
@@ -891,13 +869,9 @@ static SEXP dbl_date_warp_distance_minute(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    // Truncate towards 0 to get rid of any fractional date pieces.
-    // We ignore them completely, you should just uses a POSIXct if you
-    // need them
+    // Truncate to completely ignore fractional Date parts
     int elt = x_elt;
 
-    // `origin_offset` should be correct from `as_date()` in
-    // `origin_to_days_from_epoch()`, even if it had fractional parts
     if (needs_offset) {
       elt -= origin_offset;
     }
@@ -932,13 +906,10 @@ static SEXP int_posixct_warp_distance_minute(SEXP x, int every, SEXP origin) {
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset_dbl;
   int64_t origin_offset;
 
   if (needs_offset) {
-    origin_offset_dbl = origin_to_seconds_from_epoch(origin);
-    origin_offset_dbl = guard_with_microsecond(origin_offset_dbl);
-    origin_offset = floor(origin_offset_dbl);
+    origin_offset = origin_to_seconds_from_epoch(origin);
   }
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, size));
@@ -954,14 +925,13 @@ static SEXP int_posixct_warp_distance_minute(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    // Avoid overflow from `elt -= origin_offset`
+    // Avoid overflow
     int64_t elt = x_elt;
 
     if (needs_offset) {
       elt -= origin_offset;
     }
 
-    // Integer division, then straight into `elt` with no cast needed
     if (elt < 0) {
       elt = (elt - (SECONDS_IN_MINUTE - 1)) / SECONDS_IN_MINUTE;
     } else {
@@ -992,13 +962,10 @@ static SEXP dbl_posixct_warp_distance_minute(SEXP x, int every, SEXP origin) {
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset_dbl;
   int64_t origin_offset;
 
   if (needs_offset) {
-    origin_offset_dbl = origin_to_seconds_from_epoch(origin);
-    origin_offset_dbl = guard_with_microsecond(origin_offset_dbl);
-    origin_offset = floor(origin_offset_dbl);
+    origin_offset = origin_to_seconds_from_epoch(origin);
   }
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, size));
@@ -1014,15 +981,12 @@ static SEXP dbl_posixct_warp_distance_minute(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    x_elt = guard_with_microsecond(x_elt);
-
-    int64_t elt = floor(x_elt);
+    int64_t elt = guarded_floor(x_elt);
 
     if (needs_offset) {
       elt -= origin_offset;
     }
 
-    // Double division, then integer cast into `elt`
     if (elt < 0) {
       elt = (elt - (SECONDS_IN_MINUTE - 1)) / SECONDS_IN_MINUTE;
     } else {
@@ -1111,7 +1075,7 @@ static SEXP int_date_warp_distance_second(SEXP x, int every, SEXP origin) {
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset;
+  int origin_offset;
 
   if (needs_offset) {
     origin_offset = origin_to_days_from_epoch(origin);
@@ -1125,8 +1089,7 @@ static SEXP int_date_warp_distance_second(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    // Convert to int64_t here to hold `elt * SECONDS_IN_DAY`
-    // Can't be double because we still need integer division later
+    // Avoid overflow
     int64_t elt = x_elt;
 
     if (needs_offset) {
@@ -1164,7 +1127,7 @@ static SEXP dbl_date_warp_distance_second(SEXP x, int every, SEXP origin) {
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset;
+  int origin_offset;
 
   if (needs_offset) {
     origin_offset = origin_to_days_from_epoch(origin);
@@ -1178,10 +1141,10 @@ static SEXP dbl_date_warp_distance_second(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    // Truncate towards 0 to get rid of the fractional pieces
+    // Truncate to completely ignore fractional Date parts
+    // `int64_t` to avoid overflow
     int64_t elt = x_elt;
 
-    // `origin_offset` will have no fractional parts
     if (needs_offset) {
       elt -= origin_offset;
     }
@@ -1214,13 +1177,10 @@ static SEXP int_posixct_warp_distance_second(SEXP x, int every, SEXP origin) {
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset_dbl;
   int64_t origin_offset;
 
   if (needs_offset) {
-    origin_offset_dbl = origin_to_seconds_from_epoch(origin);
-    origin_offset_dbl = guard_with_microsecond(origin_offset_dbl);
-    origin_offset = floor(origin_offset_dbl);
+    origin_offset = origin_to_seconds_from_epoch(origin);
   }
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, x_size));
@@ -1229,7 +1189,6 @@ static SEXP int_posixct_warp_distance_second(SEXP x, int every, SEXP origin) {
   int* p_x = INTEGER(x);
 
   for (R_xlen_t i = 0; i < x_size; ++i) {
-    // Starts as `int`, since that is what `x` is
     int x_elt = p_x[i];
 
     if (x_elt == NA_INTEGER) {
@@ -1237,7 +1196,7 @@ static SEXP int_posixct_warp_distance_second(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    // Convert to `int64_t` to avoid overflow
+    // Avoid overflow
     int64_t elt = x_elt;
 
     if (needs_offset) {
@@ -1268,13 +1227,10 @@ static SEXP dbl_posixct_warp_distance_second(SEXP x, int every, SEXP origin) {
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset_dbl;
   int64_t origin_offset;
 
   if (needs_offset) {
-    origin_offset_dbl = origin_to_seconds_from_epoch(origin);
-    origin_offset_dbl = guard_with_microsecond(origin_offset_dbl);
-    origin_offset = floor(origin_offset_dbl);
+    origin_offset = origin_to_seconds_from_epoch(origin);
   }
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, x_size));
@@ -1290,13 +1246,7 @@ static SEXP dbl_posixct_warp_distance_second(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    // Always floor() to get rid of fractional seconds, whether `x_elt` is
-    // negative or positive. Need int64_t here because of the integer
-    // division later. Flooring takes the fractional seconds into account,
-    // which we want to do.
-    x_elt = guard_with_microsecond(x_elt);
-
-    int64_t elt = floor(x_elt);
+    int64_t elt = guarded_floor(x_elt);
 
     if (needs_offset) {
       elt -= origin_offset;
@@ -1382,7 +1332,7 @@ static SEXP int_date_warp_distance_millisecond(SEXP x, int every, SEXP origin) {
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset;
+  int origin_offset;
 
   if (needs_offset) {
     origin_offset = origin_to_days_from_epoch(origin);
@@ -1396,16 +1346,14 @@ static SEXP int_date_warp_distance_millisecond(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    // Convert to int64_t here to avoid overflow and
-    // hold `elt * MILLISECONDS_IN_DAY`
-    // Can't be double because we still need integer division later
+    // `int64_t` to avoid overflow
     int64_t elt = x_elt;
 
     if (needs_offset) {
       elt -= origin_offset;
     }
 
-    elt = elt * MILLISECONDS_IN_DAY;
+    elt *= MILLISECONDS_IN_DAY;
 
     if (!needs_every) {
       p_out[i] = elt;
@@ -1436,7 +1384,7 @@ static SEXP dbl_date_warp_distance_millisecond(SEXP x, int every, SEXP origin) {
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset;
+  int origin_offset;
 
   if (needs_offset) {
     origin_offset = origin_to_days_from_epoch(origin);
@@ -1450,16 +1398,15 @@ static SEXP dbl_date_warp_distance_millisecond(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    // Truncate towards 0 to get rid of the fractional pieces
+    // Truncate to completely ignore fractional Date parts
+    // `int64_t` to avoid overflow
     int64_t elt = x_elt;
 
-    // `origin_offset` should be correct from `as_date()` in
-    // `origin_to_days_from_epoch()`, even if it had fractional parts
     if (needs_offset) {
       elt -= origin_offset;
     }
 
-    elt = elt * MILLISECONDS_IN_DAY;
+    elt *= MILLISECONDS_IN_DAY;
 
     if (!needs_every) {
       p_out[i] = elt;
@@ -1489,14 +1436,10 @@ static SEXP int_posixct_warp_distance_millisecond(SEXP x, int every, SEXP origin
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset_dbl;
   int64_t origin_offset;
 
   if (needs_offset) {
-    origin_offset_dbl = origin_to_seconds_from_epoch(origin);
-    origin_offset_dbl = guard_with_microsecond(origin_offset_dbl);
-    origin_offset_dbl *= MILLISECONDS_IN_SECOND;
-    origin_offset = floor(origin_offset_dbl);
+    origin_offset = origin_to_milliseconds_from_epoch(origin);
   }
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, x_size));
@@ -1505,7 +1448,6 @@ static SEXP int_posixct_warp_distance_millisecond(SEXP x, int every, SEXP origin
   int* p_x = INTEGER(x);
 
   for (R_xlen_t i = 0; i < x_size; ++i) {
-    // Starts as `int`, since that is what `x` is
     int x_elt = p_x[i];
 
     if (x_elt == NA_INTEGER) {
@@ -1513,7 +1455,9 @@ static SEXP int_posixct_warp_distance_millisecond(SEXP x, int every, SEXP origin
       continue;
     }
 
-    // Convert to int64_t to guard against overflow
+    // `int64_t` to avoid overflow
+    // Note - Have to do `* MILLISECONDS_IN_SECOND` before the
+    // offset subtraction because the offset is already in milliseconds
     int64_t elt = x_elt * MILLISECONDS_IN_SECOND;
 
     if (needs_offset) {
@@ -1544,14 +1488,10 @@ static SEXP dbl_posixct_warp_distance_millisecond(SEXP x, int every, SEXP origin
   bool needs_every = (every != 1);
 
   bool needs_offset = (origin != R_NilValue);
-  double origin_offset_dbl;
   int64_t origin_offset;
 
   if (needs_offset) {
-    origin_offset_dbl = origin_to_seconds_from_epoch(origin);
-    origin_offset_dbl = guard_with_microsecond(origin_offset_dbl);
-    origin_offset_dbl *= MILLISECONDS_IN_SECOND;
-    origin_offset = floor(origin_offset_dbl);
+    origin_offset = origin_to_milliseconds_from_epoch(origin);
   }
 
   SEXP out = PROTECT(Rf_allocVector(REALSXP, x_size));
@@ -1567,14 +1507,7 @@ static SEXP dbl_posixct_warp_distance_millisecond(SEXP x, int every, SEXP origin
       continue;
     }
 
-    // Guard before flooring. Must guard before converting to millisecond
-    // as well, otherwise it would put the guard in the wrong decimal place
-    x_elt = guard_with_microsecond(x_elt);
-
-    x_elt = x_elt * MILLISECONDS_IN_SECOND;
-
-    // Always floor() to get rid of fractional pieces
-    int64_t elt = floor(x_elt);
+    int64_t elt = guarded_floor_to_millisecond(x_elt);
 
     if (needs_offset) {
       elt -= origin_offset;
@@ -1628,8 +1561,9 @@ static void validate_origin(SEXP origin) {
   }
 }
 
-// This will always return a double with no fractional component
-static double origin_to_days_from_epoch(SEXP origin) {
+// `as_date()` will always return a double with no fractional component,
+// and the double will always fit inside an int
+static int origin_to_days_from_epoch(SEXP origin) {
   origin = PROTECT(as_date(origin));
 
   double out = REAL(origin)[0];
@@ -1639,22 +1573,38 @@ static double origin_to_days_from_epoch(SEXP origin) {
   }
 
   UNPROTECT(1);
-  return out;
+  return (int) out;
 }
 
-static double origin_to_seconds_from_epoch(SEXP origin) {
+static int64_t origin_to_seconds_from_epoch(SEXP origin) {
   origin = PROTECT(as_datetime(origin));
 
-  double out = REAL(origin)[0];
+  double origin_value = REAL(origin)[0];
 
-  if (out == NA_REAL) {
+  if (origin_value == NA_REAL) {
     r_error("origin_to_seconds_from_epoch", "`origin` must not be `NA`.");
   }
+
+  int64_t out = guarded_floor(origin_value);
 
   UNPROTECT(1);
   return out;
 }
 
+static int64_t origin_to_milliseconds_from_epoch(SEXP origin) {
+  origin = PROTECT(as_datetime(origin));
+
+  double origin_value = REAL(origin)[0];
+
+  if (origin_value == NA_REAL) {
+    r_error("origin_to_milliseconds_from_epoch", "`origin` must not be `NA`.");
+  }
+
+  int64_t out = guarded_floor_to_millisecond(origin_value);
+
+  UNPROTECT(1);
+  return out;
+}
 
 /*
  * `double` values are represented with 64 bits:
@@ -1710,3 +1660,23 @@ static inline double guard_with_microsecond(double x) {
   return x + 0.000001;
 }
 
+static inline int64_t guarded_floor(double x) {
+  x = guard_with_microsecond(x);
+  x = floor(x);
+  return (int64_t) x;
+}
+
+// The order here is slightly different. We want to convert
+// seconds to milliseconds while still guarding correctly.
+// - Apply the guard to the seconds first at the correct decimal place
+// - Then scale up to milliseconds and floor
+#define MILLISECONDS_IN_SECOND 1000
+
+static inline int64_t guarded_floor_to_millisecond(double x) {
+  x = guard_with_microsecond(x);
+  x *= MILLISECONDS_IN_SECOND;
+  x = floor(x);
+  return (int64_t) x;
+}
+
+#undef MILLISECONDS_IN_SECOND
