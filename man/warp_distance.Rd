@@ -65,29 +65,46 @@ underlying numeric representation. \strong{It is highly advised to specify your 
 \code{origin} value with the same time zone as \code{x}.}
 
 If a \code{Date} is used for \code{x}, its time zone is assumed to be \code{"UTC"}.
-
-The information in the provided \code{origin} is truncated by the \code{by} period
-specified. This means that if you specify \code{by = "month"},
-\code{every = 2}, with an origin of \code{1970-01-15}, the only pieces of information
-that are used are the year and the month, and not the fact that the origin
-starts on the 15th of the month. The exceptions to this are \code{"week"} and
-\code{"quarter"}, see below.
-
-For \code{by = "week"}, a week is defined as a 7 day period starting
-from the \code{origin}'s year-month-day value.
-
-For \code{by = "quarter"}, a quarter is defined as a 3 month period starting
-from the \code{origin}'s year-month value.
-
-To support \code{by = "millisecond"}, care has to be taken with the impreciseness
-of floating point arithmetic. With values at that frequency,
-\code{warp_distance()} will drop all fractional values past the \emph{microsecond}
-resolution, as that is approximately as far as POSIXct will support
-consistently. It will then uses any fractional values between the millisecond
-and microsecond places to determine the period groupings. In practice, this
-means that grouping POSIXct objects with values up to the microsecond
-frequency should be safe, but going beyond that will likely cause issues.
 }
+\section{\code{origin} Truncation}{
+
+
+For \code{by} values of \code{"year"} and \code{"month"}, the information provided in
+\code{origin} is truncated. Practically this means that if you specify:\preformatted{warp_distance(by = "month", every = 2, origin = as.Date("1970-01-15"))
+}
+
+then only \code{1970-01} will be used, and not the fact that the origin starts
+on the 15th of the month.
+
+The \code{by} value of \code{"quarter"} is internally \verb{by = "month", every = every * 3}.
+This means that for \code{"quarter"} the month specified for the \code{origin} will
+be used as the month to start counting from to generate the 3 month quarter.
+
+The \code{by} value of \code{"week"} is internally \verb{by = "day", every = every * 7}.
+This means that for \code{"week"} the day of the month specified for the \code{origin}
+will be used to start counting out the 7 day week. It can be useful to
+set the origin to, say, a Monday to generate week groups that start on
+Monday.
+
+For by values of \code{"day"} and below with \code{POSIXct} objects, the internal
+calculations are done on the number of seconds from the unix origin. For
+\code{"day"} this means that you could use an \code{origin} value in the middle of
+the day, and daily distances would be computed from that exact time point.
+}
+
+\section{Precision}{
+
+
+With \code{POSIXct}, the limit of precision is approximately the microsecond
+level. Only dates that are very close to the unix origin of 1970-01-01 can
+possibly represent microsecond resolution correctly (close being within
+about 40 years on either side). Otherwise, the values past the microsecond
+resolution are essentially random, and can cause problems for the distance
+calculations. Because of this, decimal digits past the microsecond range are
+zeroed out, so please do not attempt to rely on them. It should still be safe
+to work with microseconds, by, say, bucketing them by millisecond distances.
+}
+
 \examples{
 x <- as.Date("1970-01-01") + -4:4
 x

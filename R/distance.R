@@ -25,27 +25,43 @@
 #'
 #' If a `Date` is used for `x`, its time zone is assumed to be `"UTC"`.
 #'
-#' The information in the provided `origin` is truncated by the `by` period
-#' specified. This means that if you specify `by = "month"`,
-#' `every = 2`, with an origin of `1970-01-15`, the only pieces of information
-#' that are used are the year and the month, and not the fact that the origin
-#' starts on the 15th of the month. The exceptions to this are `"week"` and
-#' `"quarter"`, see below.
+#' @section `origin` Truncation:
 #'
-#' For `by = "week"`, a week is defined as a 7 day period starting
-#' from the `origin`'s year-month-day value.
+#' For `by` values of `"year"` and `"month"`, the information provided in
+#' `origin` is truncated. Practically this means that if you specify:
 #'
-#' For `by = "quarter"`, a quarter is defined as a 3 month period starting
-#' from the `origin`'s year-month value.
+#' ```
+#' warp_distance(by = "month", every = 2, origin = as.Date("1970-01-15"))
+#' ```
 #'
-#' To support `by = "millisecond"`, care has to be taken with the impreciseness
-#' of floating point arithmetic. With values at that frequency,
-#' `warp_distance()` will drop all fractional values past the _microsecond_
-#' resolution, as that is approximately as far as POSIXct will support
-#' consistently. It will then uses any fractional values between the millisecond
-#' and microsecond places to determine the period groupings. In practice, this
-#' means that grouping POSIXct objects with values up to the microsecond
-#' frequency should be safe, but going beyond that will likely cause issues.
+#' then only `1970-01` will be used, and not the fact that the origin starts
+#' on the 15th of the month.
+#'
+#' The `by` value of `"quarter"` is internally `by = "month", every = every * 3`.
+#' This means that for `"quarter"` the month specified for the `origin` will
+#' be used as the month to start counting from to generate the 3 month quarter.
+#'
+#' The `by` value of `"week"` is internally `by = "day", every = every * 7`.
+#' This means that for `"week"` the day of the month specified for the `origin`
+#' will be used to start counting out the 7 day week. It can be useful to
+#' set the origin to, say, a Monday to generate week groups that start on
+#' Monday.
+#'
+#' For by values of `"day"` and below with `POSIXct` objects, the internal
+#' calculations are done on the number of seconds from the unix origin. For
+#' `"day"` this means that you could use an `origin` value in the middle of
+#' the day, and daily distances would be computed from that exact time point.
+#'
+#' @section Precision:
+#'
+#' With `POSIXct`, the limit of precision is approximately the microsecond
+#' level. Only dates that are very close to the unix origin of 1970-01-01 can
+#' possibly represent microsecond resolution correctly (close being within
+#' about 40 years on either side). Otherwise, the values past the microsecond
+#' resolution are essentially random, and can cause problems for the distance
+#' calculations. Because of this, decimal digits past the microsecond range are
+#' zeroed out, so please do not attempt to rely on them. It should still be safe
+#' to work with microseconds, by, say, bucketing them by millisecond distances.
 #'
 #' @param x `[Date / POSIXct / POSIXlt]`
 #'
