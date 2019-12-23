@@ -812,7 +812,7 @@ static SEXP int_date_warp_distance_minute(SEXP x, int every, SEXP origin) {
   double origin_offset;
 
   if (needs_offset) {
-    origin_offset = origin_to_days_from_epoch(origin) * MINUTES_IN_DAY;
+    origin_offset = origin_to_days_from_epoch(origin);
   }
 
   for (R_xlen_t i = 0; i < size; ++i) {
@@ -823,11 +823,11 @@ static SEXP int_date_warp_distance_minute(SEXP x, int every, SEXP origin) {
       continue;
     }
 
-    elt = elt * MINUTES_IN_DAY;
-
     if (needs_offset) {
       elt -= origin_offset;
     }
+
+    elt *= MINUTES_IN_DAY;
 
     if (!needs_every) {
       p_out[i] = elt;
@@ -861,7 +861,7 @@ static SEXP dbl_date_warp_distance_minute(SEXP x, int every, SEXP origin) {
   double origin_offset;
 
   if (needs_offset) {
-    origin_offset = origin_to_days_from_epoch(origin) * MINUTES_IN_DAY;
+    origin_offset = origin_to_days_from_epoch(origin);
   }
 
   for (R_xlen_t i = 0; i < size; ++i) {
@@ -877,13 +877,13 @@ static SEXP dbl_date_warp_distance_minute(SEXP x, int every, SEXP origin) {
     // need them
     int elt = x_elt;
 
-    elt = elt * MINUTES_IN_DAY;
-
     // `origin_offset` should be correct from `as_date()` in
     // `origin_to_days_from_epoch()`, even if it had fractional parts
     if (needs_offset) {
       elt -= origin_offset;
     }
+
+    elt *= MINUTES_IN_DAY;
 
     if (!needs_every) {
       p_out[i] = elt;
