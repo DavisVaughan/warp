@@ -7,7 +7,24 @@
  * components. It is both much faster and highly memory efficient.
  */
 
-static void convert_days_to_year_month_offset(int n, int* p_year, int* p_month);
+/*
+ * @member year
+ *   The year offset. The number of years since 1970.
+ * @member month
+ *   The month. Mapped to the range of 0-11, where 0 is January.
+ * @member day
+ *   The day of month. Mapped to the range of 0-30.
+ * @member yday
+ *   The day of the year. Mapped to the range of 0-365.
+ */
+struct warp_components {
+  int year;
+  int month;
+  int day;
+  int yday;
+};
+
+static struct warp_components convert_days_to_components(int n);
 
 // -----------------------------------------------------------------------------
 
@@ -36,9 +53,6 @@ static SEXP int_date_get_year_offset(SEXP x) {
   SEXP out = PROTECT(Rf_allocVector(INTSXP, size));
   int* p_out = INTEGER(out);
 
-  int temp_year;
-  int temp_month;
-
   for (R_xlen_t i = 0; i < size; ++i) {
     int elt = p_x[i];
 
@@ -47,9 +61,9 @@ static SEXP int_date_get_year_offset(SEXP x) {
       continue;
     }
 
-    convert_days_to_year_month_offset(elt, &temp_year, &temp_month);
+    struct warp_components components = convert_days_to_components(elt);
 
-    p_out[i] = temp_year;
+    p_out[i] = components.year;
   }
 
   UNPROTECT(1);
@@ -64,9 +78,6 @@ static SEXP dbl_date_get_year_offset(SEXP x) {
   SEXP out = PROTECT(Rf_allocVector(INTSXP, size));
   int* p_out = INTEGER(out);
 
-  int temp_year;
-  int temp_month;
-
   for (R_xlen_t i = 0; i < size; ++i) {
     double x_elt = p_x[i];
 
@@ -78,9 +89,9 @@ static SEXP dbl_date_get_year_offset(SEXP x) {
     // Truncate fractional pieces towards 0
     int elt = x_elt;
 
-    convert_days_to_year_month_offset(elt, &temp_year, &temp_month);
+    struct warp_components components = convert_days_to_components(elt);
 
-    p_out[i] = temp_year;
+    p_out[i] = components.year;
   }
 
   UNPROTECT(1);
@@ -117,9 +128,6 @@ static SEXP int_date_get_year_month_offset(SEXP x) {
   SEXP month = PROTECT(Rf_allocVector(INTSXP, size));
   int* p_month = INTEGER(month);
 
-  int temp_year;
-  int temp_month;
-
   for (R_xlen_t i = 0; i < size; ++i) {
     int elt = p_x[i];
 
@@ -129,10 +137,10 @@ static SEXP int_date_get_year_month_offset(SEXP x) {
       continue;
     }
 
-    convert_days_to_year_month_offset(elt, &temp_year, &temp_month);
+    struct warp_components components = convert_days_to_components(elt);
 
-    p_year[i] = temp_year;
-    p_month[i] = temp_month;
+    p_year[i] = components.year;
+    p_month[i] = components.month;
   }
 
   SEXP out = PROTECT(Rf_allocVector(VECSXP, 2));
@@ -154,9 +162,6 @@ static SEXP dbl_date_get_year_month_offset(SEXP x) {
   SEXP month = PROTECT(Rf_allocVector(INTSXP, size));
   int* p_month = INTEGER(month);
 
-  int temp_year;
-  int temp_month;
-
   for (R_xlen_t i = 0; i < size; ++i) {
     double x_elt = p_x[i];
 
@@ -169,10 +174,10 @@ static SEXP dbl_date_get_year_month_offset(SEXP x) {
     // Truncate fractional pieces towards 0
     int elt = x_elt;
 
-    convert_days_to_year_month_offset(elt, &temp_year, &temp_month);
+    struct warp_components components = convert_days_to_components(elt);
 
-    p_year[i] = temp_year;
-    p_month[i] = temp_month;
+    p_year[i] = components.year;
+    p_month[i] = components.month;
   }
 
   SEXP out = PROTECT(Rf_allocVector(VECSXP, 2));
@@ -185,12 +190,13 @@ static SEXP dbl_date_get_year_month_offset(SEXP x) {
 
 // -----------------------------------------------------------------------------
 
-// static const int DAYS_IN_MONTH[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+static const int DAYS_IN_MONTH[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 static const int DAYS_UP_TO_MONTH[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
 
 #define YEAR_OFFSET_FROM_EPOCH 30
 
 #define MONTH_ADJUSTMENT_TO_0_TO_11_RANGE -1
+#define DAY_ADJUSTMENT_TO_0_TO_30_RANGE -1
 
 // unclass(as.Date("2001-01-01"))
 #define DAYS_FROM_2001_01_01_TO_EPOCH -11323
@@ -215,16 +221,10 @@ static void divmod(int x, int y, int* p_quot, int* p_rem);
 // -----------------------------------------------------------------------------
 
 /*
- * `convert_days_to_year_month_offset()`
+ * `convert_days_to_components()`
  *
  * @param n
  *   A 0-based number of days since 1970-01-01, i.e. unclass(<Date>).
- * @param p_year
- *   A pointer to store the year offset in. This is the number of
- *   years since 1970.
- * @param p_month
- *   A pointer to store the month offset in. This is the month
- *   value mapped to the range of 0-11, where 0 is January.
  */
 
 /*
@@ -250,12 +250,11 @@ static void divmod(int x, int y, int* p_quot, int* p_rem);
  * dedicated to finding the month. There is an "educated guess" of
  * `(n + 50) >> 5` that gets us either exactly right or 1 too far. If we are too
  * far, we adjust it back by 1 month.
- *
- * A few lines at the end are commented out, because they are specific to also
- * getting the day of the month, which we don't need.
  */
 
-static void convert_days_to_year_month_offset(int n, int* p_year, int* p_month) {
+static struct warp_components convert_days_to_components(int n) {
+  struct warp_components components;
+
   int n_1_year_cycles;
   int n_4_year_cycles;
   int n_100_year_cycles;
@@ -265,7 +264,7 @@ static void convert_days_to_year_month_offset(int n, int* p_year, int* p_month) 
   // addition of DAYS_FROM_2001_01_01_TO_EPOCH
   if (n < SMALLEST_POSSIBLE_DAYS_FROM_EPOCH) {
     r_error(
-      "convert_days_to_year_month_offset",
+      "convert_days_to_components",
       "Integer overflow! "
       "The smallest possible value for `n` is %i",
       SMALLEST_POSSIBLE_DAYS_FROM_EPOCH
@@ -280,6 +279,8 @@ static void convert_days_to_year_month_offset(int n, int* p_year, int* p_month) 
   divmod(n, DAYS_IN_4_YEAR_CYCLE, &n_4_year_cycles, &n);
   divmod(n, DAYS_IN_1_YEAR_CYCLE, &n_1_year_cycles, &n);
 
+  components.yday = n;
+
   int year = 1 +
     n_400_year_cycles * 400 +
     n_100_year_cycles * 100 +
@@ -289,9 +290,10 @@ static void convert_days_to_year_month_offset(int n, int* p_year, int* p_month) 
   // Edge case adjustment required if we are on the border of a
   // 4 year or 400 year cycle boundary (i.e. `n = -1L`)
   if (n_1_year_cycles == 4 || n_100_year_cycles == 4) {
-    *p_year = (year - 1) + YEAR_OFFSET_FROM_EPOCH;
-    *p_month = 12 + MONTH_ADJUSTMENT_TO_0_TO_11_RANGE;
-    return;
+    components.year = (year - 1) + YEAR_OFFSET_FROM_EPOCH;
+    components.month = 12 + MONTH_ADJUSTMENT_TO_0_TO_11_RANGE;
+    components.day = 31 + DAY_ADJUSTMENT_TO_0_TO_30_RANGE;
+    return components;
   }
 
   bool is_leap_year = (n_1_year_cycles == 3) &&
@@ -308,22 +310,24 @@ static void convert_days_to_year_month_offset(int n, int* p_year, int* p_month) 
   // month and recompute the number of days up to the (now correct) month.
   if (preceding > n) {
     --month;
-    // preceding -= DAYS_IN_MONTH[month - 1] + (is_leap_year && month == 2);
+    preceding -= DAYS_IN_MONTH[month - 1] + (is_leap_year && month == 2);
   }
 
   // Substract `position in year` - `days up to current month` = `day in month`
-  // n -= preceding;
+  // It will be 0-30 based already
+  n -= preceding;
 
-  // `n` will be 0 based, so move it back to being 1 based
-  // n++;
+  components.year = year + YEAR_OFFSET_FROM_EPOCH;
+  components.month = month + MONTH_ADJUSTMENT_TO_0_TO_11_RANGE;
+  components.day = n;
 
-  *p_year = year + YEAR_OFFSET_FROM_EPOCH;
-  *p_month = month + MONTH_ADJUSTMENT_TO_0_TO_11_RANGE;
-
-  return;
+  return components;
 }
 
 #undef YEAR_OFFSET_FROM_EPOCH
+
+#undef MONTH_ADJUSTMENT_TO_0_TO_11_RANGE
+#undef DAY_ADJUSTMENT_TO_0_TO_30_RANGE
 
 #undef DAYS_FROM_2001_01_01_TO_EPOCH
 
@@ -333,6 +337,25 @@ static void convert_days_to_year_month_offset(int n, int* p_year, int* p_month) 
 #undef DAYS_IN_4_YEAR_CYCLE
 #undef DAYS_IN_100_YEAR_CYCLE
 #undef DAYS_IN_400_YEAR_CYCLE
+
+// -----------------------------------------------------------------------------
+
+// [[ export() ]]
+SEXP warp_convert_days_to_components(SEXP n) {
+  int n_ = INTEGER(n)[0];
+
+  struct warp_components components = convert_days_to_components(n_);
+
+  SEXP out = PROTECT(Rf_allocVector(INTSXP, 4));
+
+  INTEGER(out)[0] = components.year;
+  INTEGER(out)[1] = components.month;
+  INTEGER(out)[2] = components.day;
+  INTEGER(out)[3] = components.yday;
+
+  UNPROTECT(1);
+  return out;
+}
 
 // -----------------------------------------------------------------------------
 
