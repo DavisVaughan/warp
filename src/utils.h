@@ -50,6 +50,7 @@ SEXP as_date(SEXP x);
 // In `get.c`
 SEXP get_year_offset(SEXP x);
 SEXP get_year_month_offset(SEXP x);
+SEXP get_year_yday_offset(SEXP x);
 
 // In `date.c`
 SEXP date_get_year_offset(SEXP x);
