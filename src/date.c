@@ -190,6 +190,96 @@ static SEXP dbl_date_get_year_month_offset(SEXP x) {
 
 // -----------------------------------------------------------------------------
 
+static SEXP int_date_get_year_yday_offset(SEXP x);
+static SEXP dbl_date_get_year_yday_offset(SEXP x);
+
+// [[ include("utils.h") ]]
+SEXP date_get_year_yday_offset(SEXP x) {
+  switch (TYPEOF(x)) {
+  case INTSXP: return int_date_get_year_yday_offset(x);
+  case REALSXP: return dbl_date_get_year_yday_offset(x);
+  default: r_error("date_get_year_yday_offset", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
+  }
+}
+
+// [[ register() ]]
+SEXP warp_date_get_year_yday_offset(SEXP x) {
+  return date_get_year_yday_offset(x);
+}
+
+static SEXP int_date_get_year_yday_offset(SEXP x) {
+  int* p_x = INTEGER(x);
+
+  R_xlen_t size = Rf_xlength(x);
+
+  SEXP year = PROTECT(Rf_allocVector(INTSXP, size));
+  int* p_year = INTEGER(year);
+
+  SEXP yday = PROTECT(Rf_allocVector(INTSXP, size));
+  int* p_yday = INTEGER(yday);
+
+  for (R_xlen_t i = 0; i < size; ++i) {
+    int elt = p_x[i];
+
+    if (elt == NA_INTEGER) {
+      p_year[i] = NA_INTEGER;
+      p_yday[i] = NA_INTEGER;
+      continue;
+    }
+
+    struct warp_components components = convert_days_to_components(elt);
+
+    p_year[i] = components.year;
+    p_yday[i] = components.yday;
+  }
+
+  SEXP out = PROTECT(Rf_allocVector(VECSXP, 2));
+  SET_VECTOR_ELT(out, 0, year);
+  SET_VECTOR_ELT(out, 1, yday);
+
+  UNPROTECT(3);
+  return out;
+}
+
+static SEXP dbl_date_get_year_yday_offset(SEXP x) {
+  double* p_x = REAL(x);
+
+  R_xlen_t size = Rf_xlength(x);
+
+  SEXP year = PROTECT(Rf_allocVector(INTSXP, size));
+  int* p_year = INTEGER(year);
+
+  SEXP yday = PROTECT(Rf_allocVector(INTSXP, size));
+  int* p_yday = INTEGER(yday);
+
+  for (R_xlen_t i = 0; i < size; ++i) {
+    double x_elt = p_x[i];
+
+    if (!R_FINITE(x_elt)) {
+      p_year[i] = NA_INTEGER;
+      p_yday[i] = NA_INTEGER;
+      continue;
+    }
+
+    // Truncate fractional pieces towards 0
+    int elt = x_elt;
+
+    struct warp_components components = convert_days_to_components(elt);
+
+    p_year[i] = components.year;
+    p_yday[i] = components.yday;
+  }
+
+  SEXP out = PROTECT(Rf_allocVector(VECSXP, 2));
+  SET_VECTOR_ELT(out, 0, year);
+  SET_VECTOR_ELT(out, 1, yday);
+
+  UNPROTECT(3);
+  return out;
+}
+
+// -----------------------------------------------------------------------------
+
 static const int DAYS_IN_MONTH[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 static const int DAYS_UP_TO_MONTH[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
 
