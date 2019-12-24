@@ -201,9 +201,99 @@ static SEXP warp_distance_month(SEXP x, int every, SEXP origin) {
 
 // -----------------------------------------------------------------------------
 
+// This works like lubridate `floor_date()`, which floors to the previous
+// week start. So if `origin` is set to a Monday then this would group
+// Monday-Sunday together starting from `origin` being the 0 week.
+
 static SEXP warp_distance_week(SEXP x, int every, SEXP origin) {
   return warp_distance_day(x, every * 7, origin);
 }
+
+// -----------------------------------------------------------------------------
+
+// This works like lubridate `week()`. It counts the number of full 7 day weeks,
+// resetting the 7 day counter every 1st of the year. The groups are a little
+// strange at first glance when you go backwards from 1970-01-01. For example,
+// 1969-12-31 is the 53rd week of the year, so it has a -1 distance. But,
+// 1969-12-30 is in the 52nd week and so it gets a -2 distance even though it
+// is just 1 day before.
+
+// In non leap years there are 52 weeks + 1 day
+// In leap years there are 52 weeks + 2 days
+// So there are always 53 week groups
+#define WEEKS_IN_YEAR 53
+
+static SEXP warp_distance_week2(SEXP x, int every, SEXP origin) {
+  int n_prot = 0;
+
+  bool needs_offset = (origin != R_NilValue);
+
+  int origin_offset_year;
+  int origin_offset_yday;
+
+  // TODO - need yday?
+  if (needs_offset) {
+    SEXP origin_offset_lst = PROTECT_N(get_year_yday_offset(origin), &n_prot);
+    origin_offset_year = INTEGER(VECTOR_ELT(origin_offset_lst, 0))[0];
+    origin_offset_yday = INTEGER(VECTOR_ELT(origin_offset_lst, 1))[0];
+
+    if (origin_offset_year == NA_INTEGER) {
+      r_error("warp_distance_month", "`origin` cannot be `NA`.");
+    }
+  }
+
+  bool needs_every = (every != 1);
+
+  SEXP x_offset_lst = PROTECT_N(get_year_yday_offset(x), &n_prot);
+
+  SEXP year = VECTOR_ELT(x_offset_lst, 0);
+  SEXP yday = VECTOR_ELT(x_offset_lst, 1);
+
+  const int* p_year = INTEGER_RO(year);
+  const int* p_yday = INTEGER_RO(yday);
+
+  R_xlen_t size = Rf_xlength(year);
+
+  SEXP out = PROTECT_N(Rf_allocVector(REALSXP, size), &n_prot);
+  double* p_out = REAL(out);
+
+  for (R_xlen_t i = 0; i < size; ++i) {
+    int elt_year = p_year[i];
+    int elt_yday = p_yday[i];
+
+    if (elt_year == NA_INTEGER) {
+      p_out[i] = NA_REAL;
+      continue;
+    }
+
+    int elt;
+
+    if (needs_offset) {
+      // TODO probably wrong?
+      elt = (elt_year - origin_offset_year) * WEEKS_IN_YEAR + elt_yday / 7;
+    } else {
+      elt = elt_year * WEEKS_IN_YEAR + elt_yday / 7;
+    }
+
+    if (!needs_every) {
+      p_out[i] = elt;
+      continue;
+    }
+
+    if (elt < 0) {
+      elt = (elt - (every - 1)) / every;
+    } else {
+      elt = elt / every;
+    }
+
+    p_out[i] = elt;
+  }
+
+  UNPROTECT(n_prot);
+  return out;
+}
+
+#undef WEEKS_IN_YEAR
 
 // -----------------------------------------------------------------------------
 
