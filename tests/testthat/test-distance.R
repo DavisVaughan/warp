@@ -858,11 +858,11 @@ test_that("can handle `every` with altered origin - numeric POSIXct", {
   expect_equal(warp_distance(x, by = "day", every = 4L, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
 })
 
-test_that("can handle fractional seconds before the epoch correctly", {
+test_that("`as.POSIXlt()` keeps us from handling fractional negative seconds correctly", {
   # Base R printing is wrong, because as.POSIXlt() is wrong
   # https://bugs.r-project.org/bugzilla/show_bug.cgi?id=17667
 
-  # I don't care what base R prints this as, this is:
+  # I don't care what base R prints this as, this is supposed to be:
   # "1969-12-31T23:59:59.5"
   x <- .POSIXct(-0.5, "UTC")
 
@@ -870,16 +870,28 @@ test_that("can handle fractional seconds before the epoch correctly", {
   # "1969-12-30T23:59:59.5"
   y <- .POSIXct(-86400.5, "UTC")
 
-  expect_identical(warp_distance(x, "day"), -1)
-  expect_identical(warp_distance(y, "day"), -2)
+  # But `as.POSIXlt()` gives the wrong result by ignoring the negative
+  # fractional part
+  expect_failure(
+    expect_identical(warp_distance(x, "day"), -1)
+  )
+
+  expect_failure(
+    expect_identical(warp_distance(y, "day"), -2)
+  )
 })
 
-test_that("values past microseconds are ignored", {
-  x <- structure(-.000002, tzone = "UTC", class = c("POSIXct", "POSIXt"))
-  y <- structure(-.0000002, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+test_that("DST is respected", {
+  origin <- as.POSIXct("2019-03-10", "America/New_York")
+  x <- as.POSIXct("2019-03-10 01:59:59", "America/New_York")
 
-  expect_equal(warp_distance(x, "day"), -1)
-  expect_equal(warp_distance(y, "day"), 0)
+  # `x + 1` crosses the DST gap, so this day actually has 1 less hour.
+  # We ensure that the 23:59:59 hour does not look like it has creeped into
+  # the next day. If we used the pure POSIXct seconds, ignoring the time zone,
+  # then we would have a problem!
+  x <- x + c(0:1, 75600, 75601)
+
+  expect_equal(warp_distance(x, "day", origin = origin), c(0, 0, 0, 1))
 })
 
 # ------------------------------------------------------------------------------
