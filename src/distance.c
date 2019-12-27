@@ -68,13 +68,13 @@ static SEXP warp_distance_year(SEXP x, int every, SEXP origin) {
 
   bool needs_offset = (origin != R_NilValue);
 
-  int origin_offset_year;
+  int origin_offset;
 
   if (needs_offset) {
     SEXP origin_offset_sexp = PROTECT_N(get_year_offset(origin), &n_prot);
-    origin_offset_year = INTEGER(origin_offset_sexp)[0];
+    origin_offset = INTEGER(origin_offset_sexp)[0];
 
-    if (origin_offset_year == NA_INTEGER) {
+    if (origin_offset == NA_INTEGER) {
       r_error("warp_distance_year", "`origin` cannot be `NA`.");
     }
   }
@@ -98,7 +98,7 @@ static SEXP warp_distance_year(SEXP x, int every, SEXP origin) {
     }
 
     if (needs_offset) {
-      elt -= origin_offset_year;
+      elt -= origin_offset;
     }
 
     if (!needs_every) {
