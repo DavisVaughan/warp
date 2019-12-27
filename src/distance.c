@@ -68,13 +68,13 @@ static SEXP warp_distance_year(SEXP x, int every, SEXP origin) {
 
   bool needs_offset = (origin != R_NilValue);
 
-  int origin_offset_year;
+  int origin_offset;
 
   if (needs_offset) {
     SEXP origin_offset_sexp = PROTECT_N(get_year_offset(origin), &n_prot);
-    origin_offset_year = INTEGER(origin_offset_sexp)[0];
+    origin_offset = INTEGER(origin_offset_sexp)[0];
 
-    if (origin_offset_year == NA_INTEGER) {
+    if (origin_offset == NA_INTEGER) {
       r_error("warp_distance_year", "`origin` cannot be `NA`.");
     }
   }
@@ -98,7 +98,7 @@ static SEXP warp_distance_year(SEXP x, int every, SEXP origin) {
     }
 
     if (needs_offset) {
-      elt -= origin_offset_year;
+      elt -= origin_offset;
     }
 
     if (!needs_every) {
@@ -125,163 +125,34 @@ static SEXP warp_distance_quarter(SEXP x, int every, SEXP origin) {
 
 // -----------------------------------------------------------------------------
 
-#define MONTHS_IN_YEAR 12
-
 static SEXP warp_distance_month(SEXP x, int every, SEXP origin) {
   int n_prot = 0;
 
   bool needs_offset = (origin != R_NilValue);
 
-  int origin_offset_year;
-  int origin_offset_month;
+  int origin_offset;
 
   if (needs_offset) {
-    SEXP origin_offset_lst = PROTECT_N(get_year_month_offset(origin), &n_prot);
-    origin_offset_year = INTEGER(VECTOR_ELT(origin_offset_lst, 0))[0];
-    origin_offset_month = INTEGER(VECTOR_ELT(origin_offset_lst, 1))[0];
+    SEXP origin_offset_sexp = PROTECT_N(get_month_offset(origin), &n_prot);
+    origin_offset = INTEGER(origin_offset_sexp)[0];
 
-    if (origin_offset_year == NA_INTEGER) {
+    if (origin_offset == NA_INTEGER) {
       r_error("warp_distance_month", "`origin` cannot be `NA`.");
     }
   }
 
   bool needs_every = (every != 1);
 
-  SEXP x_offset_lst = PROTECT_N(get_year_month_offset(x), &n_prot);
-
-  SEXP year = VECTOR_ELT(x_offset_lst, 0);
-  SEXP month = VECTOR_ELT(x_offset_lst, 1);
-
-  const int* p_year = INTEGER_RO(year);
+  SEXP month = PROTECT_N(get_month_offset(x), &n_prot);
   const int* p_month = INTEGER_RO(month);
 
-  R_xlen_t size = Rf_xlength(year);
+  R_xlen_t size = Rf_xlength(month);
 
   SEXP out = PROTECT_N(Rf_allocVector(REALSXP, size), &n_prot);
   double* p_out = REAL(out);
 
   for (R_xlen_t i = 0; i < size; ++i) {
-    int elt_year = p_year[i];
-    int elt_month = p_month[i];
-
-    if (elt_year == NA_INTEGER) {
-      p_out[i] = NA_REAL;
-      continue;
-    }
-
-    int elt;
-
-    if (needs_offset) {
-      elt = (elt_year - origin_offset_year) * MONTHS_IN_YEAR + (elt_month - origin_offset_month);
-    } else {
-      elt = elt_year * MONTHS_IN_YEAR + elt_month;
-    }
-
-    if (!needs_every) {
-      p_out[i] = elt;
-      continue;
-    }
-
-    if (elt < 0) {
-      elt = (elt - (every - 1)) / every;
-    } else {
-      elt = elt / every;
-    }
-
-    p_out[i] = elt;
-  }
-
-  UNPROTECT(n_prot);
-  return out;
-}
-
-#undef EPOCH_YEAR
-#undef EPOCH_MONTH
-#undef MONTHS_IN_YEAR
-
-// -----------------------------------------------------------------------------
-
-static SEXP warp_distance_week(SEXP x, int every, SEXP origin) {
-  return warp_distance_day(x, every * 7, origin);
-}
-
-// -----------------------------------------------------------------------------
-
-static SEXP date_warp_distance_day(SEXP x, int every, SEXP origin);
-static SEXP posixct_warp_distance_day(SEXP x, int every, SEXP origin);
-static SEXP posixlt_warp_distance_day(SEXP x, int every, SEXP origin);
-
-static SEXP warp_distance_day(SEXP x, int every, SEXP origin) {
-  switch (time_class_type(x)) {
-  case warp_class_date: return date_warp_distance_day(x, every, origin);
-  case warp_class_posixct: return posixct_warp_distance_day(x, every, origin);
-  case warp_class_posixlt: return posixlt_warp_distance_day(x, every, origin);
-  default: r_error("warp_distance_day", "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
-  }
-}
-
-
-static SEXP int_date_warp_distance_day(SEXP x, int every, SEXP origin);
-static SEXP dbl_date_warp_distance_day(SEXP x, int every, SEXP origin);
-
-static SEXP date_warp_distance_day(SEXP x, int every, SEXP origin) {
-  switch (TYPEOF(x)) {
-  case INTSXP: return int_date_warp_distance_day(x, every, origin);
-  case REALSXP: return dbl_date_warp_distance_day(x, every, origin);
-  default: r_error("date_warp_distance_day", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
-  }
-}
-
-
-static SEXP int_posixct_warp_distance_day(SEXP x, int every, SEXP origin);
-static SEXP dbl_posixct_warp_distance_day(SEXP x, int every, SEXP origin);
-
-static SEXP posixct_warp_distance_day(SEXP x, int every, SEXP origin) {
-  switch (TYPEOF(x)) {
-  case INTSXP: return int_posixct_warp_distance_day(x, every, origin);
-  case REALSXP: return dbl_posixct_warp_distance_day(x, every, origin);
-  default: r_error("posixct_warp_distance_day", "Unknown `POSIXct` type %s.", Rf_type2char(TYPEOF(x)));
-  }
-}
-
-
-static SEXP posixlt_warp_distance_day(SEXP x, int every, SEXP origin) {
-  x = PROTECT(as_datetime(x));
-  SEXP out = PROTECT(posixct_warp_distance_day(x, every, origin));
-
-  UNPROTECT(2);
-  return out;
-}
-
-
-static SEXP int_date_warp_distance_day(SEXP x, int every, SEXP origin) {
-  bool needs_every = (every != 1);
-  bool needs_offset = (origin != R_NilValue);
-
-  // Early exit if no changes are required, the raw `day` is enough
-  if (!needs_every && !needs_offset) {
-    SEXP out = PROTECT(Rf_coerceVector(x, REALSXP));
-    SET_ATTRIB(out, R_NilValue);
-    SET_OBJECT(out, 0);
-    UNPROTECT(1);
-    return out;
-  }
-
-  R_xlen_t size = Rf_xlength(x);
-
-  int* p_x = INTEGER(x);
-
-  SEXP out = PROTECT(Rf_allocVector(REALSXP, size));
-  double* p_out = REAL(out);
-
-  int origin_offset;
-
-  if (needs_offset) {
-    origin_offset = origin_to_days_from_epoch(origin);
-  }
-
-  for (R_xlen_t i = 0; i < size; ++i) {
-    int elt = p_x[i];
+    int elt = p_month[i];
 
     if (elt == NA_INTEGER) {
       p_out[i] = NA_REAL;
@@ -306,98 +177,65 @@ static SEXP int_date_warp_distance_day(SEXP x, int every, SEXP origin) {
     p_out[i] = elt;
   }
 
-  UNPROTECT(1);
+  UNPROTECT(n_prot);
   return out;
 }
 
-static SEXP dbl_date_warp_distance_day(SEXP x, int every, SEXP origin) {
-  R_xlen_t size = Rf_xlength(x);
+// -----------------------------------------------------------------------------
 
-  double* p_x = REAL(x);
+// This works like lubridate `floor_date()`, which floors to the previous
+// week start. So if `origin` is set to a Monday then this would group
+// Monday-Sunday together starting from `origin` being the 0 week.
 
-  SEXP out = PROTECT(Rf_allocVector(REALSXP, size));
-  double* p_out = REAL(out);
+static SEXP warp_distance_week(SEXP x, int every, SEXP origin) {
+  return warp_distance_day(x, every * 7, origin);
+}
 
-  bool needs_every = (every != 1);
+// -----------------------------------------------------------------------------
+
+// This works like lubridate `week()`. It counts the number of full 7 day weeks,
+// resetting the 7 day counter every 1st of the year. The groups are a little
+// strange at first glance when you go backwards from 1970-01-01. For example,
+// 1969-12-31 is the 53rd week of the year, so it has a -1 distance. But,
+// 1969-12-30 is in the 52nd week and so it gets a -2 distance even though it
+// is just 1 day before.
+
+static SEXP warp_distance_week2(SEXP x, int every, SEXP origin) {
+  int n_prot = 0;
 
   bool needs_offset = (origin != R_NilValue);
+
   int origin_offset;
 
   if (needs_offset) {
-    origin_offset = origin_to_days_from_epoch(origin);
+    SEXP origin_offset_sexp = PROTECT_N(get_week_offset(origin), &n_prot);
+    origin_offset = INTEGER(origin_offset_sexp)[0];
+
+    if (origin_offset == NA_INTEGER) {
+      r_error("warp_distance_week", "`origin` cannot be `NA`.");
+    }
   }
-
-  for (R_xlen_t i = 0; i < size; ++i) {
-    double x_elt = p_x[i];
-
-    if (!R_FINITE(x_elt)) {
-      p_out[i] = NA_REAL;
-      continue;
-    }
-
-    // Truncate to completely ignore fractional Date parts
-    int elt = x_elt;
-
-    if (needs_offset) {
-      elt -= origin_offset;
-    }
-
-    if (!needs_every) {
-      p_out[i] = elt;
-      continue;
-    }
-
-    if (elt < 0) {
-      elt = (elt - (every - 1)) / every;
-    } else {
-      elt = elt / every;
-    }
-
-    p_out[i] = elt;
-  }
-
-  UNPROTECT(1);
-  return out;
-}
-
-#define SECONDS_IN_DAY 86400
-
-static SEXP int_posixct_warp_distance_day(SEXP x, int every, SEXP origin) {
-  R_xlen_t size = Rf_xlength(x);
 
   bool needs_every = (every != 1);
 
-  bool needs_offset = (origin != R_NilValue);
-  int64_t origin_offset;
+  SEXP week = PROTECT_N(get_week_offset(x), &n_prot);
+  const int* p_week = INTEGER_RO(week);
 
-  if (needs_offset) {
-    origin_offset = origin_to_seconds_from_epoch(origin);
-  }
+  R_xlen_t size = Rf_xlength(week);
 
-  SEXP out = PROTECT(Rf_allocVector(REALSXP, size));
+  SEXP out = PROTECT_N(Rf_allocVector(REALSXP, size), &n_prot);
   double* p_out = REAL(out);
 
-  int* p_x = INTEGER(x);
-
   for (R_xlen_t i = 0; i < size; ++i) {
-    int x_elt = p_x[i];
+    int elt = p_week[i];
 
-    if (x_elt == NA_INTEGER) {
+    if (elt == NA_INTEGER) {
       p_out[i] = NA_REAL;
       continue;
     }
 
-    // Avoid overflow
-    int64_t elt = x_elt;
-
     if (needs_offset) {
       elt -= origin_offset;
-    }
-
-    if (elt < 0) {
-      elt = (elt - (SECONDS_IN_DAY - 1)) / SECONDS_IN_DAY;
-    } else {
-      elt = elt / SECONDS_IN_DAY;
     }
 
     if (!needs_every) {
@@ -414,45 +252,48 @@ static SEXP int_posixct_warp_distance_day(SEXP x, int every, SEXP origin) {
     p_out[i] = elt;
   }
 
-  UNPROTECT(1);
+  UNPROTECT(n_prot);
   return out;
 }
 
-static SEXP dbl_posixct_warp_distance_day(SEXP x, int every, SEXP origin) {
-  R_xlen_t size = Rf_xlength(x);
+// -----------------------------------------------------------------------------
+
+static SEXP warp_distance_day(SEXP x, int every, SEXP origin) {
+  int n_prot = 0;
+
+  bool needs_offset = (origin != R_NilValue);
+
+  int origin_offset;
+
+  if (needs_offset) {
+    SEXP origin_offset_sexp = PROTECT_N(get_day_offset(origin), &n_prot);
+    origin_offset = INTEGER(origin_offset_sexp)[0];
+
+    if (origin_offset == NA_INTEGER) {
+      r_error("warp_distance_day", "`origin` cannot be `NA`.");
+    }
+  }
 
   bool needs_every = (every != 1);
 
-  bool needs_offset = (origin != R_NilValue);
-  int64_t origin_offset;
+  SEXP day = PROTECT_N(get_day_offset(x), &n_prot);
+  const int* p_day = INTEGER_RO(day);
 
-  if (needs_offset) {
-    origin_offset = origin_to_seconds_from_epoch(origin);
-  }
+  R_xlen_t size = Rf_xlength(day);
 
-  SEXP out = PROTECT(Rf_allocVector(REALSXP, size));
+  SEXP out = PROTECT_N(Rf_allocVector(REALSXP, size), &n_prot);
   double* p_out = REAL(out);
 
-  double* p_x = REAL(x);
-
   for (R_xlen_t i = 0; i < size; ++i) {
-    double x_elt = p_x[i];
+    int elt = p_day[i];
 
-    if (!R_FINITE(x_elt)) {
+    if (elt == NA_INTEGER) {
       p_out[i] = NA_REAL;
       continue;
     }
 
-    int64_t elt = guarded_floor(x_elt);
-
     if (needs_offset) {
       elt -= origin_offset;
-    }
-
-    if (elt < 0) {
-      elt = (elt - (SECONDS_IN_DAY - 1)) / SECONDS_IN_DAY;
-    } else {
-      elt = elt / SECONDS_IN_DAY;
     }
 
     if (!needs_every) {
@@ -469,11 +310,9 @@ static SEXP dbl_posixct_warp_distance_day(SEXP x, int every, SEXP origin) {
     p_out[i] = elt;
   }
 
-  UNPROTECT(1);
+  UNPROTECT(n_prot);
   return out;
 }
-
-#undef SECONDS_IN_DAY
 
 // -----------------------------------------------------------------------------
 
