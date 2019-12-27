@@ -101,74 +101,61 @@ static SEXP dbl_date_get_year_offset(SEXP x) {
 
 // -----------------------------------------------------------------------------
 
-static SEXP int_date_get_year_month_offset(SEXP x);
-static SEXP dbl_date_get_year_month_offset(SEXP x);
+static SEXP int_date_get_month_offset(SEXP x);
+static SEXP dbl_date_get_month_offset(SEXP x);
 
 // [[ include("utils.h") ]]
-SEXP date_get_year_month_offset(SEXP x) {
+SEXP date_get_month_offset(SEXP x) {
   switch (TYPEOF(x)) {
-  case INTSXP: return int_date_get_year_month_offset(x);
-  case REALSXP: return dbl_date_get_year_month_offset(x);
-  default: r_error("date_get_year_month_offset", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
+  case INTSXP: return int_date_get_month_offset(x);
+  case REALSXP: return dbl_date_get_month_offset(x);
+  default: r_error("date_get_month_offset", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
   }
 }
 
 // [[ register() ]]
-SEXP warp_date_get_year_month_offset(SEXP x) {
-  return date_get_year_month_offset(x);
+SEXP warp_date_get_month_offset(SEXP x) {
+  return date_get_month_offset(x);
 }
 
-static SEXP int_date_get_year_month_offset(SEXP x) {
+static SEXP int_date_get_month_offset(SEXP x) {
   int* p_x = INTEGER(x);
 
   R_xlen_t size = Rf_xlength(x);
 
-  SEXP year = PROTECT(Rf_allocVector(INTSXP, size));
-  int* p_year = INTEGER(year);
-
-  SEXP month = PROTECT(Rf_allocVector(INTSXP, size));
-  int* p_month = INTEGER(month);
+  SEXP out = PROTECT(Rf_allocVector(INTSXP, size));
+  int* p_out = INTEGER(out);
 
   for (R_xlen_t i = 0; i < size; ++i) {
     int elt = p_x[i];
 
     if (elt == NA_INTEGER) {
-      p_year[i] = NA_INTEGER;
-      p_month[i] = NA_INTEGER;
+      p_out[i] = NA_INTEGER;
       continue;
     }
 
     struct warp_components components = convert_days_to_components(elt);
 
-    p_year[i] = components.year;
-    p_month[i] = components.month;
+    p_out[i] = components.year * 12 + components.month;
   }
 
-  SEXP out = PROTECT(Rf_allocVector(VECSXP, 2));
-  SET_VECTOR_ELT(out, 0, year);
-  SET_VECTOR_ELT(out, 1, month);
-
-  UNPROTECT(3);
+  UNPROTECT(1);
   return out;
 }
 
-static SEXP dbl_date_get_year_month_offset(SEXP x) {
+static SEXP dbl_date_get_month_offset(SEXP x) {
   double* p_x = REAL(x);
 
   R_xlen_t size = Rf_xlength(x);
 
-  SEXP year = PROTECT(Rf_allocVector(INTSXP, size));
-  int* p_year = INTEGER(year);
-
-  SEXP month = PROTECT(Rf_allocVector(INTSXP, size));
-  int* p_month = INTEGER(month);
+  SEXP out = PROTECT(Rf_allocVector(INTSXP, size));
+  int* p_out = INTEGER(out);
 
   for (R_xlen_t i = 0; i < size; ++i) {
     double x_elt = p_x[i];
 
     if (!R_FINITE(x_elt)) {
-      p_year[i] = NA_INTEGER;
-      p_month[i] = NA_INTEGER;
+      p_out[i] = NA_INTEGER;
       continue;
     }
 
@@ -177,15 +164,10 @@ static SEXP dbl_date_get_year_month_offset(SEXP x) {
 
     struct warp_components components = convert_days_to_components(elt);
 
-    p_year[i] = components.year;
-    p_month[i] = components.month;
+    p_out[i] = components.year * 12 + components.month;
   }
 
-  SEXP out = PROTECT(Rf_allocVector(VECSXP, 2));
-  SET_VECTOR_ELT(out, 0, year);
-  SET_VECTOR_ELT(out, 1, month);
-
-  UNPROTECT(3);
+  UNPROTECT(1);
   return out;
 }
 

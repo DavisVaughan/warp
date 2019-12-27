@@ -10,7 +10,7 @@ extern SEXP warp_warp_boundary(SEXP, SEXP, SEXP, SEXP);
 
 extern SEXP warp_class_type(SEXP);
 extern SEXP warp_date_get_year_offset(SEXP);
-extern SEXP warp_date_get_year_month_offset(SEXP);
+extern SEXP warp_date_get_month_offset(SEXP);
 extern SEXP warp_convert_days_to_components(SEXP);
 extern SEXP warp_divmod(SEXP, SEXP);
 extern SEXP warp_div(SEXP, SEXP);
@@ -25,7 +25,7 @@ static const R_CallMethodDef CallEntries[] = {
   {"warp_warp_boundary",              (DL_FUNC) &warp_warp_boundary, 4},
   {"warp_class_type",                 (DL_FUNC) &warp_class_type, 1},
   {"warp_date_get_year_offset",       (DL_FUNC) &warp_date_get_year_offset, 1},
-  {"warp_date_get_year_month_offset", (DL_FUNC) &warp_date_get_year_month_offset, 1},
+  {"warp_date_get_month_offset",      (DL_FUNC) &warp_date_get_month_offset, 1},
   {"warp_convert_days_to_components", (DL_FUNC) &warp_convert_days_to_components, 1},
   {"warp_divmod",                     (DL_FUNC) &warp_divmod, 2},
   {"warp_div",                        (DL_FUNC) &warp_div, 2},

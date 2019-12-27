@@ -125,56 +125,42 @@ static SEXP warp_distance_quarter(SEXP x, int every, SEXP origin) {
 
 // -----------------------------------------------------------------------------
 
-#define MONTHS_IN_YEAR 12
-
 static SEXP warp_distance_month(SEXP x, int every, SEXP origin) {
   int n_prot = 0;
 
   bool needs_offset = (origin != R_NilValue);
 
-  int origin_offset_year;
-  int origin_offset_month;
+  int origin_offset;
 
   if (needs_offset) {
-    SEXP origin_offset_lst = PROTECT_N(get_year_month_offset(origin), &n_prot);
-    origin_offset_year = INTEGER(VECTOR_ELT(origin_offset_lst, 0))[0];
-    origin_offset_month = INTEGER(VECTOR_ELT(origin_offset_lst, 1))[0];
+    SEXP origin_offset_sexp = PROTECT_N(get_month_offset(origin), &n_prot);
+    origin_offset = INTEGER(origin_offset_sexp)[0];
 
-    if (origin_offset_year == NA_INTEGER) {
+    if (origin_offset == NA_INTEGER) {
       r_error("warp_distance_month", "`origin` cannot be `NA`.");
     }
   }
 
   bool needs_every = (every != 1);
 
-  SEXP x_offset_lst = PROTECT_N(get_year_month_offset(x), &n_prot);
-
-  SEXP year = VECTOR_ELT(x_offset_lst, 0);
-  SEXP month = VECTOR_ELT(x_offset_lst, 1);
-
-  const int* p_year = INTEGER_RO(year);
+  SEXP month = PROTECT_N(get_month_offset(x), &n_prot);
   const int* p_month = INTEGER_RO(month);
 
-  R_xlen_t size = Rf_xlength(year);
+  R_xlen_t size = Rf_xlength(month);
 
   SEXP out = PROTECT_N(Rf_allocVector(REALSXP, size), &n_prot);
   double* p_out = REAL(out);
 
   for (R_xlen_t i = 0; i < size; ++i) {
-    int elt_year = p_year[i];
-    int elt_month = p_month[i];
+    int elt = p_month[i];
 
-    if (elt_year == NA_INTEGER) {
+    if (elt == NA_INTEGER) {
       p_out[i] = NA_REAL;
       continue;
     }
 
-    int elt;
-
     if (needs_offset) {
-      elt = (elt_year - origin_offset_year) * MONTHS_IN_YEAR + (elt_month - origin_offset_month);
-    } else {
-      elt = elt_year * MONTHS_IN_YEAR + elt_month;
+      elt -= origin_offset;
     }
 
     if (!needs_every) {
@@ -194,10 +180,6 @@ static SEXP warp_distance_month(SEXP x, int every, SEXP origin) {
   UNPROTECT(n_prot);
   return out;
 }
-
-#undef EPOCH_YEAR
-#undef EPOCH_MONTH
-#undef MONTHS_IN_YEAR
 
 // -----------------------------------------------------------------------------
 
