@@ -858,7 +858,9 @@ test_that("can handle `every` with altered origin - numeric POSIXct", {
   expect_equal(warp_distance(x, by = "day", every = 4L, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
 })
 
-test_that("`as.POSIXlt()` keeps us from handling fractional negative seconds correctly", {
+test_that("`as.POSIXlt()` keeps us from handling fractional negative seconds correctly on linux", {
+  skip_on_os(c("linux", "solaris")) # maybe solaris? being safe
+
   # Base R printing is wrong, because as.POSIXlt() is wrong
   # https://bugs.r-project.org/bugzilla/show_bug.cgi?id=17667
 
