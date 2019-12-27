@@ -51,12 +51,12 @@ SEXP as_date(SEXP x);
 SEXP get_year_offset(SEXP x);
 SEXP get_month_offset(SEXP x);
 SEXP get_day_offset(SEXP x);
-SEXP get_year_yday_offset(SEXP x);
+SEXP get_week_offset(SEXP x);
 
 // In `date.c`
 SEXP date_get_year_offset(SEXP x);
 SEXP date_get_month_offset(SEXP x);
-SEXP date_get_year_yday_offset(SEXP x);
+SEXP date_get_week_offset(SEXP x);
 
 // In `coercion.c`
 SEXP as_datetime(SEXP x);

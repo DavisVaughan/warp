@@ -15,10 +15,10 @@
  *   Extract the number of days offset from 1970.
  *   Return an integer vector.
  *
- * `get_year_yday_offset()`
- *   Extract the number of years offset from 1970.
- *   Extract the yday offset as an integer in the range of 0-365.
- *   Return a list of both.
+ * `get_week_offset()`
+ *   Extract the number of weeks offset from 1970, with a restart of the 7
+ *   day counter every January 1st.
+ *   Return an integer vector
  */
 
 // -----------------------------------------------------------------------------
@@ -261,62 +261,65 @@ static inline int days_before_year(int year) {
 
 // -----------------------------------------------------------------------------
 
-static SEXP posixct_get_year_yday_offset(SEXP x);
-static SEXP posixlt_get_year_yday_offset(SEXP x);
+static SEXP posixct_get_week_offset(SEXP x);
+static SEXP posixlt_get_week_offset(SEXP x);
 
 // [[ "utils.h" ]]
-SEXP get_year_yday_offset(SEXP x) {
+SEXP get_week_offset(SEXP x) {
   switch(time_class_type(x)) {
-  case warp_class_date: return date_get_year_yday_offset(x);
-  case warp_class_posixct: return posixct_get_year_yday_offset(x);
-  case warp_class_posixlt: return posixlt_get_year_yday_offset(x);
-  default: r_error("get_year_yday_offset", "Internal error: Unknown date time class.");
+  case warp_class_date: return date_get_week_offset(x);
+  case warp_class_posixct: return posixct_get_week_offset(x);
+  case warp_class_posixlt: return posixlt_get_week_offset(x);
+  default: r_error("get_week_offset", "Internal error: Unknown date time class.");
   }
 }
 
-static SEXP posixct_get_year_yday_offset(SEXP x) {
+static SEXP posixct_get_week_offset(SEXP x) {
   x = PROTECT(as_posixlt_from_posixct(x));
-  SEXP out = posixlt_get_year_yday_offset(x);
+  SEXP out = posixlt_get_week_offset(x);
   UNPROTECT(1);
   return out;
 }
 
-static SEXP posixlt_get_year_yday_offset(SEXP x) {
-  SEXP year = VECTOR_ELT(x, 5);
-  year = PROTECT(r_maybe_duplicate(year));
+#define WEEKS_IN_YEAR 53
 
+static SEXP posixlt_get_week_offset(SEXP x) {
+  SEXP year = VECTOR_ELT(x, 5);
   SEXP yday = VECTOR_ELT(x, 7);
 
   if (TYPEOF(year) != INTSXP) {
     r_error(
-      "posixlt_get_year_yday_offset",
+      "posixlt_get_week_offset",
       "Internal error: The 6th element of the POSIXlt object should be an integer."
     );
   }
 
   if (TYPEOF(yday) != INTSXP) {
     r_error(
-      "posixlt_get_year_yday_offset",
+      "posixlt_get_week_offset",
       "Internal error: The 8th element of the POSIXlt object should be an integer."
     );
   }
 
   int* p_year = INTEGER(year);
+  int* p_yday = INTEGER(yday);
 
-  R_xlen_t n = Rf_xlength(year);
+  R_xlen_t size = Rf_xlength(year);
 
-  for (R_xlen_t i = 0; i < n; ++i) {
+  SEXP out = PROTECT(Rf_allocVector(INTSXP, size));
+  int* p_out = INTEGER(out);
+
+  for (R_xlen_t i = 0; i < size; ++i) {
     if (p_year[i] == NA_INTEGER) {
+      p_out[i] = NA_INTEGER;
       continue;
     }
 
-    p_year[i] -= 70;
+    p_out[i] = (p_year[i] - 70) * WEEKS_IN_YEAR + p_yday[i] / 7;
   }
 
-  SEXP out = PROTECT(Rf_allocVector(VECSXP, 2));
-  SET_VECTOR_ELT(out, 0, year);
-  SET_VECTOR_ELT(out, 1, yday);
-
-  UNPROTECT(2);
+  UNPROTECT(1);
   return out;
 }
+
+#undef WEEKS_IN_YEAR

@@ -200,61 +200,42 @@ static SEXP warp_distance_week(SEXP x, int every, SEXP origin) {
 // 1969-12-30 is in the 52nd week and so it gets a -2 distance even though it
 // is just 1 day before.
 
-// In non leap years there are 52 weeks + 1 day
-// In leap years there are 52 weeks + 2 days
-// So there are always 53 week groups
-#define WEEKS_IN_YEAR 53
-
 static SEXP warp_distance_week2(SEXP x, int every, SEXP origin) {
   int n_prot = 0;
 
   bool needs_offset = (origin != R_NilValue);
 
-  int origin_offset_year;
-  int origin_offset_yday;
+  int origin_offset;
 
-  // TODO - need yday?
   if (needs_offset) {
-    SEXP origin_offset_lst = PROTECT_N(get_year_yday_offset(origin), &n_prot);
-    origin_offset_year = INTEGER(VECTOR_ELT(origin_offset_lst, 0))[0];
-    origin_offset_yday = INTEGER(VECTOR_ELT(origin_offset_lst, 1))[0];
+    SEXP origin_offset_sexp = PROTECT_N(get_week_offset(origin), &n_prot);
+    origin_offset = INTEGER(origin_offset_sexp)[0];
 
-    if (origin_offset_year == NA_INTEGER) {
-      r_error("warp_distance_month", "`origin` cannot be `NA`.");
+    if (origin_offset == NA_INTEGER) {
+      r_error("warp_distance_week", "`origin` cannot be `NA`.");
     }
   }
 
   bool needs_every = (every != 1);
 
-  SEXP x_offset_lst = PROTECT_N(get_year_yday_offset(x), &n_prot);
+  SEXP week = PROTECT_N(get_week_offset(x), &n_prot);
+  const int* p_week = INTEGER_RO(week);
 
-  SEXP year = VECTOR_ELT(x_offset_lst, 0);
-  SEXP yday = VECTOR_ELT(x_offset_lst, 1);
-
-  const int* p_year = INTEGER_RO(year);
-  const int* p_yday = INTEGER_RO(yday);
-
-  R_xlen_t size = Rf_xlength(year);
+  R_xlen_t size = Rf_xlength(week);
 
   SEXP out = PROTECT_N(Rf_allocVector(REALSXP, size), &n_prot);
   double* p_out = REAL(out);
 
   for (R_xlen_t i = 0; i < size; ++i) {
-    int elt_year = p_year[i];
-    int elt_yday = p_yday[i];
+    int elt = p_week[i];
 
-    if (elt_year == NA_INTEGER) {
+    if (elt == NA_INTEGER) {
       p_out[i] = NA_REAL;
       continue;
     }
 
-    int elt;
-
     if (needs_offset) {
-      // TODO probably wrong?
-      elt = (elt_year - origin_offset_year) * WEEKS_IN_YEAR + elt_yday / 7;
-    } else {
-      elt = elt_year * WEEKS_IN_YEAR + elt_yday / 7;
+      elt -= origin_offset;
     }
 
     if (!needs_every) {
@@ -274,8 +255,6 @@ static SEXP warp_distance_week2(SEXP x, int every, SEXP origin) {
   UNPROTECT(n_prot);
   return out;
 }
-
-#undef WEEKS_IN_YEAR
 
 // -----------------------------------------------------------------------------
 
