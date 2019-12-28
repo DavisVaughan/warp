@@ -4,28 +4,33 @@
 #' `warp_distance()` is a low level engine for computing date time distances.
 #'
 #' It returns the distance from `x` to the `origin` in units
-#' defined by the period specified with `by`. For example, `by = "year"` would
-#' return the number of years from the `origin`, which is the Unix epoch of
-#' `1970-01-01 00:00:00 UTC` by default.
+#' defined by the period specified with `by`.
+#'
+#' For example, `by = "year"` would return the number of years from
+#' the `origin`. Setting `every = 2` would return the number of 2 year groups
+#' from the `origin`.
 #'
 #' @details
-#' The return value of `warp_distance()` is suitable for use as a grouping
-#' column in, for example, a `dplyr::mutate()`. This is especially useful for
-#' grouping by a multitude of a particular period, such as "every 5 months"
-#' starting from your particular `origin` value. If you want "cleaner" grouping
-#' values, you might consider running `vctrs::vec_group_id()` on the result from
-#' `warp_distance()`.
+#' The return value of `warp_distance()` has a variety of uses. It can be used
+#' for:
+#'
+#' - A grouping column in a `dplyr::group_by()`. This is especially useful for
+#'   grouping by a multitude of a particular period, such as "every 5 months".
+#'
+#' - Computing distances between values in `x`, in terms of the `by` period.
+#'   By returning the distances from the `origin`, `warp_distance()` has also
+#'   implicitly computed the distances between values of `x`. This is used
+#'   by `slide::block()` to break the input into time blocks.
 #'
 #' When the time zone of `x` differs from the time zone of `origin`, a warning
 #' is issued, and `x` is coerced to the time zone of `origin` without changing
 #' the number of seconds of `x` from the epoch. In other words, the time zone
 #' of `x` is directly changed to the time zone of `origin` without changing the
 #' underlying numeric representation. __It is highly advised to specify your own
-#' `origin` value with the same time zone as `x`.__
+#' `origin` value with the same time zone as `x`.__ If a `Date` is used for
+#' `x`, its time zone is assumed to be `"UTC"`.
 #'
-#' If a `Date` is used for `x`, its time zone is assumed to be `"UTC"`.
-#'
-#' @section `origin` Truncation:
+#' @section `by`:
 #'
 #' For `by` values of `"year"`, `"month"`, and `"day"`, the information
 #' provided in `origin` is truncated. Practically this means that if you
@@ -70,27 +75,29 @@
 #'
 #'   A string defining the period to group by. Valid inputs are:
 #'
-#'   - `"year"`
-#'   - `"quarter"`
-#'   - `"month"`
-#'   - `"week"`
-#'   - `"day"`
-#'   - `"hour"`
-#'   - `"minute"`
-#'   - `"second"`
-#'   - `"millisecond"`
+#'   `"year"`, `"quarter"`, `"month"`, `"week"`, `"day"`, `"hour"`, `"minute"`,
+#'   `"second"`, `"millisecond"`
 #'
 #' @param every `[positive integer(1)]`
 #'
-#'   The number of `by` periods to lump together when constructing the groups.
-#'   For example, with the default `origin` and `by = "year"`, `every = 2`
-#'   would put the years `1970` and `1971` in the same group.
+#'   The number of `by` periods to group together.
+#'
+#'   For example, if `by = "year"` and `every` is set to `2`, then the years
+#'   1970 and 1971 would be placed in the same group.
 #'
 #' @param origin `[Date(1) / POSIXct(1) / POSIXlt(1)]`
 #'
-#'   The reference value for the distances to be computed from. This is
-#'   particularly important when `every > 1` and you need to define when the
-#'   "first" event was to start counting from.
+#'   The reference date time value. The default when left as `NULL` is the
+#'   Unix epoch of `1970-01-01 00:00:00 UTC`.
+#'
+#'   This is used for two purposes:
+#'
+#'   - Defining the anchor to count from when `every > 1`.
+#'
+#'   - Aligning the time zone with the input. When the input vector and the
+#'     `origin` have altering time zones, a warning is issued and the input
+#'     is coerced to the time zone of the `origin`. It is highly advised to
+#'     provide your own `origin` if your input is a POSIXct.
 #'
 #' @return
 #' A double vector containing the distances.

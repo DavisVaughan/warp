@@ -14,29 +14,30 @@ A date time vector.}
 \item{by}{\verb{[character(1)]}
 
 A string defining the period to group by. Valid inputs are:
-\itemize{
-\item \code{"year"}
-\item \code{"quarter"}
-\item \code{"month"}
-\item \code{"week"}
-\item \code{"day"}
-\item \code{"hour"}
-\item \code{"minute"}
-\item \code{"second"}
-\item \code{"millisecond"}
-}}
+
+\code{"year"}, \code{"quarter"}, \code{"month"}, \code{"week"}, \code{"day"}, \code{"hour"}, \code{"minute"},
+\code{"second"}, \code{"millisecond"}}
 
 \item{every}{\verb{[positive integer(1)]}
 
-The number of \code{by} periods to lump together when constructing the groups.
-For example, with the default \code{origin} and \code{by = "year"}, \code{every = 2}
-would put the years \code{1970} and \code{1971} in the same group.}
+The number of \code{by} periods to group together.
+
+For example, if \code{by = "year"} and \code{every} is set to \code{2}, then the years
+1970 and 1971 would be placed in the same group.}
 
 \item{origin}{\verb{[Date(1) / POSIXct(1) / POSIXlt(1)]}
 
-The reference value for the distances to be computed from. This is
-particularly important when \code{every > 1} and you need to define when the
-"first" event was to start counting from.}
+The reference date time value. The default when left as \code{NULL} is the
+Unix epoch of \verb{1970-01-01 00:00:00 UTC}.
+
+This is used for two purposes:
+\itemize{
+\item Defining the anchor to count from when \code{every > 1}.
+\item Aligning the time zone with the input. When the input vector and the
+\code{origin} have altering time zones, a warning is issued and the input
+is coerced to the time zone of the \code{origin}. It is highly advised to
+provide your own \code{origin} if your input is a POSIXct.
+}}
 }
 \value{
 A double vector containing the distances.
@@ -45,28 +46,33 @@ A double vector containing the distances.
 \code{warp_distance()} is a low level engine for computing date time distances.
 
 It returns the distance from \code{x} to the \code{origin} in units
-defined by the period specified with \code{by}. For example, \code{by = "year"} would
-return the number of years from the \code{origin}, which is the Unix epoch of
-\verb{1970-01-01 00:00:00 UTC} by default.
+defined by the period specified with \code{by}.
+
+For example, \code{by = "year"} would return the number of years from
+the \code{origin}. Setting \code{every = 2} would return the number of 2 year groups
+from the \code{origin}.
 }
 \details{
-The return value of \code{warp_distance()} is suitable for use as a grouping
-column in, for example, a \code{dplyr::mutate()}. This is especially useful for
-grouping by a multitude of a particular period, such as "every 5 months"
-starting from your particular \code{origin} value. If you want "cleaner" grouping
-values, you might consider running \code{vctrs::vec_group_id()} on the result from
-\code{warp_distance()}.
+The return value of \code{warp_distance()} has a variety of uses. It can be used
+for:
+\itemize{
+\item A grouping column in a \code{dplyr::group_by()}. This is especially useful for
+grouping by a multitude of a particular period, such as "every 5 months".
+\item Computing distances between values in \code{x}, in terms of the \code{by} period.
+By returning the distances from the \code{origin}, \code{warp_distance()} has also
+implicitly computed the distances between values of \code{x}. This is used
+by \code{slide::block()} to break the input into time blocks.
+}
 
 When the time zone of \code{x} differs from the time zone of \code{origin}, a warning
 is issued, and \code{x} is coerced to the time zone of \code{origin} without changing
 the number of seconds of \code{x} from the epoch. In other words, the time zone
 of \code{x} is directly changed to the time zone of \code{origin} without changing the
 underlying numeric representation. \strong{It is highly advised to specify your own
-\code{origin} value with the same time zone as \code{x}.}
-
-If a \code{Date} is used for \code{x}, its time zone is assumed to be \code{"UTC"}.
+\code{origin} value with the same time zone as \code{x}.} If a \code{Date} is used for
+\code{x}, its time zone is assumed to be \code{"UTC"}.
 }
-\section{\code{origin} Truncation}{
+\section{\code{by}}{
 
 
 For \code{by} values of \code{"year"}, \code{"month"}, and \code{"day"}, the information
