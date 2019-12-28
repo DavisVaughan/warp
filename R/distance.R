@@ -27,11 +27,12 @@
 #'
 #' @section `origin` Truncation:
 #'
-#' For `by` values of `"year"` and `"month"`, the information provided in
-#' `origin` is truncated. Practically this means that if you specify:
+#' For `by` values of `"year"`, `"month"`, and `"day"`, the information
+#' provided in `origin` is truncated. Practically this means that if you
+#' specify:
 #'
 #' ```
-#' warp_distance(by = "month", every = 2, origin = as.Date("1970-01-15"))
+#' warp_distance(by = "month", origin = as.Date("1970-01-15"))
 #' ```
 #'
 #' then only `1970-01` will be used, and not the fact that the origin starts
@@ -41,16 +42,14 @@
 #' This means that for `"quarter"` the month specified for the `origin` will
 #' be used as the month to start counting from to generate the 3 month quarter.
 #'
-#' The `by` value of `"week"` is internally `by = "day", every = every * 7`.
-#' This means that for `"week"` the day of the month specified for the `origin`
-#' will be used to start counting out the 7 day week. It can be useful to
-#' set the origin to, say, a Monday to generate week groups that start on
-#' Monday.
-#'
-#' For by values of `"day"` and below with `POSIXct` objects, the internal
-#' calculations are done on the number of seconds from the unix origin. For
-#' `"day"` this means that you could use an `origin` value in the middle of
-#' the day, and daily distances would be computed from that exact time point.
+#' The `by` value of `"week"` is computed in the same way as
+#' `lubridate::week()`. Week groups are defined as complete 7 day periods,
+#' with the 7 day counter resetting every January 1st. To mimic the behavior
+#' of `lubridate::floor_date()`, use `by = "day"` and multiply `every` by 7.
+#' To mimic the `week_start` argument of `floor_date()`, set `origin` to a date
+#' with a week day identical to the one you want the week to start from. For
+#' example, the default origin of `1970-01-01` is a Thursday, so this would be
+#' generate groups identical to `floor_date(week_start = 4)`.
 #'
 #' @section Precision:
 #'

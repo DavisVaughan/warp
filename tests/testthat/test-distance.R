@@ -505,28 +505,239 @@ test_that("can warp_distance() by month with POSIXlt", {
 # ------------------------------------------------------------------------------
 # warp_distance(<Date>, by = "week")
 
-# This uses `by = "day"` with `every = every * 7`, so just do a basic test
-
 test_that("can warp_distance() by week with Date", {
-  x <- as.Date(c("1969-12-24", "1969-12-25", "1970-01-01", "1970-01-07", "1970-01-08"))
+  x <- as.Date("1970-01-01")
+  expect_identical(warp_distance(x, "week"), 0)
 
-  expect_identical(warp_distance(x, "week"), c(-2, -1, 0, 0, 1))
+  x <- as.Date("1970-01-08")
+  expect_identical(warp_distance(x, "week"), 1)
+
+  x <- as.Date("1971-01-01")
+  expect_identical(warp_distance(x, "week"), 53)
 })
 
-test_that("can adjust the origin at the day level", {
-  origin <- as.Date("1970-01-02")
-  x <- as.Date(c("1969-12-24", "1969-12-25", "1970-01-01", "1970-01-07", "1970-01-08"))
+test_that("Date + UTC origin does not emit a warning", {
+  x <- as.Date("1971-01-01")
+  origin <- as.POSIXct("1971-01-01", tz = "UTC")
 
-  expect_identical(warp_distance(x, "week", origin = origin), c(-2, -2, -1, 0, 0))
+  expect_identical(warp_distance(x, "week", origin = origin), 0)
+})
+
+test_that("Date + non-UTC origin converts with a warning", {
+  x <- as.Date("1971-01-01")
+  x_with_tz <- structure(unclass(x) * 86400, tzone = "America/New_York", class = c("POSIXct", "POSIXt"))
+  origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
+
+  expect_identical(
+    expect_warning(
+      warp_distance(x, "week", origin = origin),
+      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
+    ),
+    warp_distance(x_with_tz, "week", origin = origin)
+  )
+})
+
+test_that("can use integer Dates", {
+  x <- structure(0L, class = "Date")
+  expect_identical(warp_distance(x, "week"), 0)
+
+  x <- structure(31L, class = "Date")
+  expect_identical(warp_distance(x, "week"), 4)
+})
+
+test_that("can handle `every` with default origin", {
+  x <- as.Date(c(
+    "1969-12-23", "1969-12-30",
+    "1969-12-31", "1970-01-01",
+    "1970-01-08", "1970-01-15",
+    "1970-01-22"
+  ))
+
+  expect_equal(warp_distance(x, by = "week", every = 2L), c(-2, -1, -1, 0, 0, 1, 1))
+  expect_equal(warp_distance(x, by = "week", every = 3L), c(-1, -1, -1, 0, 0, 0, 1))
+  expect_equal(warp_distance(x, by = "week", every = 4L), c(-1, -1, -1, 0, 0, 0, 0))
+})
+
+test_that("can handle `every` with altered origin", {
+  x <- as.Date(c(
+    "1969-12-23", "1969-12-30",
+    "1969-12-31", "1970-01-01",
+    "1970-01-08", "1970-01-15",
+    "1970-01-22"
+  ))
+
+  origin <- as.Date("1970-01-08")
+
+  expect_equal(warp_distance(x, by = "week", every = 2L, origin = origin), c(-2, -2, -1, -1, 0, 0, 1))
+  expect_equal(warp_distance(x, by = "week", every = 3L, origin = origin), c(-2, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, by = "week", every = 4L, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
+})
+
+test_that("fractional Date pieces are ignored", {
+  # "1969-12-31 23:59:52 UTC"
+  # .POSIXct(-0.0001 * 86400, "UTC")
+  x <- structure(-0.0001, class = "Date")
+
+  # But we really treat this as `new_date(0)`
+  expect_equal(warp_distance(x, by = "week"), 0)
+})
+
+test_that("size 0 input works - integer Dates", {
+  x <- structure(integer(), class = "Date")
+
+  expect_equal(warp_distance(x, by = "week"), numeric())
+  expect_equal(warp_distance(x, by = "week", every = 2), numeric())
+})
+
+test_that("size 0 input works - numeric Dates", {
+  x <- structure(numeric(), class = "Date")
+
+  expect_equal(warp_distance(x, by = "week"), numeric())
+  expect_equal(warp_distance(x, by = "week", every = 2), numeric())
+})
+
+test_that("going backwards in time still uses groups computed from the first of the year", {
+  # The 53rd week of 1969
+  x <- as.Date("1969-12-31")
+  # The 52nd week of 1969
+  y <- as.Date("1969-12-30")
+  expect_identical(warp_distance(x, "week"), -1)
+  expect_identical(warp_distance(y, "week"), -2)
 })
 
 # ------------------------------------------------------------------------------
 # warp_distance(<POSIXct>, by = "week")
 
 test_that("can warp_distance() by week with POSIXct", {
-  x <- as.POSIXct(c("1969-12-24", "1969-12-25", "1970-01-01", "1970-01-07", "1970-01-08"), "UTC")
+  x <- as.POSIXct("1970-01-01", tz = "UTC")
+  expect_identical(warp_distance(x, "week"), 0)
 
-  expect_identical(warp_distance(x, "week"), c(-2, -1, 0, 0, 1))
+  x <- as.POSIXct("1970-01-08", tz = "UTC")
+  expect_identical(warp_distance(x, "week"), 1)
+})
+
+test_that("UTC POSIXct + UTC origin does not emit a warning", {
+  x <- as.POSIXct("1971-01-01", tz = "UTC")
+
+  expect_warning(warp_distance(x, "week"), NA)
+
+  expect_identical(warp_distance(x, "week"), 53)
+  expect_identical(warp_distance(x, "week", origin = x), 0)
+})
+
+test_that("UTC POSIXct + Date origin does not emit a warning", {
+  x <- as.POSIXct("1971-01-01", tz = "UTC")
+  origin1 <- as.Date("1971-01-01")
+  origin2 <- as.Date("1972-01-01")
+
+  expect_warning(warp_distance(x, "week", origin = origin1), NA)
+
+  expect_identical(warp_distance(x, "week", origin = origin1), 0)
+  expect_identical(warp_distance(x, "week", origin = origin2), -53)
+})
+
+test_that("UTC POSIXct + non-UTC origin converts with a warning", {
+  x <- as.POSIXct("1971-01-01", tz = "UTC")
+  x_with_tz <- structure(x, tzone = "America/New_York")
+  origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
+
+  expect_identical(
+    expect_warning(
+      warp_distance(x, "week", origin = origin),
+      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
+    ),
+    warp_distance(x_with_tz, "week", origin = origin)
+  )
+})
+
+test_that("local time POSIXct + UTC origin converts with a warning", {
+  with_envvar(list(TZ = "America/New_York"), {
+    x <- as.POSIXct("1970-12-31 23:00:00") # in UTC this is in 1971-01
+    origin <- as.POSIXct("1971-01-01", tz = "UTC")
+
+    expect_identical(
+      expect_warning(warp_distance(x, "week", origin = origin)),
+      0
+    )
+  })
+})
+
+test_that("can use integer POSIXct", {
+  x <- structure(-1L, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_identical(warp_distance(x, "week"), -1)
+})
+
+test_that("can handle `NA` dates", {
+  x <- structure(NA_real_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_identical(warp_distance(x, "week"), NA_real_)
+
+  x <- structure(NA_integer_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_identical(warp_distance(x, "week"), NA_real_)
+})
+
+test_that("can handle `every` with default origin", {
+  x <- as.POSIXct(c(
+    "1969-12-23", "1969-12-30",
+    "1969-12-31", "1970-01-01",
+    "1970-01-08", "1970-01-15",
+    "1970-01-22"
+  ), tz = "UTC")
+
+  expect_equal(warp_distance(x, by = "week", every = 2L), c(-2, -1, -1, 0, 0, 1, 1))
+  expect_equal(warp_distance(x, by = "week", every = 3L), c(-1, -1, -1, 0, 0, 0, 1))
+  expect_equal(warp_distance(x, by = "week", every = 4L), c(-1, -1, -1, 0, 0, 0, 0))
+})
+
+test_that("can handle `every` with altered origin", {
+  x <- as.POSIXct(c(
+    "1969-12-23", "1969-12-30",
+    "1969-12-31", "1970-01-01",
+    "1970-01-08", "1970-01-15",
+    "1970-01-22"
+  ), tz = "UTC")
+
+  origin <- as.Date("1970-01-08")
+
+  expect_equal(warp_distance(x, by = "week", every = 2L, origin = origin), c(-2, -2, -1, -1, 0, 0, 1))
+  expect_equal(warp_distance(x, by = "week", every = 3L, origin = origin), c(-2, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, by = "week", every = 4L, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
+})
+
+test_that("can handle `every` with altered origin and altered timezone", {
+  x <- as.POSIXct(c(
+    "1969-12-23", "1969-12-30",
+    "1969-12-31", "1970-01-01",
+    "1970-01-08", "1970-01-15",
+    "1970-01-22"
+  ), tz = "America/New_York")
+
+  origin <- as.POSIXct("1970-01-08", tz = "America/New_York")
+
+  expect_equal(warp_distance(x, by = "week", every = 2L, origin = origin), c(-2, -2, -1, -1, 0, 0, 1))
+  expect_equal(warp_distance(x, by = "week", every = 3L, origin = origin), c(-2, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, by = "week", every = 4L, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
+})
+
+test_that("going backwards in time still uses groups computed from the first of the year", {
+  # The 53rd week of 1969
+  x <- as.POSIXct("1969-12-31", "UTC")
+  # The 52nd week of 1969
+  y <- as.POSIXct("1969-12-30", "UTC")
+  expect_identical(warp_distance(x, "week"), -1)
+  expect_identical(warp_distance(y, "week"), -2)
+})
+
+# ------------------------------------------------------------------------------
+# warp_distance(<POSIXlt>, by = "week")
+
+test_that("can warp_distance() by week with POSIXlt", {
+  x <- as.POSIXct("1970-01-01", tz = "UTC")
+  x <- as.POSIXlt(x)
+  expect_identical(warp_distance(x, "week"), 0)
+
+  x <- as.POSIXct("1971-01-01", tz = "UTC")
+  x <- as.POSIXlt(x)
+  expect_identical(warp_distance(x, "week"), 53)
 })
 
 # ------------------------------------------------------------------------------
@@ -884,8 +1095,8 @@ test_that("`as.POSIXlt()` keeps us from handling fractional negative seconds cor
 })
 
 test_that("DST is respected", {
-  origin <- as.POSIXct("2019-03-10", "America/New_York")
-  x <- as.POSIXct("2019-03-10 01:59:59", "America/New_York")
+  origin <- as.POSIXct("2018-03-11", "America/New_York")
+  x <- as.POSIXct("2018-03-11 01:59:59", "America/New_York")
 
   # `x + 1` crosses the DST gap, so this day actually has 1 less hour.
   # We ensure that the 23:59:59 hour does not look like it has creeped into
@@ -893,7 +1104,7 @@ test_that("DST is respected", {
   # then we would have a problem!
   x <- x + c(0:1, 75600, 75601)
 
-  expect_equal(warp_distance(x, "day", origin = origin), c(0, 0, 0, 1))
+  expect_equal(warp_distance(x, "week", origin = origin), c(0, 0, 0, 1))
 })
 
 # ------------------------------------------------------------------------------

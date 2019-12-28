@@ -183,24 +183,7 @@ static SEXP warp_distance_month(SEXP x, int every, SEXP origin) {
 
 // -----------------------------------------------------------------------------
 
-// This works like lubridate `floor_date()`, which floors to the previous
-// week start. So if `origin` is set to a Monday then this would group
-// Monday-Sunday together starting from `origin` being the 0 week.
-
 static SEXP warp_distance_week(SEXP x, int every, SEXP origin) {
-  return warp_distance_day(x, every * 7, origin);
-}
-
-// -----------------------------------------------------------------------------
-
-// This works like lubridate `week()`. It counts the number of full 7 day weeks,
-// resetting the 7 day counter every 1st of the year. The groups are a little
-// strange at first glance when you go backwards from 1970-01-01. For example,
-// 1969-12-31 is the 53rd week of the year, so it has a -1 distance. But,
-// 1969-12-30 is in the 52nd week and so it gets a -2 distance even though it
-// is just 1 day before.
-
-static SEXP warp_distance_week2(SEXP x, int every, SEXP origin) {
   int n_prot = 0;
 
   bool needs_offset = (origin != R_NilValue);

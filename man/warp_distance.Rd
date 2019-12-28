@@ -69,8 +69,9 @@ If a \code{Date} is used for \code{x}, its time zone is assumed to be \code{"UTC
 \section{\code{origin} Truncation}{
 
 
-For \code{by} values of \code{"year"} and \code{"month"}, the information provided in
-\code{origin} is truncated. Practically this means that if you specify:\preformatted{warp_distance(by = "month", every = 2, origin = as.Date("1970-01-15"))
+For \code{by} values of \code{"year"}, \code{"month"}, and \code{"day"}, the information
+provided in \code{origin} is truncated. Practically this means that if you
+specify:\preformatted{warp_distance(by = "month", origin = as.Date("1970-01-15"))
 }
 
 then only \code{1970-01} will be used, and not the fact that the origin starts
@@ -80,16 +81,14 @@ The \code{by} value of \code{"quarter"} is internally \verb{by = "month", every 
 This means that for \code{"quarter"} the month specified for the \code{origin} will
 be used as the month to start counting from to generate the 3 month quarter.
 
-The \code{by} value of \code{"week"} is internally \verb{by = "day", every = every * 7}.
-This means that for \code{"week"} the day of the month specified for the \code{origin}
-will be used to start counting out the 7 day week. It can be useful to
-set the origin to, say, a Monday to generate week groups that start on
-Monday.
-
-For by values of \code{"day"} and below with \code{POSIXct} objects, the internal
-calculations are done on the number of seconds from the unix origin. For
-\code{"day"} this means that you could use an \code{origin} value in the middle of
-the day, and daily distances would be computed from that exact time point.
+The \code{by} value of \code{"week"} is computed in the same way as
+\code{lubridate::week()}. Week groups are defined as complete 7 day periods,
+with the 7 day counter resetting every January 1st. To mimic the behavior
+of \code{lubridate::floor_date()}, use \code{by = "day"} and multiply \code{every} by 7.
+To mimic the \code{week_start} argument of \code{floor_date()}, set \code{origin} to a date
+with a week day identical to the one you want the week to start from. For
+example, the default origin of \code{1970-01-01} is a Thursday, so this would be
+generate groups identical to \code{floor_date(week_start = 4)}.
 }
 
 \section{Precision}{
