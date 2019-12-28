@@ -186,8 +186,9 @@ underlying numeric representation. <strong>It is highly advised to specify your 
     
 
 
-<p>For <code>by</code> values of <code>"year"</code> and <code>"month"</code>, the information provided in
-<code>origin</code> is truncated. Practically this means that if you specify:</p><pre>warp_distance(by = "month", every = 2, origin = as.Date("1970-01-15"))
+<p>For <code>by</code> values of <code>"year"</code>, <code>"month"</code>, and <code>"day"</code>, the information
+provided in <code>origin</code> is truncated. Practically this means that if you
+specify:</p><pre>warp_distance(by = "month", origin = as.Date("1970-01-15"))
 </pre>
 
 <p>then only <code>1970-01</code> will be used, and not the fact that the origin starts
@@ -195,15 +196,14 @@ on the 15th of the month.</p>
 <p>The <code>by</code> value of <code>"quarter"</code> is internally <code>by = "month", every = every * 3</code>.
 This means that for <code>"quarter"</code> the month specified for the <code>origin</code> will
 be used as the month to start counting from to generate the 3 month quarter.</p>
-<p>The <code>by</code> value of <code>"week"</code> is internally <code>by = "day", every = every * 7</code>.
-This means that for <code>"week"</code> the day of the month specified for the <code>origin</code>
-will be used to start counting out the 7 day week. It can be useful to
-set the origin to, say, a Monday to generate week groups that start on
-Monday.</p>
-<p>For by values of <code>"day"</code> and below with <code>POSIXct</code> objects, the internal
-calculations are done on the number of seconds from the unix origin. For
-<code>"day"</code> this means that you could use an <code>origin</code> value in the middle of
-the day, and daily distances would be computed from that exact time point.</p>
+<p>The <code>by</code> value of <code>"week"</code> is computed in the same way as
+<code>lubridate::week()</code>. Week groups are defined as complete 7 day periods,
+with the 7 day counter resetting every January 1st. To mimic the behavior
+of <code>lubridate::floor_date()</code>, use <code>by = "day"</code> and multiply <code>every</code> by 7.
+To mimic the <code>week_start</code> argument of <code>floor_date()</code>, set <code>origin</code> to a date
+with a week day identical to the one you want the week to start from. For
+example, the default origin of <code>1970-01-01</code> is a Thursday, so this would be
+generate groups identical to <code>floor_date(week_start = 4)</code>.</p>
     <h2 class="hasAnchor" id="precision"><a class="anchor" href="#precision"></a>Precision</h2>
 
     
