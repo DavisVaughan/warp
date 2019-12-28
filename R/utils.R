@@ -2,10 +2,6 @@ time_class_type <- function(x) {
   .Call(warp_class_type, x)
 }
 
-single_quote <- function(x) {
-  encodeString(x, quote = "'", na.encode = FALSE)
-}
-
 # Callable from C
 as_posixct_from_posixlt <- function(x) {
   as.POSIXct.POSIXlt(x)
