@@ -38,9 +38,10 @@
 <meta property="og:title" content="Compute distances from a date time origin — warp_distance" />
 <meta property="og:description" content="warp_distance() is a low level engine for computing date time distances.
 It returns the distance from x to the origin in units
-defined by the period specified with by. For example, by = &quot;year&quot; would
-return the number of years from the origin, which is the Unix epoch of
-1970-01-01 00:00:00 UTC by default." />
+defined by the period specified with by.
+For example, by = &quot;year&quot; would return the number of years from
+the origin. Setting every = 2 would return the number of 2 year groups
+from the origin." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -117,9 +118,10 @@ return the number of years from the origin, which is the Unix epoch of
     <div class="ref-description">
     <p><code>warp_distance()</code> is a low level engine for computing date time distances.</p>
 <p>It returns the distance from <code>x</code> to the <code>origin</code> in units
-defined by the period specified with <code>by</code>. For example, <code>by = "year"</code> would
-return the number of years from the <code>origin</code>, which is the Unix epoch of
-<code>1970-01-01 00:00:00 UTC</code> by default.</p>
+defined by the period specified with <code>by</code>.</p>
+<p>For example, <code>by = "year"</code> would return the number of years from
+the <code>origin</code>. Setting <code>every = 2</code> would return the number of 2 year groups
+from the <code>origin</code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>warp_distance</span>(<span class='no'>x</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='st'>"year"</span>, <span class='kw'>every</span> <span class='kw'>=</span> <span class='fl'>1L</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
@@ -135,31 +137,29 @@ return the number of years from the <code>origin</code>, which is the Unix epoch
     <tr>
       <th>by</th>
       <td><p><code>[character(1)]</code></p>
-<p>A string defining the period to group by. Valid inputs are:</p><ul>
-<li><p><code>"year"</code></p></li>
-<li><p><code>"quarter"</code></p></li>
-<li><p><code>"month"</code></p></li>
-<li><p><code>"week"</code></p></li>
-<li><p><code>"day"</code></p></li>
-<li><p><code>"hour"</code></p></li>
-<li><p><code>"minute"</code></p></li>
-<li><p><code>"second"</code></p></li>
-<li><p><code>"millisecond"</code></p></li>
-</ul></td>
+<p>A string defining the period to group by. Valid inputs are:</p>
+<p><code>"year"</code>, <code>"quarter"</code>, <code>"month"</code>, <code>"week"</code>, <code>"day"</code>, <code>"hour"</code>, <code>"minute"</code>,
+<code>"second"</code>, <code>"millisecond"</code></p></td>
     </tr>
     <tr>
       <th>every</th>
       <td><p><code>[positive integer(1)]</code></p>
-<p>The number of <code>by</code> periods to lump together when constructing the groups.
-For example, with the default <code>origin</code> and <code>by = "year"</code>, <code>every = 2</code>
-would put the years <code>1970</code> and <code>1971</code> in the same group.</p></td>
+<p>The number of <code>by</code> periods to group together.</p>
+<p>For example, if <code>by = "year"</code> and <code>every</code> is set to <code>2</code>, then the years
+1970 and 1971 would be placed in the same group.</p></td>
     </tr>
     <tr>
       <th>origin</th>
       <td><p><code>[Date(1) / POSIXct(1) / POSIXlt(1)]</code></p>
-<p>The reference value for the distances to be computed from. This is
-particularly important when <code>every &gt; 1</code> and you need to define when the
-"first" event was to start counting from.</p></td>
+<p>The reference date time value. The default when left as <code>NULL</code> is the
+Unix epoch of <code>1970-01-01 00:00:00 UTC</code>.</p>
+<p>This is used for two purposes:</p><ul>
+<li><p>Defining the anchor to count from when <code>every &gt; 1</code>.</p></li>
+<li><p>Aligning the time zone with the input. When the input vector and the
+<code>origin</code> have altering time zones, a warning is issued and the input
+is coerced to the time zone of the <code>origin</code>. It is highly advised to
+provide your own <code>origin</code> if your input is a POSIXct.</p></li>
+</ul></td>
     </tr>
     </table>
 
@@ -168,20 +168,24 @@ particularly important when <code>every &gt; 1</code> and you need to define whe
     <p>A double vector containing the distances.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>The return value of <code>warp_distance()</code> is suitable for use as a grouping
-column in, for example, a <code>dplyr::mutate()</code>. This is especially useful for
-grouping by a multitude of a particular period, such as "every 5 months"
-starting from your particular <code>origin</code> value. If you want "cleaner" grouping
-values, you might consider running <code>vctrs::vec_group_id()</code> on the result from
-<code>warp_distance()</code>.</p>
+    <p>The return value of <code>warp_distance()</code> has a variety of uses. It can be used
+for:</p><ul>
+<li><p>A grouping column in a <code>dplyr::group_by()</code>. This is especially useful for
+grouping by a multitude of a particular period, such as "every 5 months".</p></li>
+<li><p>Computing distances between values in <code>x</code>, in terms of the <code>by</code> period.
+By returning the distances from the <code>origin</code>, <code>warp_distance()</code> has also
+implicitly computed the distances between values of <code>x</code>. This is used
+by <code>slide::block()</code> to break the input into time blocks.</p></li>
+</ul>
+
 <p>When the time zone of <code>x</code> differs from the time zone of <code>origin</code>, a warning
 is issued, and <code>x</code> is coerced to the time zone of <code>origin</code> without changing
 the number of seconds of <code>x</code> from the epoch. In other words, the time zone
 of <code>x</code> is directly changed to the time zone of <code>origin</code> without changing the
 underlying numeric representation. <strong>It is highly advised to specify your own
-<code>origin</code> value with the same time zone as <code>x</code>.</strong></p>
-<p>If a <code>Date</code> is used for <code>x</code>, its time zone is assumed to be <code>"UTC"</code>.</p>
-    <h2 class="hasAnchor" id="origin-truncation"><a class="anchor" href="#origin-truncation"></a><code>origin</code> Truncation</h2>
+<code>origin</code> value with the same time zone as <code>x</code>.</strong> If a <code>Date</code> is used for
+<code>x</code>, its time zone is assumed to be <code>"UTC"</code>.</p>
+    <h2 class="hasAnchor" id="by"><a class="anchor" href="#by"></a><code>by</code></h2>
 
     
 
@@ -268,7 +272,7 @@ to work with microseconds, by, say, bucketing them by millisecond distances.</p>
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
       <li><a href="#details">Details</a></li>
-      <li><a href="#origin-truncation"><code>origin</code> Truncation</a></li>
+      <li><a href="#by"><code>by</code></a></li>
       <li><a href="#precision">Precision</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
