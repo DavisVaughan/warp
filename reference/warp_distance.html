@@ -38,8 +38,8 @@
 <meta property="og:title" content="Compute distances from a date time origin — warp_distance" />
 <meta property="og:description" content="warp_distance() is a low level engine for computing date time distances.
 It returns the distance from x to the origin in units
-defined by the period specified with by.
-For example, by = &quot;year&quot; would return the number of years from
+defined by the period.
+For example, period = &quot;year&quot; would return the number of years from
 the origin. Setting every = 2 would return the number of 2 year groups
 from the origin." />
 <meta name="twitter:card" content="summary" />
@@ -118,13 +118,13 @@ from the origin." />
     <div class="ref-description">
     <p><code>warp_distance()</code> is a low level engine for computing date time distances.</p>
 <p>It returns the distance from <code>x</code> to the <code>origin</code> in units
-defined by the period specified with <code>by</code>.</p>
-<p>For example, <code>by = "year"</code> would return the number of years from
+defined by the <code>period</code>.</p>
+<p>For example, <code>period = "year"</code> would return the number of years from
 the <code>origin</code>. Setting <code>every = 2</code> would return the number of 2 year groups
 from the <code>origin</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>warp_distance</span>(<span class='no'>x</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='st'>"year"</span>, <span class='kw'>every</span> <span class='kw'>=</span> <span class='fl'>1L</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>warp_distance</span>(<span class='no'>x</span>, <span class='kw'>period</span> <span class='kw'>=</span> <span class='st'>"year"</span>, <span class='kw'>every</span> <span class='kw'>=</span> <span class='fl'>1L</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -135,7 +135,7 @@ from the <code>origin</code>.</p>
 <p>A date time vector.</p></td>
     </tr>
     <tr>
-      <th>by</th>
+      <th>period</th>
       <td><p><code>[character(1)]</code></p>
 <p>A string defining the period to group by. Valid inputs are:</p>
 <p><code>"year"</code>, <code>"quarter"</code>, <code>"month"</code>, <code>"week"</code>, <code>"day"</code>, <code>"hour"</code>, <code>"minute"</code>,
@@ -144,8 +144,8 @@ from the <code>origin</code>.</p>
     <tr>
       <th>every</th>
       <td><p><code>[positive integer(1)]</code></p>
-<p>The number of <code>by</code> periods to group together.</p>
-<p>For example, if <code>by = "year"</code> and <code>every</code> is set to <code>2</code>, then the years
+<p>The number of <code>period</code>s to group together.</p>
+<p>For example, if <code>period = "year"</code> and <code>every</code> is set to <code>2</code>, then the years
 1970 and 1971 would be placed in the same group.</p></td>
     </tr>
     <tr>
@@ -172,7 +172,7 @@ provide your own <code>origin</code> if your input is a POSIXct.</p></li>
 for:</p><ul>
 <li><p>A grouping column in a <code>dplyr::group_by()</code>. This is especially useful for
 grouping by a multitude of a particular period, such as "every 5 months".</p></li>
-<li><p>Computing distances between values in <code>x</code>, in terms of the <code>by</code> period.
+<li><p>Computing distances between values in <code>x</code>, in units of the <code>period</code>.
 By returning the distances from the <code>origin</code>, <code>warp_distance()</code> has also
 implicitly computed the distances between values of <code>x</code>. This is used
 by <code>slide::block()</code> to break the input into time blocks.</p></li>
@@ -185,25 +185,26 @@ of <code>x</code> is directly changed to the time zone of <code>origin</code> wi
 underlying numeric representation. <strong>It is highly advised to specify your own
 <code>origin</code> value with the same time zone as <code>x</code>.</strong> If a <code>Date</code> is used for
 <code>x</code>, its time zone is assumed to be <code>"UTC"</code>.</p>
-    <h2 class="hasAnchor" id="by"><a class="anchor" href="#by"></a><code>by</code></h2>
+    <h2 class="hasAnchor" id="period"><a class="anchor" href="#period"></a>Period</h2>
 
     
 
 
-<p>For <code>by</code> values of <code>"year"</code>, <code>"month"</code>, and <code>"day"</code>, the information
+<p>For <code>period</code> values of <code>"year"</code>, <code>"month"</code>, and <code>"day"</code>, the information
 provided in <code>origin</code> is truncated. Practically this means that if you
-specify:</p><pre>warp_distance(by = "month", origin = as.Date("1970-01-15"))
+specify:</p><pre>warp_distance(period = "month", origin = as.Date("1970-01-15"))
 </pre>
 
 <p>then only <code>1970-01</code> will be used, and not the fact that the origin starts
 on the 15th of the month.</p>
-<p>The <code>by</code> value of <code>"quarter"</code> is internally <code>by = "month", every = every * 3</code>.
-This means that for <code>"quarter"</code> the month specified for the <code>origin</code> will
-be used as the month to start counting from to generate the 3 month quarter.</p>
-<p>The <code>by</code> value of <code>"week"</code> is computed in the same way as
+<p>The <code>period</code> value of <code>"quarter"</code> is internally
+<code>period = "month", every = every * 3</code>. This means that for <code>"quarter"</code>
+the month specified for the <code>origin</code> will be used as the month to start
+counting from to generate the 3 month quarter.</p>
+<p>The <code>period</code> value of <code>"week"</code> is computed in the same way as
 <code>lubridate::week()</code>. Week groups are defined as complete 7 day periods,
 with the 7 day counter resetting every January 1st. To mimic the behavior
-of <code>lubridate::floor_date()</code>, use <code>by = "day"</code> and multiply <code>every</code> by 7.
+of <code>lubridate::floor_date()</code>, use <code>period = "day"</code> and multiply <code>every</code> by 7.
 To mimic the <code>week_start</code> argument of <code>floor_date()</code>, set <code>origin</code> to a date
 with a week day identical to the one you want the week to start from. For
 example, the default origin of <code>1970-01-01</code> is a Thursday, so this would be
@@ -272,7 +273,7 @@ to work with microseconds, by, say, bucketing them by millisecond distances.</p>
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
       <li><a href="#details">Details</a></li>
-      <li><a href="#by"><code>by</code></a></li>
+      <li><a href="#period">Period</a></li>
       <li><a href="#precision">Precision</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>

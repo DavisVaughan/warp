@@ -118,7 +118,7 @@ rolling from one month to the next. It returns the start and stop positions
 for each contiguous period chunk in <code>x</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>warp_boundary</span>(<span class='no'>x</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='st'>"year"</span>, <span class='kw'>every</span> <span class='kw'>=</span> <span class='fl'>1L</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>warp_boundary</span>(<span class='no'>x</span>, <span class='kw'>period</span> <span class='kw'>=</span> <span class='st'>"year"</span>, <span class='kw'>every</span> <span class='kw'>=</span> <span class='fl'>1L</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -129,7 +129,7 @@ for each contiguous period chunk in <code>x</code>.</p>
 <p>A date time vector.</p></td>
     </tr>
     <tr>
-      <th>by</th>
+      <th>period</th>
       <td><p><code>[character(1)]</code></p>
 <p>A string defining the period to group by. Valid inputs are:</p>
 <p><code>"year"</code>, <code>"quarter"</code>, <code>"month"</code>, <code>"week"</code>, <code>"day"</code>, <code>"hour"</code>, <code>"minute"</code>,
@@ -138,8 +138,8 @@ for each contiguous period chunk in <code>x</code>.</p>
     <tr>
       <th>every</th>
       <td><p><code>[positive integer(1)]</code></p>
-<p>The number of <code>by</code> periods to group together.</p>
-<p>For example, if <code>by = "year"</code> and <code>every</code> is set to <code>2</code>, then the years
+<p>The number of <code>period</code>s to group together.</p>
+<p>For example, if <code>period = "year"</code> and <code>every</code> is set to <code>2</code>, then the years
 1970 and 1971 would be placed in the same group.</p></td>
     </tr>
     <tr>
