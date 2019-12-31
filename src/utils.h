@@ -9,19 +9,19 @@
 
 // -----------------------------------------------------------------------------
 
-enum warp_by_type {
-  warp_by_year,
-  warp_by_quarter,
-  warp_by_month,
-  warp_by_week,
-  warp_by_day,
-  warp_by_hour,
-  warp_by_minute,
-  warp_by_second,
-  warp_by_millisecond
+enum warp_period_type {
+  warp_period_year,
+  warp_period_quarter,
+  warp_period_month,
+  warp_period_week,
+  warp_period_day,
+  warp_period_hour,
+  warp_period_minute,
+  warp_period_second,
+  warp_period_millisecond
 };
 
-enum warp_by_type as_by_type(SEXP by);
+enum warp_period_type as_period_type(SEXP period);
 
 // -----------------------------------------------------------------------------
 

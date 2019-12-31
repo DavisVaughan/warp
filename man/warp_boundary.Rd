@@ -4,14 +4,14 @@
 \alias{warp_boundary}
 \title{Locate period boundaries for a date vector}
 \usage{
-warp_boundary(x, by = "year", every = 1L, origin = NULL)
+warp_boundary(x, period = "year", every = 1L, origin = NULL)
 }
 \arguments{
 \item{x}{\verb{[Date / POSIXct / POSIXlt]}
 
 A date time vector.}
 
-\item{by}{\verb{[character(1)]}
+\item{period}{\verb{[character(1)]}
 
 A string defining the period to group by. Valid inputs are:
 
@@ -20,9 +20,9 @@ A string defining the period to group by. Valid inputs are:
 
 \item{every}{\verb{[positive integer(1)]}
 
-The number of \code{by} periods to group together.
+The number of \code{period}s to group together.
 
-For example, if \code{by = "year"} and \code{every} is set to \code{2}, then the years
+For example, if \code{period = "year"} and \code{every} is set to \code{2}, then the years
 1970 and 1971 would be placed in the same group.}
 
 \item{origin}{\verb{[Date(1) / POSIXct(1) / POSIXlt(1)]}

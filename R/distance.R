@@ -4,9 +4,9 @@
 #' `warp_distance()` is a low level engine for computing date time distances.
 #'
 #' It returns the distance from `x` to the `origin` in units
-#' defined by the period specified with `by`.
+#' defined by the `period`.
 #'
-#' For example, `by = "year"` would return the number of years from
+#' For example, `period = "year"` would return the number of years from
 #' the `origin`. Setting `every = 2` would return the number of 2 year groups
 #' from the `origin`.
 #'
@@ -17,7 +17,7 @@
 #' - A grouping column in a `dplyr::group_by()`. This is especially useful for
 #'   grouping by a multitude of a particular period, such as "every 5 months".
 #'
-#' - Computing distances between values in `x`, in terms of the `by` period.
+#' - Computing distances between values in `x`, in units of the `period`.
 #'   By returning the distances from the `origin`, `warp_distance()` has also
 #'   implicitly computed the distances between values of `x`. This is used
 #'   by `slide::block()` to break the input into time blocks.
@@ -30,27 +30,28 @@
 #' `origin` value with the same time zone as `x`.__ If a `Date` is used for
 #' `x`, its time zone is assumed to be `"UTC"`.
 #'
-#' @section `by`:
+#' @section Period:
 #'
-#' For `by` values of `"year"`, `"month"`, and `"day"`, the information
+#' For `period` values of `"year"`, `"month"`, and `"day"`, the information
 #' provided in `origin` is truncated. Practically this means that if you
 #' specify:
 #'
 #' ```
-#' warp_distance(by = "month", origin = as.Date("1970-01-15"))
+#' warp_distance(period = "month", origin = as.Date("1970-01-15"))
 #' ```
 #'
 #' then only `1970-01` will be used, and not the fact that the origin starts
 #' on the 15th of the month.
 #'
-#' The `by` value of `"quarter"` is internally `by = "month", every = every * 3`.
-#' This means that for `"quarter"` the month specified for the `origin` will
-#' be used as the month to start counting from to generate the 3 month quarter.
+#' The `period` value of `"quarter"` is internally
+#' `period = "month", every = every * 3`. This means that for `"quarter"`
+#' the month specified for the `origin` will be used as the month to start
+#' counting from to generate the 3 month quarter.
 #'
-#' The `by` value of `"week"` is computed in the same way as
+#' The `period` value of `"week"` is computed in the same way as
 #' `lubridate::week()`. Week groups are defined as complete 7 day periods,
 #' with the 7 day counter resetting every January 1st. To mimic the behavior
-#' of `lubridate::floor_date()`, use `by = "day"` and multiply `every` by 7.
+#' of `lubridate::floor_date()`, use `period = "day"` and multiply `every` by 7.
 #' To mimic the `week_start` argument of `floor_date()`, set `origin` to a date
 #' with a week day identical to the one you want the week to start from. For
 #' example, the default origin of `1970-01-01` is a Thursday, so this would be
@@ -71,7 +72,7 @@
 #'
 #'   A date time vector.
 #'
-#' @param by `[character(1)]`
+#' @param period `[character(1)]`
 #'
 #'   A string defining the period to group by. Valid inputs are:
 #'
@@ -80,9 +81,9 @@
 #'
 #' @param every `[positive integer(1)]`
 #'
-#'   The number of `by` periods to group together.
+#'   The number of `period`s to group together.
 #'
-#'   For example, if `by = "year"` and `every` is set to `2`, then the years
+#'   For example, if `period = "year"` and `every` is set to `2`, then the years
 #'   1970 and 1971 would be placed in the same group.
 #'
 #' @param origin `[Date(1) / POSIXct(1) / POSIXlt(1)]`
@@ -152,6 +153,6 @@
 #' origin <- as.POSIXct("1970-01-01", "America/New_York")
 #' warp_distance(x_in_nyc, "hour", origin = origin)
 #'
-warp_distance <- function(x, by = "year", every = 1L, origin = NULL) {
-  .Call(warp_warp_distance, x, by, every, origin)
+warp_distance <- function(x, period = "year", every = 1L, origin = NULL) {
+  .Call(warp_warp_distance, x, period, every, origin)
 }

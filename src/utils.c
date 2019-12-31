@@ -102,50 +102,50 @@ static bool str_equal(const char* x, const char* y) {
 }
 
 // [[ include("utils.h") ]]
-enum warp_by_type as_by_type(SEXP by) {
-  if (TYPEOF(by) != STRSXP || Rf_length(by) != 1) {
-    Rf_errorcall(R_NilValue, "`by` must be a single string.");
+enum warp_period_type as_period_type(SEXP period) {
+  if (TYPEOF(period) != STRSXP || Rf_length(period) != 1) {
+    Rf_errorcall(R_NilValue, "`period` must be a single string.");
   }
 
-  const char* type = CHAR(STRING_ELT(by, 0));
+  const char* type = CHAR(STRING_ELT(period, 0));
 
   if (str_equal(type, "year") || str_equal(type, "years") || str_equal(type, "yearly")) {
-    return warp_by_year;
+    return warp_period_year;
   }
 
   if (str_equal(type, "quarter") || str_equal(type, "quarters") || str_equal(type, "quarterly")) {
-    return warp_by_quarter;
+    return warp_period_quarter;
   }
 
   if (str_equal(type, "month") || str_equal(type, "months") || str_equal(type, "monthly")) {
-    return warp_by_month;
+    return warp_period_month;
   }
 
   if (str_equal(type, "week") || str_equal(type, "weeks") || str_equal(type, "weekly")) {
-    return warp_by_week;
+    return warp_period_week;
   }
 
   if (str_equal(type, "day") || str_equal(type, "days") || str_equal(type, "daily")) {
-    return warp_by_day;
+    return warp_period_day;
   }
 
   if (str_equal(type, "hour") || str_equal(type, "hours") || str_equal(type, "hourly")) {
-    return warp_by_hour;
+    return warp_period_hour;
   }
 
   if (str_equal(type, "minute") || str_equal(type, "minutes") || str_equal(type, "minutely")) {
-    return warp_by_minute;
+    return warp_period_minute;
   }
 
   if (str_equal(type, "second") || str_equal(type, "seconds") || str_equal(type, "secondly")) {
-    return warp_by_second;
+    return warp_period_second;
   }
 
   if (str_equal(type, "millisecond") || str_equal(type, "milliseconds")) {
-    return warp_by_millisecond;
+    return warp_period_millisecond;
   }
 
-  Rf_errorcall(R_NilValue, "Unknown `by` value '%s'.", type);
+  Rf_errorcall(R_NilValue, "Unknown `period` value '%s'.", type);
 }
 
 // -----------------------------------------------------------------------------

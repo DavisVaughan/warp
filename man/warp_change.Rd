@@ -4,14 +4,14 @@
 \alias{warp_change}
 \title{Detect changes in a date time vector}
 \usage{
-warp_change(x, by = "year", every = 1L, origin = NULL)
+warp_change(x, period = "year", every = 1L, origin = NULL)
 }
 \arguments{
 \item{x}{\verb{[Date / POSIXct / POSIXlt]}
 
 A date time vector.}
 
-\item{by}{\verb{[character(1)]}
+\item{period}{\verb{[character(1)]}
 
 A string defining the period to group by. Valid inputs are:
 
@@ -20,9 +20,9 @@ A string defining the period to group by. Valid inputs are:
 
 \item{every}{\verb{[positive integer(1)]}
 
-The number of \code{by} periods to group together.
+The number of \code{period}s to group together.
 
-For example, if \code{by = "year"} and \code{every} is set to \code{2}, then the years
+For example, if \code{period = "year"} and \code{every} is set to \code{2}, then the years
 1970 and 1971 would be placed in the same group.}
 
 \item{origin}{\verb{[Date(1) / POSIXct(1) / POSIXlt(1)]}
@@ -43,14 +43,14 @@ provide your own \code{origin} if your input is a POSIXct.
 A double vector of locations right before a change.
 }
 \description{
-\code{warp_change()} detects changes at the period level, using the period
-supplied in \code{by}. It returns the locations of the last value before the
-change. The location of the last value is always returned at the end.
+\code{warp_change()} detects changes at the \code{period} level. It returns the
+locations of the value just before a change. The location of the last
+value in \code{x} is always returned at the end.
 }
 \examples{
 x <- as.Date("2019-01-01") + 0:5
 
-warp_change(x, by = "day", every = 2)
+warp_change(x, period = "day", every = 2)
 
-warp_change(x, by = "day", every = 2, origin = as.Date("2019-01-01"))
+warp_change(x, period = "day", every = 2, origin = as.Date("2019-01-01"))
 }

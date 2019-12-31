@@ -41,13 +41,13 @@ x <- as.Date("1970-01-01") + -2:2
 x
 #> [1] "1969-12-30" "1969-12-31" "1970-01-01" "1970-01-02" "1970-01-03"
 
-warp_distance(x, by = "month")
+warp_distance(x, period = "month")
 #> [1] -1 -1  0  0  0
 ```
 
 The values that `warp_distance()` returns correspond to the distance
-from `x` to the `origin`, in units defined by the `by` period and the
-width defined by `every`. The `origin` defaults to the unix epoch of
+from `x` to the `origin`, in units defined by the `period` and the width
+defined by `every`. The `origin` defaults to the unix epoch of
 `1970-01-01 00:00:00`, but you can change that. In this case the
 distances are saying that, for example, `"1970-01-02"` is in the same
 month as the origin, and `"1969-12-31"` is 1 month group away.
@@ -57,7 +57,7 @@ let’s lump every 2 days together, starting from the default `origin`.
 
 ``` r
 # Groups 1970-01-01 and 1970-01-02 together
-warp_distance(x, by = "day", every = 2)
+warp_distance(x, period = "day", every = 2)
 #> [1] -1 -1  0  0  1
 ```
 
@@ -70,7 +70,7 @@ origin
 #> [1] "1970-01-02"
 
 # Groups 1970-01-02 and 1970-01-03 together
-warp_distance(x, by = "day", every = 2, origin = origin)
+warp_distance(x, period = "day", every = 2, origin = origin)
 #> [1] -2 -1 -1  0  0
 ```
 
