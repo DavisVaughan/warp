@@ -4,14 +4,14 @@
 \alias{warp_distance}
 \title{Compute distances from a date time origin}
 \usage{
-warp_distance(x, by = "year", every = 1L, origin = NULL)
+warp_distance(x, period = "year", every = 1L, origin = NULL)
 }
 \arguments{
 \item{x}{\verb{[Date / POSIXct / POSIXlt]}
 
 A date time vector.}
 
-\item{by}{\verb{[character(1)]}
+\item{period}{\verb{[character(1)]}
 
 A string defining the period to group by. Valid inputs are:
 
@@ -20,9 +20,9 @@ A string defining the period to group by. Valid inputs are:
 
 \item{every}{\verb{[positive integer(1)]}
 
-The number of \code{by} periods to group together.
+The number of \code{period}s to group together.
 
-For example, if \code{by = "year"} and \code{every} is set to \code{2}, then the years
+For example, if \code{period = "year"} and \code{every} is set to \code{2}, then the years
 1970 and 1971 would be placed in the same group.}
 
 \item{origin}{\verb{[Date(1) / POSIXct(1) / POSIXlt(1)]}
@@ -46,9 +46,9 @@ A double vector containing the distances.
 \code{warp_distance()} is a low level engine for computing date time distances.
 
 It returns the distance from \code{x} to the \code{origin} in units
-defined by the period specified with \code{by}.
+defined by the \code{period}.
 
-For example, \code{by = "year"} would return the number of years from
+For example, \code{period = "year"} would return the number of years from
 the \code{origin}. Setting \code{every = 2} would return the number of 2 year groups
 from the \code{origin}.
 }
@@ -58,7 +58,7 @@ for:
 \itemize{
 \item A grouping column in a \code{dplyr::group_by()}. This is especially useful for
 grouping by a multitude of a particular period, such as "every 5 months".
-\item Computing distances between values in \code{x}, in terms of the \code{by} period.
+\item Computing distances between values in \code{x}, in units of the \code{period}.
 By returning the distances from the \code{origin}, \code{warp_distance()} has also
 implicitly computed the distances between values of \code{x}. This is used
 by \code{slide::block()} to break the input into time blocks.
@@ -72,25 +72,26 @@ underlying numeric representation. \strong{It is highly advised to specify your 
 \code{origin} value with the same time zone as \code{x}.} If a \code{Date} is used for
 \code{x}, its time zone is assumed to be \code{"UTC"}.
 }
-\section{\code{by}}{
+\section{Period}{
 
 
-For \code{by} values of \code{"year"}, \code{"month"}, and \code{"day"}, the information
+For \code{period} values of \code{"year"}, \code{"month"}, and \code{"day"}, the information
 provided in \code{origin} is truncated. Practically this means that if you
-specify:\preformatted{warp_distance(by = "month", origin = as.Date("1970-01-15"))
+specify:\preformatted{warp_distance(period = "month", origin = as.Date("1970-01-15"))
 }
 
 then only \code{1970-01} will be used, and not the fact that the origin starts
 on the 15th of the month.
 
-The \code{by} value of \code{"quarter"} is internally \verb{by = "month", every = every * 3}.
-This means that for \code{"quarter"} the month specified for the \code{origin} will
-be used as the month to start counting from to generate the 3 month quarter.
+The \code{period} value of \code{"quarter"} is internally
+\verb{period = "month", every = every * 3}. This means that for \code{"quarter"}
+the month specified for the \code{origin} will be used as the month to start
+counting from to generate the 3 month quarter.
 
-The \code{by} value of \code{"week"} is computed in the same way as
+The \code{period} value of \code{"week"} is computed in the same way as
 \code{lubridate::week()}. Week groups are defined as complete 7 day periods,
 with the 7 day counter resetting every January 1st. To mimic the behavior
-of \code{lubridate::floor_date()}, use \code{by = "day"} and multiply \code{every} by 7.
+of \code{lubridate::floor_date()}, use \code{period = "day"} and multiply \code{every} by 7.
 To mimic the \code{week_start} argument of \code{floor_date()}, set \code{origin} to a date
 with a week day identical to the one you want the week to start from. For
 example, the default origin of \code{1970-01-01} is a Thursday, so this would be

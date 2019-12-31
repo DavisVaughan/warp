@@ -24,7 +24,7 @@ static SEXP warp_distance_second(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_millisecond(SEXP x, int every, SEXP origin);
 
 // [[ include("warp.h") ]]
-SEXP warp_distance(SEXP x, enum warp_by_type type, int every, SEXP origin) {
+SEXP warp_distance(SEXP x, enum warp_period_type type, int every, SEXP origin) {
   validate_origin(origin);
   validate_every(every);
 
@@ -38,15 +38,15 @@ SEXP warp_distance(SEXP x, enum warp_by_type type, int every, SEXP origin) {
   SEXP out;
 
   switch (type) {
-  case warp_by_year: out = PROTECT(warp_distance_year(x, every, origin)); break;
-  case warp_by_quarter: out = PROTECT(warp_distance_quarter(x, every, origin)); break;
-  case warp_by_month: out = PROTECT(warp_distance_month(x, every, origin)); break;
-  case warp_by_week: out = PROTECT(warp_distance_week(x, every, origin)); break;
-  case warp_by_day: out = PROTECT(warp_distance_day(x, every, origin)); break;
-  case warp_by_hour: out = PROTECT(warp_distance_hour(x, every, origin)); break;
-  case warp_by_minute: out = PROTECT(warp_distance_minute(x, every, origin)); break;
-  case warp_by_second: out = PROTECT(warp_distance_second(x, every, origin)); break;
-  case warp_by_millisecond: out = PROTECT(warp_distance_millisecond(x, every, origin)); break;
+  case warp_period_year: out = PROTECT(warp_distance_year(x, every, origin)); break;
+  case warp_period_quarter: out = PROTECT(warp_distance_quarter(x, every, origin)); break;
+  case warp_period_month: out = PROTECT(warp_distance_month(x, every, origin)); break;
+  case warp_period_week: out = PROTECT(warp_distance_week(x, every, origin)); break;
+  case warp_period_day: out = PROTECT(warp_distance_day(x, every, origin)); break;
+  case warp_period_hour: out = PROTECT(warp_distance_hour(x, every, origin)); break;
+  case warp_period_minute: out = PROTECT(warp_distance_minute(x, every, origin)); break;
+  case warp_period_second: out = PROTECT(warp_distance_second(x, every, origin)); break;
+  case warp_period_millisecond: out = PROTECT(warp_distance_millisecond(x, every, origin)); break;
   default: r_error("warp_distance", "Internal error: unknown `type`.");
   }
 
@@ -55,8 +55,8 @@ SEXP warp_distance(SEXP x, enum warp_by_type type, int every, SEXP origin) {
 }
 
 // [[ register() ]]
-SEXP warp_warp_distance(SEXP x, SEXP by, SEXP every, SEXP origin) {
-  enum warp_by_type type = as_by_type(by);
+SEXP warp_warp_distance(SEXP x, SEXP period, SEXP every, SEXP origin) {
+  enum warp_period_type type = as_period_type(period);
   int every_ = pull_every(every);
   return warp_distance(x, type, every_, origin);
 }

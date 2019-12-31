@@ -6,7 +6,7 @@
 static SEXP warp_change_impl(SEXP x);
 
 // [[ include("warp.h") ]]
-SEXP warp_change(SEXP x, enum warp_by_type type, int every, SEXP origin) {
+SEXP warp_change(SEXP x, enum warp_period_type type, int every, SEXP origin) {
   SEXP distances = PROTECT(warp_distance(x, type, every, origin));
   SEXP out = warp_change_impl(distances);
   UNPROTECT(1);
@@ -14,8 +14,8 @@ SEXP warp_change(SEXP x, enum warp_by_type type, int every, SEXP origin) {
 }
 
 // [[ register() ]]
-SEXP warp_warp_change(SEXP x, SEXP by, SEXP every, SEXP origin) {
-  enum warp_by_type type = as_by_type(by);
+SEXP warp_warp_change(SEXP x, SEXP period, SEXP every, SEXP origin) {
+  enum warp_period_type type = as_period_type(period);
   int every_ = pull_every(every);
   return warp_change(x, type, every_, origin);
 }

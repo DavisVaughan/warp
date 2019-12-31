@@ -1,8 +1,8 @@
 #' Detect changes in a date time vector
 #'
-#' `warp_change()` detects changes at the period level, using the period
-#' supplied in `by`. It returns the locations of the last value before the
-#' change. The location of the last value is always returned at the end.
+#' `warp_change()` detects changes at the `period` level. It returns the
+#' locations of the value just before a change. The location of the last
+#' value in `x` is always returned at the end.
 #'
 #' @inheritParams warp_distance
 #'
@@ -13,9 +13,9 @@
 #' @examples
 #' x <- as.Date("2019-01-01") + 0:5
 #'
-#' warp_change(x, by = "day", every = 2)
+#' warp_change(x, period = "day", every = 2)
 #'
-#' warp_change(x, by = "day", every = 2, origin = as.Date("2019-01-01"))
-warp_change <- function(x, by = "year", every = 1L, origin = NULL) {
-  .Call(warp_warp_change, x, by, every, origin)
+#' warp_change(x, period = "day", every = 2, origin = as.Date("2019-01-01"))
+warp_change <- function(x, period = "year", every = 1L, origin = NULL) {
+  .Call(warp_warp_change, x, period, every, origin)
 }
