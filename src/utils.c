@@ -5,6 +5,8 @@
 SEXP warp_ns_env = NULL;
 
 SEXP syms_x = NULL;
+SEXP syms_tzone = NULL;
+SEXP syms_class = NULL;
 
 SEXP syms_as_posixct_from_posixlt = NULL;
 SEXP syms_as_posixlt_from_posixct = NULL;
@@ -15,6 +17,7 @@ SEXP fns_as_posixlt_from_posixct = NULL;
 SEXP fns_as_date = NULL;
 
 SEXP classes_data_frame = NULL;
+SEXP classes_posixct = NULL;
 
 SEXP strings_start_stop = NULL;
 
@@ -88,6 +91,10 @@ int pull_every(SEXP every) {
     r_error("pull_every", "`every` must have size 1, not %i", Rf_length(every));
   }
 
+  if (OBJECT(every) != 0) {
+    r_error("pull_every", "`every` must be a bare integer-ish value.");
+  }
+
   switch (TYPEOF(every)) {
   case INTSXP: return INTEGER(every)[0];
   case REALSXP: return Rf_asInteger(every);
@@ -97,9 +104,12 @@ int pull_every(SEXP every) {
 
 // -----------------------------------------------------------------------------
 
-static bool str_equal(const char* x, const char* y) {
+// [[ include("utils.h") ]]
+bool str_equal(const char* x, const char* y) {
   return strcmp(x, y) == 0;
 }
+
+// -----------------------------------------------------------------------------
 
 // [[ include("utils.h") ]]
 enum warp_period_type as_period_type(SEXP period) {
@@ -361,6 +371,8 @@ void warp_init_utils(SEXP ns) {
   warp_ns_env = ns;
 
   syms_x = Rf_install("x");
+  syms_tzone = Rf_install("tzone");
+  syms_class = Rf_install("class");
 
   new_env_call = r_parse_eval("as.call(list(new.env, TRUE, NULL, NULL))", R_BaseEnv);
   R_PreserveObject(new_env_call);
@@ -379,6 +391,11 @@ void warp_init_utils(SEXP ns) {
   classes_data_frame = Rf_allocVector(STRSXP, 1);
   R_PreserveObject(classes_data_frame);
   SET_STRING_ELT(classes_data_frame, 0, Rf_mkChar("data.frame"));
+
+  classes_posixct = Rf_allocVector(STRSXP, 2);
+  R_PreserveObject(classes_posixct);
+  SET_STRING_ELT(classes_posixct, 0, Rf_mkChar("POSIXct"));
+  SET_STRING_ELT(classes_posixct, 1, Rf_mkChar("POSIXt"));
 
   strings_start_stop = Rf_allocVector(STRSXP, 2);
   R_PreserveObject(strings_start_stop);

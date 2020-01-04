@@ -18,7 +18,7 @@ test_that("Date + UTC origin does not emit a warning", {
   x <- as.Date("1971-01-01")
   origin <- as.POSIXct("1971-01-01", tz = "UTC")
 
-  expect_identical(warp_distance(x, "year", origin), 0)
+  expect_identical(warp_distance(x, "year", origin = origin), 0)
 })
 
 test_that("Date + non-UTC origin converts with a warning", {
@@ -127,7 +127,7 @@ test_that("UTC POSIXct + UTC origin does not emit a warning", {
   expect_warning(warp_distance(x, "year"), NA)
 
   expect_identical(warp_distance(x, "year"), 1)
-  expect_identical(warp_distance(x, "year", x), 0)
+  expect_identical(warp_distance(x, "year", origin = x), 0)
 })
 
 test_that("UTC POSIXct + Date origin does not emit a warning", {
@@ -135,7 +135,7 @@ test_that("UTC POSIXct + Date origin does not emit a warning", {
   origin1 <- as.Date("1971-01-01")
   origin2 <- as.Date("1972-01-01")
 
-  expect_warning(warp_distance(x, "year", origin1), NA)
+  expect_warning(warp_distance(x, "year", origin = origin1), NA)
 
   expect_identical(warp_distance(x, "year", origin = origin1), 0)
   expect_identical(warp_distance(x, "year", origin = origin2), -1)
@@ -161,7 +161,7 @@ test_that("local time POSIXct + UTC origin converts with a warning", {
     origin <- as.POSIXct("1971-01-01", tz = "UTC")
 
     expect_identical(
-      expect_warning(warp_distance(x, "year", origin)),
+      expect_warning(warp_distance(x, "year", origin = origin)),
       0
     )
   })
@@ -221,6 +221,16 @@ test_that("can handle `every` with altered origin and altered timezone", {
   expect_equal(warp_distance(x, every = 2L, origin = origin), c(-2, -2, -1, -1, 0, 0, 1))
   expect_equal(warp_distance(x, every = 3L, origin = origin), c(-2, -1, -1, -1, 0, 0, 0))
   expect_equal(warp_distance(x, every = 4L, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
+})
+
+test_that("default `origin` results in epoch in the time zone of `x`", {
+  x <- as.POSIXct("1969-12-31 23:00:00", tz = "America/New_York")
+  y <- as.POSIXct("1969-12-31 23:00:00", tz = "UTC")
+
+  expect_equal(
+    warp_distance(x, period = "year"),
+    warp_distance(y, period = "year")
+  )
 })
 
 # ------------------------------------------------------------------------------
@@ -489,6 +499,16 @@ test_that("can handle `every` with altered origin and altered timezone", {
   expect_equal(warp_distance(x, period = "month", every = 4L, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
 })
 
+test_that("default `origin` results in epoch in the time zone of `x`", {
+  x <- as.POSIXct("1969-12-31 23:00:00", tz = "America/New_York")
+  y <- as.POSIXct("1969-12-31 23:00:00", tz = "UTC")
+
+  expect_equal(
+    warp_distance(x, period = "month"),
+    warp_distance(y, period = "month")
+  )
+})
+
 # ------------------------------------------------------------------------------
 # warp_distance(<POSIXlt>, period = "month")
 
@@ -725,6 +745,16 @@ test_that("going backwards in time still uses groups computed from the first of 
   y <- as.POSIXct("1969-12-30", "UTC")
   expect_identical(warp_distance(x, "week"), -1)
   expect_identical(warp_distance(y, "week"), -2)
+})
+
+test_that("default `origin` results in epoch in the time zone of `x`", {
+  x <- as.POSIXct("1969-12-31 23:00:00", tz = "America/New_York")
+  y <- as.POSIXct("1969-12-31 23:00:00", tz = "UTC")
+
+  expect_equal(
+    warp_distance(x, period = "week"),
+    warp_distance(y, period = "week")
+  )
 })
 
 # ------------------------------------------------------------------------------
@@ -1104,7 +1134,17 @@ test_that("DST is respected", {
   # then we would have a problem!
   x <- x + c(0:1, 75600, 75601)
 
-  expect_equal(warp_distance(x, "week", origin = origin), c(0, 0, 0, 1))
+  expect_equal(warp_distance(x, "day", origin = origin), c(0, 0, 0, 1))
+})
+
+test_that("default `origin` results in epoch in the time zone of `x`", {
+  x <- as.POSIXct("1969-12-31 23:00:00", tz = "America/New_York")
+  y <- as.POSIXct("1969-12-31 23:00:00", tz = "UTC")
+
+  expect_equal(
+    warp_distance(x, period = "day"),
+    warp_distance(y, period = "day")
+  )
 })
 
 # ------------------------------------------------------------------------------
@@ -1484,6 +1524,16 @@ test_that("values past microseconds are ignored", {
   expect_equal(warp_distance(y, "hour"), 0)
 })
 
+test_that("default `origin` results in epoch in the time zone of `x`", {
+  x <- as.POSIXct("1969-12-31 23:00:00", tz = "America/New_York")
+  y <- as.POSIXct("1969-12-31 23:00:00", tz = "UTC")
+
+  expect_equal(
+    warp_distance(x, period = "hour"),
+    warp_distance(y, period = "hour")
+  )
+})
+
 # ------------------------------------------------------------------------------
 # warp_distance(<POSIXlt>, period = "hour")
 
@@ -1861,6 +1911,16 @@ test_that("values past microseconds are essentially ignored", {
 
   expect_equal(warp_distance(x, "minute"), -1)
   expect_equal(warp_distance(y, "minute"), 0)
+})
+
+test_that("default `origin` results in epoch in the time zone of `x`", {
+  x <- as.POSIXct("1969-12-31 23:00:00", tz = "America/New_York")
+  y <- as.POSIXct("1969-12-31 23:00:00", tz = "UTC")
+
+  expect_equal(
+    warp_distance(x, period = "minute"),
+    warp_distance(y, period = "minute")
+  )
 })
 
 # ------------------------------------------------------------------------------
@@ -2250,6 +2310,16 @@ test_that("values past microseconds are essentially ignored", {
 
   expect_equal(warp_distance(x, "second"), -1)
   expect_equal(warp_distance(y, "second"), 0)
+})
+
+test_that("default `origin` results in epoch in the time zone of `x`", {
+  x <- as.POSIXct("1969-12-31 23:00:00", tz = "America/New_York")
+  y <- as.POSIXct("1969-12-31 23:00:00", tz = "UTC")
+
+  expect_equal(
+    warp_distance(x, period = "second"),
+    warp_distance(y, period = "second")
+  )
 })
 
 # ------------------------------------------------------------------------------
@@ -2664,6 +2734,16 @@ test_that("proof that the +1e-7 guard is necessary", {
   expect_identical(warp_distance(x, "millisecond"), 1000000001327)
 })
 
+test_that("default `origin` results in epoch in the time zone of `x`", {
+  x <- as.POSIXct("1969-12-31 23:00:00", tz = "America/New_York")
+  y <- as.POSIXct("1969-12-31 23:00:00", tz = "UTC")
+
+  expect_equal(
+    warp_distance(x, period = "millisecond"),
+    warp_distance(y, period = "millisecond")
+  )
+})
+
 # ------------------------------------------------------------------------------
 # warp_distance(<POSIXlt>, period = "millisecond")
 
@@ -2695,6 +2775,7 @@ test_that("`origin` is validated", {
 test_that("`every` is validated", {
   expect_error(warp_distance(new_date(0), every = 0), "greater than 0, not 0")
   expect_error(warp_distance(new_date(0), every = -1), "greater than 0, not -1")
+  expect_error(warp_distance(new_date(0), every = structure(1, class = "foobar")), "bare integer-ish")
   expect_error(warp_distance(new_date(0), every = "x"), "integer-ish, not character")
   expect_error(warp_distance(new_date(0), every = c(1, 1)), "size 1, not 2")
   expect_error(warp_distance(new_date(0), every = integer()), "size 1, not 0")

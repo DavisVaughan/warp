@@ -25,19 +25,13 @@ The number of \code{period}s to group together.
 For example, if \code{period = "year"} and \code{every} is set to \code{2}, then the years
 1970 and 1971 would be placed in the same group.}
 
-\item{origin}{\verb{[Date(1) / POSIXct(1) / POSIXlt(1)]}
+\item{origin}{\verb{[Date(1) / POSIXct(1) / POSIXlt(1) / NULL]}
 
 The reference date time value. The default when left as \code{NULL} is the
-Unix epoch of \verb{1970-01-01 00:00:00 UTC}.
+epoch time of \verb{1970-01-01 00:00:00}, \emph{in the time zone of \code{x}}.
 
-This is used for two purposes:
-\itemize{
-\item Defining the anchor to count from when \code{every > 1}.
-\item Aligning the time zone with the input. When the input vector and the
-\code{origin} have altering time zones, a warning is issued and the input
-is coerced to the time zone of the \code{origin}. It is highly advised to
-provide your own \code{origin} if your input is a POSIXct.
-}}
+This is generally used to define the anchor time to count from, which is
+relevant when \code{every > 1}.}
 }
 \value{
 A double vector containing the distances.
@@ -68,7 +62,7 @@ When the time zone of \code{x} differs from the time zone of \code{origin}, a wa
 is issued, and \code{x} is coerced to the time zone of \code{origin} without changing
 the number of seconds of \code{x} from the epoch. In other words, the time zone
 of \code{x} is directly changed to the time zone of \code{origin} without changing the
-underlying numeric representation. \strong{It is highly advised to specify your own
+underlying numeric representation. \strong{It is highly advised to specify an
 \code{origin} value with the same time zone as \code{x}.} If a \code{Date} is used for
 \code{x}, its time zone is assumed to be \code{"UTC"}.
 }
@@ -143,21 +137,23 @@ warp_distance(y, "second", every = 5)
 origin <- as.POSIXct("1970-01-01 00:00:01", "UTC")
 warp_distance(y, "second", every = 5, origin = origin)
 
-# Differing time zones between `x` and `origin` can be particularly
-# problematic. For this reason, if the time zones are different a warning
-# is issued and `x` is coerced to the time zone of `origin`. The default
-# `origin` time zone for the epoch is UTC.
-x_in_nyc <- as.POSIXct("1970-01-01 01:00:00", "America/New_York")
+# When `x` is not UTC and `origin` is left as `NULL`, the origin is set as
+# 1970-01-01 00:00:00 in the time zone of `x`. This seems to be the most
+# practically useful default.
+z <- as.POSIXct("1969-12-31 23:00:00", "UTC")
+z_in_nyc <- as.POSIXct("1969-12-31 23:00:00", "America/New_York")
 
-# The default origin is `1970-01-01 00:00:00 UTC`.
-# We passed in a clock time 1 hour after that, but in a different time zone.
-# America/New_York is 5 hours behind UTC, so when it is converted to
-# UTC the value becomes `1970-01-01 06:00:00 UTC`
-warp_distance(x_in_nyc, "hour")
+# Practically this means that these give the same result, because their
+# `origin` values are defined in their respective time zones.
+warp_distance(z, "year")
+warp_distance(z_in_nyc, "year")
 
-# We can use an origin value in our own time zone to fix this
-# (it doesn't have to be 1970-01-01)
-origin <- as.POSIXct("1970-01-01", "America/New_York")
-warp_distance(x_in_nyc, "hour", origin = origin)
-
+# Compare that to what would happen if we used a static `origin` of
+# 1970-01-01 00:00:00 UTC.
+# America/New_York is 5 hours behind UTC, so when `z_in_nyc` is converted to
+# UTC the value becomes `1970-01-01 04:00:00 UTC`, a different year. Because
+# this is generally surprising, a warning is thrown.
+origin <- as.POSIXct("1970-01-01 00:00:00", tz = "UTC")
+warp_distance(z, "year", origin = origin)
+warp_distance(z_in_nyc, "year", origin = origin)
 }

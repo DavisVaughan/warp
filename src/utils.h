@@ -43,6 +43,8 @@ void __attribute__((noreturn)) r_error(const char* where, const char* why, ...);
 
 SEXP r_maybe_duplicate(SEXP x);
 
+bool str_equal(const char* x, const char* y);
+
 SEXP as_posixct_from_posixlt(SEXP x);
 SEXP as_posixlt_from_posixct(SEXP x);
 SEXP as_date(SEXP x);
@@ -61,10 +63,14 @@ SEXP date_get_week_offset(SEXP x);
 // In `coercion.c`
 SEXP as_datetime(SEXP x);
 
-const char* get_timezone(SEXP x);
-SEXP convert_timezone(SEXP x, const char* timezone);
+SEXP get_origin_epoch_in_time_zone(SEXP x);
+SEXP convert_time_zone(SEXP x, SEXP origin);
+
+extern SEXP syms_tzone;
+extern SEXP syms_class;
 
 extern SEXP classes_data_frame;
+extern SEXP classes_posixct;
 
 extern SEXP strings_start_stop;
 
