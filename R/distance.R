@@ -26,7 +26,7 @@
 #' is issued, and `x` is coerced to the time zone of `origin` without changing
 #' the number of seconds of `x` from the epoch. In other words, the time zone
 #' of `x` is directly changed to the time zone of `origin` without changing the
-#' underlying numeric representation. __It is highly advised to specify your own
+#' underlying numeric representation. __It is highly advised to specify an
 #' `origin` value with the same time zone as `x`.__ If a `Date` is used for
 #' `x`, its time zone is assumed to be `"UTC"`.
 #'
@@ -86,19 +86,13 @@
 #'   For example, if `period = "year"` and `every` is set to `2`, then the years
 #'   1970 and 1971 would be placed in the same group.
 #'
-#' @param origin `[Date(1) / POSIXct(1) / POSIXlt(1)]`
+#' @param origin `[Date(1) / POSIXct(1) / POSIXlt(1) / NULL]`
 #'
 #'   The reference date time value. The default when left as `NULL` is the
-#'   Unix epoch of `1970-01-01 00:00:00 UTC`.
+#'   epoch time of `1970-01-01 00:00:00`, _in the time zone of `x`_.
 #'
-#'   This is used for two purposes:
-#'
-#'   - Defining the anchor to count from when `every > 1`.
-#'
-#'   - Aligning the time zone with the input. When the input vector and the
-#'     `origin` have altering time zones, a warning is issued and the input
-#'     is coerced to the time zone of the `origin`. It is highly advised to
-#'     provide your own `origin` if your input is a POSIXct.
+#'   This is generally used to define the anchor time to count from, which is
+#'   relevant when `every > 1`.
 #'
 #' @return
 #' A double vector containing the distances.
@@ -136,23 +130,25 @@
 #' origin <- as.POSIXct("1970-01-01 00:00:01", "UTC")
 #' warp_distance(y, "second", every = 5, origin = origin)
 #'
-#' # Differing time zones between `x` and `origin` can be particularly
-#' # problematic. For this reason, if the time zones are different a warning
-#' # is issued and `x` is coerced to the time zone of `origin`. The default
-#' # `origin` time zone for the epoch is UTC.
-#' x_in_nyc <- as.POSIXct("1970-01-01 01:00:00", "America/New_York")
+#' # When `x` is not UTC and `origin` is left as `NULL`, the origin is set as
+#' # 1970-01-01 00:00:00 in the time zone of `x`. This seems to be the most
+#' # practically useful default.
+#' z <- as.POSIXct("1969-12-31 23:00:00", "UTC")
+#' z_in_nyc <- as.POSIXct("1969-12-31 23:00:00", "America/New_York")
 #'
-#' # The default origin is `1970-01-01 00:00:00 UTC`.
-#' # We passed in a clock time 1 hour after that, but in a different time zone.
-#' # America/New_York is 5 hours behind UTC, so when it is converted to
-#' # UTC the value becomes `1970-01-01 06:00:00 UTC`
-#' warp_distance(x_in_nyc, "hour")
+#' # Practically this means that these give the same result, because their
+#' # `origin` values are defined in their respective time zones.
+#' warp_distance(z, "year")
+#' warp_distance(z_in_nyc, "year")
 #'
-#' # We can use an origin value in our own time zone to fix this
-#' # (it doesn't have to be 1970-01-01)
-#' origin <- as.POSIXct("1970-01-01", "America/New_York")
-#' warp_distance(x_in_nyc, "hour", origin = origin)
-#'
+#' # Compare that to what would happen if we used a static `origin` of
+#' # 1970-01-01 00:00:00 UTC.
+#' # America/New_York is 5 hours behind UTC, so when `z_in_nyc` is converted to
+#' # UTC the value becomes `1970-01-01 04:00:00 UTC`, a different year. Because
+#' # this is generally surprising, a warning is thrown.
+#' origin <- as.POSIXct("1970-01-01 00:00:00", tz = "UTC")
+#' warp_distance(z, "year", origin = origin)
+#' warp_distance(z_in_nyc, "year", origin = origin)
 warp_distance <- function(x, period = "year", every = 1L, origin = NULL) {
   .Call(warp_warp_distance, x, period, every, origin)
 }
