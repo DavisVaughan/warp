@@ -91,6 +91,10 @@ int pull_every(SEXP every) {
     r_error("pull_every", "`every` must have size 1, not %i", Rf_length(every));
   }
 
+  if (OBJECT(every) != 0) {
+    r_error("pull_every", "`every` must be a bare integer-ish value.");
+  }
+
   switch (TYPEOF(every)) {
   case INTSXP: return INTEGER(every)[0];
   case REALSXP: return Rf_asInteger(every);
