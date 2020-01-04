@@ -32,8 +32,11 @@ SEXP warp_distance(SEXP x, enum warp_period_type type, int every, SEXP origin) {
     r_error("warp_distance", "`x` must inherit from 'Date', 'POSIXct', or 'POSIXlt'.");
   }
 
-  const char* origin_timezone = get_timezone(origin);
-  x = PROTECT(convert_timezone(x, origin_timezone));
+  if (origin == R_NilValue) {
+    origin = PROTECT(get_origin_epoch_in_time_zone(x));
+  } else {
+    x = PROTECT(convert_time_zone(x, origin));
+  }
 
   SEXP out;
 
