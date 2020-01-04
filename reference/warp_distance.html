@@ -150,16 +150,11 @@ from the <code>origin</code>.</p>
     </tr>
     <tr>
       <th>origin</th>
-      <td><p><code>[Date(1) / POSIXct(1) / POSIXlt(1)]</code></p>
+      <td><p><code>[Date(1) / POSIXct(1) / POSIXlt(1) / NULL]</code></p>
 <p>The reference date time value. The default when left as <code>NULL</code> is the
-Unix epoch of <code>1970-01-01 00:00:00 UTC</code>.</p>
-<p>This is used for two purposes:</p><ul>
-<li><p>Defining the anchor to count from when <code>every &gt; 1</code>.</p></li>
-<li><p>Aligning the time zone with the input. When the input vector and the
-<code>origin</code> have altering time zones, a warning is issued and the input
-is coerced to the time zone of the <code>origin</code>. It is highly advised to
-provide your own <code>origin</code> if your input is a POSIXct.</p></li>
-</ul></td>
+epoch time of <code>1970-01-01 00:00:00</code>, <em>in the time zone of <code>x</code></em>.</p>
+<p>This is generally used to define the anchor time to count from, which is
+relevant when <code>every &gt; 1</code>.</p></td>
     </tr>
     </table>
 
@@ -182,7 +177,7 @@ by <code>slide::block()</code> to break the input into time blocks.</p></li>
 is issued, and <code>x</code> is coerced to the time zone of <code>origin</code> without changing
 the number of seconds of <code>x</code> from the epoch. In other words, the time zone
 of <code>x</code> is directly changed to the time zone of <code>origin</code> without changing the
-underlying numeric representation. <strong>It is highly advised to specify your own
+underlying numeric representation. <strong>It is highly advised to specify an
 <code>origin</code> value with the same time zone as <code>x</code>.</strong> If a <code>Date</code> is used for
 <code>x</code>, its time zone is assumed to be <code>"UTC"</code>.</p>
     <h2 class="hasAnchor" id="period"><a class="anchor" href="#period"></a>Period</h2>
@@ -250,22 +245,22 @@ to work with microseconds, by, say, bucketing them by millisecond distances.</p>
 <span class='co'># [1970-01-01 00:00:11, 1970-01-01 00:00:16) = 2</span>
 <span class='no'>origin</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.POSIXlt.html'>as.POSIXct</a></span>(<span class='st'>"1970-01-01 00:00:01"</span>, <span class='st'>"UTC"</span>)
 <span class='fu'>warp_distance</span>(<span class='no'>y</span>, <span class='st'>"second"</span>, <span class='kw'>every</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='no'>origin</span>)</div><div class='output co'>#&gt; [1] 0 0 0 0 1 1 2</div><div class='input'>
-<span class='co'># Differing time zones between `x` and `origin` can be particularly</span>
-<span class='co'># problematic. For this reason, if the time zones are different a warning</span>
-<span class='co'># is issued and `x` is coerced to the time zone of `origin`. The default</span>
-<span class='co'># `origin` time zone for the epoch is UTC.</span>
-<span class='no'>x_in_nyc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.POSIXlt.html'>as.POSIXct</a></span>(<span class='st'>"1970-01-01 01:00:00"</span>, <span class='st'>"America/New_York"</span>)
+<span class='co'># When `x` is not UTC and `origin` is left as `NULL`, the origin is set as</span>
+<span class='co'># 1970-01-01 00:00:00 in the time zone of `x`. This seems to be the most</span>
+<span class='co'># practically useful default.</span>
+<span class='no'>z</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.POSIXlt.html'>as.POSIXct</a></span>(<span class='st'>"1969-12-31 23:00:00"</span>, <span class='st'>"UTC"</span>)
+<span class='no'>z_in_nyc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.POSIXlt.html'>as.POSIXct</a></span>(<span class='st'>"1969-12-31 23:00:00"</span>, <span class='st'>"America/New_York"</span>)
 
-<span class='co'># The default origin is `1970-01-01 00:00:00 UTC`.</span>
-<span class='co'># We passed in a clock time 1 hour after that, but in a different time zone.</span>
-<span class='co'># America/New_York is 5 hours behind UTC, so when it is converted to</span>
-<span class='co'># UTC the value becomes `1970-01-01 06:00:00 UTC`</span>
-<span class='fu'>warp_distance</span>(<span class='no'>x_in_nyc</span>, <span class='st'>"hour"</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: `x` (America/New_York) and `origin` (UTC) do not have the same time zone. Converting `x` to the time zone of `origin`. It is highly advised to provide `x` and `origin` with the same time zone.</span></div><div class='output co'>#&gt; [1] 6</div><div class='input'>
-<span class='co'># We can use an origin value in our own time zone to fix this</span>
-<span class='co'># (it doesn't have to be 1970-01-01)</span>
-<span class='no'>origin</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.POSIXlt.html'>as.POSIXct</a></span>(<span class='st'>"1970-01-01"</span>, <span class='st'>"America/New_York"</span>)
-<span class='fu'>warp_distance</span>(<span class='no'>x_in_nyc</span>, <span class='st'>"hour"</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='no'>origin</span>)</div><div class='output co'>#&gt; [1] 1</div><div class='input'>
-</div></pre>
+<span class='co'># Practically this means that these give the same result, because their</span>
+<span class='co'># `origin` values are defined in their respective time zones.</span>
+<span class='fu'>warp_distance</span>(<span class='no'>z</span>, <span class='st'>"year"</span>)</div><div class='output co'>#&gt; [1] -1</div><div class='input'><span class='fu'>warp_distance</span>(<span class='no'>z_in_nyc</span>, <span class='st'>"year"</span>)</div><div class='output co'>#&gt; [1] -1</div><div class='input'>
+<span class='co'># Compare that to what would happen if we used a static `origin` of</span>
+<span class='co'># 1970-01-01 00:00:00 UTC.</span>
+<span class='co'># America/New_York is 5 hours behind UTC, so when `z_in_nyc` is converted to</span>
+<span class='co'># UTC the value becomes `1970-01-01 04:00:00 UTC`, a different year. Because</span>
+<span class='co'># this is generally surprising, a warning is thrown.</span>
+<span class='no'>origin</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.POSIXlt.html'>as.POSIXct</a></span>(<span class='st'>"1970-01-01 00:00:00"</span>, <span class='kw'>tz</span> <span class='kw'>=</span> <span class='st'>"UTC"</span>)
+<span class='fu'>warp_distance</span>(<span class='no'>z</span>, <span class='st'>"year"</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='no'>origin</span>)</div><div class='output co'>#&gt; [1] -1</div><div class='input'><span class='fu'>warp_distance</span>(<span class='no'>z_in_nyc</span>, <span class='st'>"year"</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='no'>origin</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: `x` (America/New_York) and `origin` (UTC) do not have the same time zone. Converting `x` to the time zone of `origin`. It is highly advised to provide `x` and `origin` with the same time zone.</span></div><div class='output co'>#&gt; [1] 0</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

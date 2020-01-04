@@ -144,16 +144,11 @@ value in <code>x</code> is always returned at the end.</p>
     </tr>
     <tr>
       <th>origin</th>
-      <td><p><code>[Date(1) / POSIXct(1) / POSIXlt(1)]</code></p>
+      <td><p><code>[Date(1) / POSIXct(1) / POSIXlt(1) / NULL]</code></p>
 <p>The reference date time value. The default when left as <code>NULL</code> is the
-Unix epoch of <code>1970-01-01 00:00:00 UTC</code>.</p>
-<p>This is used for two purposes:</p><ul>
-<li><p>Defining the anchor to count from when <code>every &gt; 1</code>.</p></li>
-<li><p>Aligning the time zone with the input. When the input vector and the
-<code>origin</code> have altering time zones, a warning is issued and the input
-is coerced to the time zone of the <code>origin</code>. It is highly advised to
-provide your own <code>origin</code> if your input is a POSIXct.</p></li>
-</ul></td>
+epoch time of <code>1970-01-01 00:00:00</code>, <em>in the time zone of <code>x</code></em>.</p>
+<p>This is generally used to define the anchor time to count from, which is
+relevant when <code>every &gt; 1</code>.</p></td>
     </tr>
     </table>
 
