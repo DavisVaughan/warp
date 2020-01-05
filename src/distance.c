@@ -276,16 +276,16 @@ static SEXP warp_distance_yday(SEXP x, int every, SEXP origin) {
     }
   }
 
-  SEXP day = PROTECT_N(get_yday_offset(x, every), &n_prot);
-  const int* p_day = INTEGER_RO(day);
+  SEXP yday = PROTECT_N(get_yday_offset(x, every), &n_prot);
+  const int* p_yday = INTEGER_RO(yday);
 
-  R_xlen_t size = Rf_xlength(day);
+  R_xlen_t size = Rf_xlength(yday);
 
   SEXP out = PROTECT_N(Rf_allocVector(REALSXP, size), &n_prot);
   double* p_out = REAL(out);
 
   for (R_xlen_t i = 0; i < size; ++i) {
-    int elt = p_day[i];
+    int elt = p_yday[i];
 
     if (elt == NA_INTEGER) {
       p_out[i] = NA_REAL;
