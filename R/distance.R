@@ -76,8 +76,8 @@
 #'
 #'   A string defining the period to group by. Valid inputs are:
 #'
-#'   `"year"`, `"quarter"`, `"month"`, `"week"`, `"yweek"`, `"day"`, `"hour"`,
-#'   `"minute"`, `"second"`, `"millisecond"`
+#'   `"year"`, `"quarter"`, `"month"`, `"week"`, `"yweek"`, `"day"`, `"yday"`,
+#'   `"hour"`, `"minute"`, `"second"`, `"millisecond"`
 #'
 #' @param every `[positive integer(1)]`
 #'
