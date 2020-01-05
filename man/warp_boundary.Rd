@@ -15,8 +15,8 @@ A date time vector.}
 
 A string defining the period to group by. Valid inputs are:
 
-\code{"year"}, \code{"quarter"}, \code{"month"}, \code{"week"}, \code{"day"}, \code{"hour"}, \code{"minute"},
-\code{"second"}, \code{"millisecond"}}
+\code{"year"}, \code{"quarter"}, \code{"month"}, \code{"week"}, \code{"yweek"}, \code{"day"}, \code{"hour"},
+\code{"minute"}, \code{"second"}, \code{"millisecond"}}
 
 \item{every}{\verb{[positive integer(1)]}
 

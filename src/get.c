@@ -15,7 +15,7 @@
  *   Extract the number of days offset from 1970.
  *   Return an integer vector.
  *
- * `get_week_offset()`
+ * `get_yweek_offset()`
  *   Extract the number of weeks offset from 1970, with a restart of the 7
  *   day counter every January 1st.
  *   Return an integer vector
@@ -261,42 +261,42 @@ static inline int days_before_year(int year) {
 
 // -----------------------------------------------------------------------------
 
-static SEXP posixct_get_week_offset(SEXP x);
-static SEXP posixlt_get_week_offset(SEXP x);
+static SEXP posixct_get_yweek_offset(SEXP x);
+static SEXP posixlt_get_yweek_offset(SEXP x);
 
 // [[ "utils.h" ]]
-SEXP get_week_offset(SEXP x) {
+SEXP get_yweek_offset(SEXP x) {
   switch(time_class_type(x)) {
-  case warp_class_date: return date_get_week_offset(x);
-  case warp_class_posixct: return posixct_get_week_offset(x);
-  case warp_class_posixlt: return posixlt_get_week_offset(x);
-  default: r_error("get_week_offset", "Internal error: Unknown date time class.");
+  case warp_class_date: return date_get_yweek_offset(x);
+  case warp_class_posixct: return posixct_get_yweek_offset(x);
+  case warp_class_posixlt: return posixlt_get_yweek_offset(x);
+  default: r_error("get_yweek_offset", "Internal error: Unknown date time class.");
   }
 }
 
-static SEXP posixct_get_week_offset(SEXP x) {
+static SEXP posixct_get_yweek_offset(SEXP x) {
   x = PROTECT(as_posixlt_from_posixct(x));
-  SEXP out = posixlt_get_week_offset(x);
+  SEXP out = posixlt_get_yweek_offset(x);
   UNPROTECT(1);
   return out;
 }
 
 #define WEEKS_IN_YEAR 53
 
-static SEXP posixlt_get_week_offset(SEXP x) {
+static SEXP posixlt_get_yweek_offset(SEXP x) {
   SEXP year = VECTOR_ELT(x, 5);
   SEXP yday = VECTOR_ELT(x, 7);
 
   if (TYPEOF(year) != INTSXP) {
     r_error(
-      "posixlt_get_week_offset",
+      "posixlt_get_yweek_offset",
       "Internal error: The 6th element of the POSIXlt object should be an integer."
     );
   }
 
   if (TYPEOF(yday) != INTSXP) {
     r_error(
-      "posixlt_get_week_offset",
+      "posixlt_get_yweek_offset",
       "Internal error: The 8th element of the POSIXlt object should be an integer."
     );
   }

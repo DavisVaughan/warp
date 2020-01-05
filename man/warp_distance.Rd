@@ -15,8 +15,8 @@ A date time vector.}
 
 A string defining the period to group by. Valid inputs are:
 
-\code{"year"}, \code{"quarter"}, \code{"month"}, \code{"week"}, \code{"day"}, \code{"hour"}, \code{"minute"},
-\code{"second"}, \code{"millisecond"}}
+\code{"year"}, \code{"quarter"}, \code{"month"}, \code{"week"}, \code{"yweek"}, \code{"day"}, \code{"hour"},
+\code{"minute"}, \code{"second"}, \code{"millisecond"}}
 
 \item{every}{\verb{[positive integer(1)]}
 
@@ -82,10 +82,10 @@ The \code{period} value of \code{"quarter"} is internally
 the month specified for the \code{origin} will be used as the month to start
 counting from to generate the 3 month quarter.
 
-The \code{period} value of \code{"week"} is computed in the same way as
+The \code{period} value of \code{"yweek"} is computed in the same way as
 \code{lubridate::week()}. Week groups are defined as complete 7 day periods,
 with the 7 day counter resetting every January 1st. To mimic the behavior
-of \code{lubridate::floor_date()}, use \code{period = "day"} and multiply \code{every} by 7.
+of \code{lubridate::floor_date()}, use \code{period = "week"}.
 To mimic the \code{week_start} argument of \code{floor_date()}, set \code{origin} to a date
 with a week day identical to the one you want the week to start from. For
 example, the default origin of \code{1970-01-01} is a Thursday, so this would be

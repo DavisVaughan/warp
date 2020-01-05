@@ -48,10 +48,10 @@
 #' the month specified for the `origin` will be used as the month to start
 #' counting from to generate the 3 month quarter.
 #'
-#' The `period` value of `"week"` is computed in the same way as
+#' The `period` value of `"yweek"` is computed in the same way as
 #' `lubridate::week()`. Week groups are defined as complete 7 day periods,
 #' with the 7 day counter resetting every January 1st. To mimic the behavior
-#' of `lubridate::floor_date()`, use `period = "day"` and multiply `every` by 7.
+#' of `lubridate::floor_date()`, use `period = "week"`.
 #' To mimic the `week_start` argument of `floor_date()`, set `origin` to a date
 #' with a week day identical to the one you want the week to start from. For
 #' example, the default origin of `1970-01-01` is a Thursday, so this would be
@@ -76,8 +76,8 @@
 #'
 #'   A string defining the period to group by. Valid inputs are:
 #'
-#'   `"year"`, `"quarter"`, `"month"`, `"week"`, `"day"`, `"hour"`, `"minute"`,
-#'   `"second"`, `"millisecond"`
+#'   `"year"`, `"quarter"`, `"month"`, `"week"`, `"yweek"`, `"day"`, `"hour"`,
+#'   `"minute"`, `"second"`, `"millisecond"`
 #'
 #' @param every `[positive integer(1)]`
 #'

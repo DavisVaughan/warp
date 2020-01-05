@@ -14,7 +14,9 @@ enum warp_period_type {
   warp_period_quarter,
   warp_period_month,
   warp_period_week,
+  warp_period_yweek,
   warp_period_day,
+  warp_period_yday,
   warp_period_hour,
   warp_period_minute,
   warp_period_second,
@@ -53,12 +55,12 @@ SEXP as_date(SEXP x);
 SEXP get_year_offset(SEXP x);
 SEXP get_month_offset(SEXP x);
 SEXP get_day_offset(SEXP x);
-SEXP get_week_offset(SEXP x);
+SEXP get_yweek_offset(SEXP x);
 
 // In `date.c`
 SEXP date_get_year_offset(SEXP x);
 SEXP date_get_month_offset(SEXP x);
-SEXP date_get_week_offset(SEXP x);
+SEXP date_get_yweek_offset(SEXP x);
 
 // In `coercion.c`
 SEXP as_datetime(SEXP x);

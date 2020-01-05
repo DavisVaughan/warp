@@ -173,21 +173,21 @@ static SEXP dbl_date_get_month_offset(SEXP x) {
 
 // -----------------------------------------------------------------------------
 
-static SEXP int_date_get_week_offset(SEXP x);
-static SEXP dbl_date_get_week_offset(SEXP x);
+static SEXP int_date_get_yweek_offset(SEXP x);
+static SEXP dbl_date_get_yweek_offset(SEXP x);
 
 // [[ include("utils.h") ]]
-SEXP date_get_week_offset(SEXP x) {
+SEXP date_get_yweek_offset(SEXP x) {
   switch (TYPEOF(x)) {
-  case INTSXP: return int_date_get_week_offset(x);
-  case REALSXP: return dbl_date_get_week_offset(x);
-  default: r_error("date_get_week_offset", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
+  case INTSXP: return int_date_get_yweek_offset(x);
+  case REALSXP: return dbl_date_get_yweek_offset(x);
+  default: r_error("date_get_yweek_offset", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
   }
 }
 
 // [[ register() ]]
-SEXP warp_date_get_week_offset(SEXP x) {
-  return date_get_week_offset(x);
+SEXP warp_date_get_yweek_offset(SEXP x) {
+  return date_get_yweek_offset(x);
 }
 
 // In non leap years there are 52 weeks + 1 day
@@ -195,7 +195,7 @@ SEXP warp_date_get_week_offset(SEXP x) {
 // So there are always 53 week groups
 #define WEEKS_IN_YEAR 53
 
-static SEXP int_date_get_week_offset(SEXP x) {
+static SEXP int_date_get_yweek_offset(SEXP x) {
   int* p_x = INTEGER(x);
 
   R_xlen_t size = Rf_xlength(x);
@@ -220,7 +220,7 @@ static SEXP int_date_get_week_offset(SEXP x) {
   return out;
 }
 
-static SEXP dbl_date_get_week_offset(SEXP x) {
+static SEXP dbl_date_get_yweek_offset(SEXP x) {
   double* p_x = REAL(x);
 
   R_xlen_t size = Rf_xlength(x);

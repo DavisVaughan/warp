@@ -17,6 +17,7 @@ static SEXP warp_distance_year(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_quarter(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_month(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_week(SEXP x, int every, SEXP origin);
+static SEXP warp_distance_yweek(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_day(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_hour(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_minute(SEXP x, int every, SEXP origin);
@@ -45,6 +46,7 @@ SEXP warp_distance(SEXP x, enum warp_period_type type, int every, SEXP origin) {
   case warp_period_quarter: out = PROTECT(warp_distance_quarter(x, every, origin)); break;
   case warp_period_month: out = PROTECT(warp_distance_month(x, every, origin)); break;
   case warp_period_week: out = PROTECT(warp_distance_week(x, every, origin)); break;
+  case warp_period_yweek: out = PROTECT(warp_distance_yweek(x, every, origin)); break;
   case warp_period_day: out = PROTECT(warp_distance_day(x, every, origin)); break;
   case warp_period_hour: out = PROTECT(warp_distance_hour(x, every, origin)); break;
   case warp_period_minute: out = PROTECT(warp_distance_minute(x, every, origin)); break;
@@ -187,6 +189,12 @@ static SEXP warp_distance_month(SEXP x, int every, SEXP origin) {
 // -----------------------------------------------------------------------------
 
 static SEXP warp_distance_week(SEXP x, int every, SEXP origin) {
+  return warp_distance_day(x, every * 7, origin);
+}
+
+// -----------------------------------------------------------------------------
+
+static SEXP warp_distance_yweek(SEXP x, int every, SEXP origin) {
   int n_prot = 0;
 
   bool needs_offset = (origin != R_NilValue);
@@ -194,26 +202,26 @@ static SEXP warp_distance_week(SEXP x, int every, SEXP origin) {
   int origin_offset;
 
   if (needs_offset) {
-    SEXP origin_offset_sexp = PROTECT_N(get_week_offset(origin), &n_prot);
+    SEXP origin_offset_sexp = PROTECT_N(get_yweek_offset(origin), &n_prot);
     origin_offset = INTEGER(origin_offset_sexp)[0];
 
     if (origin_offset == NA_INTEGER) {
-      r_error("warp_distance_week", "`origin` cannot be `NA`.");
+      r_error("warp_distance_yweek", "`origin` cannot be `NA`.");
     }
   }
 
   bool needs_every = (every != 1);
 
-  SEXP week = PROTECT_N(get_week_offset(x), &n_prot);
-  const int* p_week = INTEGER_RO(week);
+  SEXP yweek = PROTECT_N(get_yweek_offset(x), &n_prot);
+  const int* p_yweek = INTEGER_RO(yweek);
 
-  R_xlen_t size = Rf_xlength(week);
+  R_xlen_t size = Rf_xlength(yweek);
 
   SEXP out = PROTECT_N(Rf_allocVector(REALSXP, size), &n_prot);
   double* p_out = REAL(out);
 
   for (R_xlen_t i = 0; i < size; ++i) {
-    int elt = p_week[i];
+    int elt = p_yweek[i];
 
     if (elt == NA_INTEGER) {
       p_out[i] = NA_REAL;

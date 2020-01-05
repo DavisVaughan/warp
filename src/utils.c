@@ -135,8 +135,16 @@ enum warp_period_type as_period_type(SEXP period) {
     return warp_period_week;
   }
 
+  if (str_equal(type, "yweek")) {
+    return warp_period_yweek;
+  }
+
   if (str_equal(type, "day") || str_equal(type, "days") || str_equal(type, "daily")) {
     return warp_period_day;
+  }
+
+  if (str_equal(type, "yday")) {
+    return warp_period_yday;
   }
 
   if (str_equal(type, "hour") || str_equal(type, "hours") || str_equal(type, "hourly")) {
