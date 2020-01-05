@@ -1534,6 +1534,24 @@ test_that("default `origin` results in epoch in the time zone of `x`", {
   )
 })
 
+test_that("half-hour offset time zones are correct (#13)", {
+  chr <- c(
+    "1970-01-01 00:00:00",
+    "1970-01-01 00:50:00",
+    "1970-01-01 01:00:00",
+    "1970-01-01 01:20:00",
+    "1970-01-01 01:30:00"
+  )
+
+  x <- as.POSIXct(chr, "Asia/Kolkata")
+  y <- as.POSIXct(chr, "UTC")
+
+  expect_equal(
+    warp_distance(x, period = "hour"),
+    warp_distance(y, period = "hour")
+  )
+})
+
 # ------------------------------------------------------------------------------
 # warp_distance(<POSIXlt>, period = "hour")
 
