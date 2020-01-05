@@ -261,42 +261,43 @@ static inline int days_before_year(int year) {
 
 // -----------------------------------------------------------------------------
 
-static SEXP posixct_get_yweek_offset(SEXP x);
-static SEXP posixlt_get_yweek_offset(SEXP x);
+static SEXP posixct_get_yday_offset(SEXP x, int every);
+static SEXP posixlt_get_yday_offset(SEXP x, int every);
 
 // [[ "utils.h" ]]
-SEXP get_yweek_offset(SEXP x) {
+SEXP get_yday_offset(SEXP x, int every) {
   switch(time_class_type(x)) {
-  case warp_class_date: return date_get_yweek_offset(x);
-  case warp_class_posixct: return posixct_get_yweek_offset(x);
-  case warp_class_posixlt: return posixlt_get_yweek_offset(x);
-  default: r_error("get_yweek_offset", "Internal error: Unknown date time class.");
+  case warp_class_date: return date_get_yday_offset(x, every);
+  case warp_class_posixct: return posixct_get_yday_offset(x, every);
+  case warp_class_posixlt: return posixlt_get_yday_offset(x, every);
+  default: r_error("get_yday_offset", "Internal error: Unknown date time class.");
   }
 }
 
-static SEXP posixct_get_yweek_offset(SEXP x) {
+static SEXP posixct_get_yday_offset(SEXP x, int every) {
   x = PROTECT(as_posixlt_from_posixct(x));
-  SEXP out = posixlt_get_yweek_offset(x);
+  SEXP out = posixlt_get_yday_offset(x, every);
   UNPROTECT(1);
   return out;
 }
 
-#define WEEKS_IN_YEAR 53
+#define DAYS_IN_YEAR 365
+#define DAYS_IN_LEAP_YEAR 366
 
-static SEXP posixlt_get_yweek_offset(SEXP x) {
+static SEXP posixlt_get_yday_offset(SEXP x, int every) {
   SEXP year = VECTOR_ELT(x, 5);
   SEXP yday = VECTOR_ELT(x, 7);
 
   if (TYPEOF(year) != INTSXP) {
     r_error(
-      "posixlt_get_yweek_offset",
+      "posixlt_get_yday_offset",
       "Internal error: The 6th element of the POSIXlt object should be an integer."
     );
   }
 
   if (TYPEOF(yday) != INTSXP) {
     r_error(
-      "posixlt_get_yweek_offset",
+      "posixlt_get_yday_offset",
       "Internal error: The 8th element of the POSIXlt object should be an integer."
     );
   }
@@ -309,17 +310,27 @@ static SEXP posixlt_get_yweek_offset(SEXP x) {
   SEXP out = PROTECT(Rf_allocVector(INTSXP, size));
   int* p_out = INTEGER(out);
 
+  int units_in_non_leap_year = (DAYS_IN_YEAR - 1) / every + 1;
+  int units_in_leap_year = (DAYS_IN_LEAP_YEAR - 1) / every + 1;
+
   for (R_xlen_t i = 0; i < size; ++i) {
     if (p_year[i] == NA_INTEGER) {
       p_out[i] = NA_INTEGER;
       continue;
     }
 
-    p_out[i] = (p_year[i] - 70) * WEEKS_IN_YEAR + p_yday[i] / 7;
+    int day_units_before_year = units_before_year(
+      p_year[i] - 70,
+      units_in_non_leap_year,
+      units_in_leap_year
+    );
+
+    p_out[i] = day_units_before_year + p_yday[i] / every;
   }
 
   UNPROTECT(1);
   return out;
 }
 
-#undef WEEKS_IN_YEAR
+#undef DAYS_IN_YEAR
+#undef DAYS_IN_LEAP_YEAR

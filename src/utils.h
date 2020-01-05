@@ -51,20 +51,25 @@ SEXP as_posixct_from_posixlt(SEXP x);
 SEXP as_posixlt_from_posixct(SEXP x);
 SEXP as_date(SEXP x);
 
+int units_before_year(int year_offset,
+                      int units_in_non_leap_year,
+                      int units_in_leap_year);
+
 // In `get.c`
 SEXP get_year_offset(SEXP x);
 SEXP get_month_offset(SEXP x);
 SEXP get_day_offset(SEXP x);
-SEXP get_yweek_offset(SEXP x);
+SEXP get_yday_offset(SEXP x, int every);
 
 // In `date.c`
 SEXP date_get_year_offset(SEXP x);
 SEXP date_get_month_offset(SEXP x);
-SEXP date_get_yweek_offset(SEXP x);
+SEXP date_get_yday_offset(SEXP x, int every);
 
 // In `coercion.c`
 SEXP as_datetime(SEXP x);
 
+// In `timezone.c`
 SEXP get_origin_epoch_in_time_zone(SEXP x);
 SEXP convert_time_zone(SEXP x, SEXP origin);
 

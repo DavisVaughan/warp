@@ -173,35 +173,31 @@ static SEXP dbl_date_get_month_offset(SEXP x) {
 
 // -----------------------------------------------------------------------------
 
-static SEXP int_date_get_yweek_offset(SEXP x);
-static SEXP dbl_date_get_yweek_offset(SEXP x);
+static SEXP int_date_get_yday_offset(SEXP x, int every);
+static SEXP dbl_date_get_yday_offset(SEXP x, int every);
 
 // [[ include("utils.h") ]]
-SEXP date_get_yweek_offset(SEXP x) {
+SEXP date_get_yday_offset(SEXP x, int every) {
   switch (TYPEOF(x)) {
-  case INTSXP: return int_date_get_yweek_offset(x);
-  case REALSXP: return dbl_date_get_yweek_offset(x);
-  default: r_error("date_get_yweek_offset", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
+  case INTSXP: return int_date_get_yday_offset(x, every);
+  case REALSXP: return dbl_date_get_yday_offset(x, every);
+  default: r_error("date_get_yday_offset", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
   }
 }
 
-// [[ register() ]]
-SEXP warp_date_get_yweek_offset(SEXP x) {
-  return date_get_yweek_offset(x);
-}
+#define DAYS_IN_YEAR 365
+#define DAYS_IN_LEAP_YEAR 366
 
-// In non leap years there are 52 weeks + 1 day
-// In leap years there are 52 weeks + 2 days
-// So there are always 53 week groups
-#define WEEKS_IN_YEAR 53
-
-static SEXP int_date_get_yweek_offset(SEXP x) {
+static SEXP int_date_get_yday_offset(SEXP x, int every) {
   int* p_x = INTEGER(x);
 
   R_xlen_t size = Rf_xlength(x);
 
   SEXP out = PROTECT(Rf_allocVector(INTSXP, size));
   int* p_out = INTEGER(out);
+
+  int units_in_non_leap_year = (DAYS_IN_YEAR - 1) / every + 1;
+  int units_in_leap_year = (DAYS_IN_LEAP_YEAR - 1) / every + 1;
 
   for (R_xlen_t i = 0; i < size; ++i) {
     int elt = p_x[i];
@@ -213,20 +209,29 @@ static SEXP int_date_get_yweek_offset(SEXP x) {
 
     struct warp_components components = convert_days_to_components(elt);
 
-    p_out[i] = components.year * WEEKS_IN_YEAR + components.yday / 7;
+    int day_units_before_year = units_before_year(
+      components.year,
+      units_in_non_leap_year,
+      units_in_leap_year
+    );
+
+    p_out[i] = day_units_before_year + components.yday / every;
   }
 
   UNPROTECT(1);
   return out;
 }
 
-static SEXP dbl_date_get_yweek_offset(SEXP x) {
+static SEXP dbl_date_get_yday_offset(SEXP x, int every) {
   double* p_x = REAL(x);
 
   R_xlen_t size = Rf_xlength(x);
 
   SEXP out = PROTECT(Rf_allocVector(INTSXP, size));
   int* p_out = INTEGER(out);
+
+  int units_in_non_leap_year = (DAYS_IN_YEAR - 1) / every + 1;
+  int units_in_leap_year = (DAYS_IN_LEAP_YEAR - 1) / every + 1;
 
   for (R_xlen_t i = 0; i < size; ++i) {
     double x_elt = p_x[i];
@@ -241,14 +246,21 @@ static SEXP dbl_date_get_yweek_offset(SEXP x) {
 
     struct warp_components components = convert_days_to_components(elt);
 
-    p_out[i] = components.year * WEEKS_IN_YEAR + components.yday / 7;
+    int day_units_before_year = units_before_year(
+      components.year,
+      units_in_non_leap_year,
+      units_in_leap_year
+    );
+
+    p_out[i] = day_units_before_year + components.yday / every;
   }
 
   UNPROTECT(1);
   return out;
 }
 
-#undef WEEKS_IN_YEAR
+#undef DAYS_IN_YEAR
+#undef DAYS_IN_LEAP_YEAR
 
 // -----------------------------------------------------------------------------
 
@@ -339,8 +351,6 @@ static struct warp_components convert_days_to_components(int n) {
   divmod(n, DAYS_IN_4_YEAR_CYCLE, &n_4_year_cycles, &n);
   divmod(n, DAYS_IN_1_YEAR_CYCLE, &n_1_year_cycles, &n);
 
-  components.yday = n;
-
   int year = 1 +
     n_400_year_cycles * 400 +
     n_100_year_cycles * 100 +
@@ -353,8 +363,11 @@ static struct warp_components convert_days_to_components(int n) {
     components.year = (year - 1) + YEAR_OFFSET_FROM_EPOCH;
     components.month = 12 + MONTH_ADJUSTMENT_TO_0_TO_11_RANGE;
     components.day = 31 + DAY_ADJUSTMENT_TO_0_TO_30_RANGE;
+    components.yday = 365;
     return components;
   }
+
+  components.yday = n;
 
   bool is_leap_year = (n_1_year_cycles == 3) &&
     (n_4_year_cycles != 24 || n_100_year_cycles == 3);
