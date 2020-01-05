@@ -15,10 +15,10 @@
  *   Extract the number of days offset from 1970.
  *   Return an integer vector.
  *
- * `get_yweek_offset()`
- *   Extract the number of weeks offset from 1970, with a restart of the 7
+ * `get_yday_offset()`
+ *   Extract the number of days offset from 1970, with a restart of the 7
  *   day counter every January 1st.
- *   Return an integer vector
+ *   Return an integer vector.
  */
 
 // -----------------------------------------------------------------------------
