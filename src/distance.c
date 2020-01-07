@@ -638,8 +638,6 @@ static SEXP posixct_warp_distance_mday(SEXP x, int every, SEXP origin) {
 
 static const int DAYS_IN_MONTH[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 static const int DAYS_IN_MONTH_LEAP[12] = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-static const int DAYS_UP_TO_MONTH[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
-static const int DAYS_UP_TO_MONTH_LEAP[12] = {0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335};
 
 #define is_leap_year(year) ((((year) % 4) == 0 && ((year) % 100) != 0) || ((year) % 400) == 0)
 
@@ -770,6 +768,8 @@ static SEXP dbl_date_warp_distance_mday(SEXP x, int every, SEXP origin) {
   UNPROTECT(1);
   return out;
 }
+
+#undef is_leap_year
 
 static void fill_units_per_month(int* x, int every) {
   for (int i = 0; i < 12; ++i) {
