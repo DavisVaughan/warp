@@ -85,10 +85,6 @@ SEXP as_posixct_from_posixlt(SEXP x);
 SEXP as_posixlt_from_posixct(SEXP x);
 SEXP as_date(SEXP x);
 
-int units_before_year(int year_offset,
-                      int units_in_non_leap_year,
-                      int units_in_leap_year);
-
 // In `get.c`
 SEXP get_year_offset(SEXP x);
 SEXP get_month_offset(SEXP x);

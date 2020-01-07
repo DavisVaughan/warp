@@ -105,50 +105,6 @@ int pull_every(SEXP every) {
 
 // -----------------------------------------------------------------------------
 
-static inline int leap_years_before_year(int year);
-
-/*
- * Compute the number of units of something between 1970-01-01 and your year
- * of interest, accounting for leap years.
- *
- * @param year_offset
- *   The number of years since 1970-01-01, 0-based.
- * @param units_in_non_leap_year
- *   The number of units of your parameter of interest in non-leap years.
- * @param units_in_leap_year
- *   The number of units of your parameter of interest in leap years.
- */
-// [[ include("utils.h") ]]
-int units_before_year(int year_offset,
-                      int units_in_non_leap_year,
-                      int units_in_leap_year) {
-
-  int n_leap_years_before_year = leap_years_before_year(year_offset + 1969);
-  int n_non_leap_years_before_year = year_offset - n_leap_years_before_year;
-
-  int out =
-    n_leap_years_before_year * units_in_leap_year +
-    n_non_leap_years_before_year * units_in_non_leap_year;
-
-  return out;
-}
-
-// sum(lubridate::leap_year(as.Date("0001-01-01") + lubridate::years(0:1969)))
-#define LEAP_YEARS_FROM_0001_01_01_TO_EPOCH 477
-
-static inline int leap_years_before_year(int year) {
-  int n_leap_years =
-    int_div(year, 4) -
-    int_div(year, 100) +
-    int_div(year, 400);
-
-  return n_leap_years - LEAP_YEARS_FROM_0001_01_01_TO_EPOCH;
-}
-
-#undef LEAP_YEARS_FROM_0001_01_01_TO_EPOCH
-
-// -----------------------------------------------------------------------------
-
 // [[ include("utils.h") ]]
 bool str_equal(const char* x, const char* y) {
   return strcmp(x, y) == 0;
