@@ -357,22 +357,3 @@ struct warp_components convert_days_to_components(int n) {
 #undef DAYS_IN_4_YEAR_CYCLE
 #undef DAYS_IN_100_YEAR_CYCLE
 #undef DAYS_IN_400_YEAR_CYCLE
-
-// -----------------------------------------------------------------------------
-
-// [[ export() ]]
-SEXP warp_convert_days_to_components(SEXP n) {
-  int n_ = INTEGER(n)[0];
-
-  struct warp_components components = convert_days_to_components(n_);
-
-  SEXP out = PROTECT(Rf_allocVector(INTSXP, 4));
-
-  INTEGER(out)[0] = components.year_offset;
-  INTEGER(out)[1] = components.month;
-  INTEGER(out)[2] = components.day;
-  INTEGER(out)[3] = components.yday;
-
-  UNPROTECT(1);
-  return out;
-}
