@@ -1438,15 +1438,15 @@ test_that("can ignore fractional pieces in Dates", {
 test_that("size 0 input works - integer Dates", {
   x <- structure(integer(), class = "Date")
 
-  expect_equal(warp_distance(x, period = "hour"), numeric())
-  expect_equal(warp_distance(x, period = "hour", every = 2), numeric())
+  expect_identical(warp_distance(x, period = "hour"), numeric())
+  expect_identical(warp_distance(x, period = "hour", every = 2), numeric())
 })
 
 test_that("size 0 input works - numeric Dates", {
   x <- structure(numeric(), class = "Date")
 
-  expect_equal(warp_distance(x, period = "hour"), numeric())
-  expect_equal(warp_distance(x, period = "hour", every = 2), numeric())
+  expect_identical(warp_distance(x, period = "hour"), numeric())
+  expect_identical(warp_distance(x, period = "hour", every = 2), numeric())
 })
 
 # ------------------------------------------------------------------------------
@@ -1718,6 +1718,17 @@ test_that("half-hour offset time zones are correct (#13)", {
   expect_equal(
     warp_distance(x, period = "hour"),
     warp_distance(y, period = "hour")
+  )
+})
+
+test_that("can have an integer POSIXct origin", {
+  x <- new_datetime(60 * 60, "UTC")
+
+  origin <- structure(0L, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+
+  expect_identical(
+    warp_distance(x, period = "hour", origin = origin),
+    1
   )
 })
 
