@@ -1,5 +1,6 @@
 #include "warp.h"
 #include "utils.h"
+#include "divmod.h"
 #include <stdint.h> // For int64_t (especially on Windows)
 
 // Helpers defined at the bottom of the file
@@ -17,7 +18,9 @@ static SEXP warp_distance_year(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_quarter(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_month(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_week(SEXP x, int every, SEXP origin);
+static SEXP warp_distance_yweek(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_day(SEXP x, int every, SEXP origin);
+static SEXP warp_distance_yday(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_hour(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_minute(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_second(SEXP x, int every, SEXP origin);
@@ -45,7 +48,9 @@ SEXP warp_distance(SEXP x, enum warp_period_type type, int every, SEXP origin) {
   case warp_period_quarter: out = PROTECT(warp_distance_quarter(x, every, origin)); break;
   case warp_period_month: out = PROTECT(warp_distance_month(x, every, origin)); break;
   case warp_period_week: out = PROTECT(warp_distance_week(x, every, origin)); break;
+  case warp_period_yweek: out = PROTECT(warp_distance_yweek(x, every, origin)); break;
   case warp_period_day: out = PROTECT(warp_distance_day(x, every, origin)); break;
+  case warp_period_yday: out = PROTECT(warp_distance_yday(x, every, origin)); break;
   case warp_period_hour: out = PROTECT(warp_distance_hour(x, every, origin)); break;
   case warp_period_minute: out = PROTECT(warp_distance_minute(x, every, origin)); break;
   case warp_period_second: out = PROTECT(warp_distance_second(x, every, origin)); break;
@@ -187,59 +192,20 @@ static SEXP warp_distance_month(SEXP x, int every, SEXP origin) {
 // -----------------------------------------------------------------------------
 
 static SEXP warp_distance_week(SEXP x, int every, SEXP origin) {
-  int n_prot = 0;
+  return warp_distance_day(x, every * 7, origin);
+}
 
-  bool needs_offset = (origin != R_NilValue);
+// -----------------------------------------------------------------------------
 
-  int origin_offset;
-
-  if (needs_offset) {
-    SEXP origin_offset_sexp = PROTECT_N(get_week_offset(origin), &n_prot);
-    origin_offset = INTEGER(origin_offset_sexp)[0];
-
-    if (origin_offset == NA_INTEGER) {
-      r_error("warp_distance_week", "`origin` cannot be `NA`.");
-    }
+static SEXP warp_distance_yweek(SEXP x, int every, SEXP origin) {
+  if (every > 52) {
+    r_error(
+      "warp_distance_yweek",
+      "The maximum allowed value of `every` for `period = 'yweek'` is 52."
+    );
   }
 
-  bool needs_every = (every != 1);
-
-  SEXP week = PROTECT_N(get_week_offset(x), &n_prot);
-  const int* p_week = INTEGER_RO(week);
-
-  R_xlen_t size = Rf_xlength(week);
-
-  SEXP out = PROTECT_N(Rf_allocVector(REALSXP, size), &n_prot);
-  double* p_out = REAL(out);
-
-  for (R_xlen_t i = 0; i < size; ++i) {
-    int elt = p_week[i];
-
-    if (elt == NA_INTEGER) {
-      p_out[i] = NA_REAL;
-      continue;
-    }
-
-    if (needs_offset) {
-      elt -= origin_offset;
-    }
-
-    if (!needs_every) {
-      p_out[i] = elt;
-      continue;
-    }
-
-    if (elt < 0) {
-      elt = (elt - (every - 1)) / every;
-    } else {
-      elt = elt / every;
-    }
-
-    p_out[i] = elt;
-  }
-
-  UNPROTECT(n_prot);
-  return out;
+  return warp_distance_yday(x, every * 7, origin);
 }
 
 // -----------------------------------------------------------------------------
@@ -299,6 +265,332 @@ static SEXP warp_distance_day(SEXP x, int every, SEXP origin) {
   UNPROTECT(n_prot);
   return out;
 }
+
+// -----------------------------------------------------------------------------
+
+static SEXP date_warp_distance_yday(SEXP x, int every, SEXP origin);
+static SEXP posixct_warp_distance_yday(SEXP x, int every, SEXP origin);
+static SEXP posixlt_warp_distance_yday(SEXP x, int every, SEXP origin);
+
+static SEXP warp_distance_yday(SEXP x, int every, SEXP origin) {
+  if (every > 364) {
+    r_error(
+      "warp_distance_yday",
+      "The maximum allowed value of `every` for `period = 'yday'` is 364."
+    );
+  }
+
+  switch (time_class_type(x)) {
+  case warp_class_date: return date_warp_distance_yday(x, every, origin);
+  case warp_class_posixct: return posixct_warp_distance_yday(x, every, origin);
+  case warp_class_posixlt: return posixlt_warp_distance_yday(x, every, origin);
+  default: r_error("warp_distance_yday", "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
+  }
+}
+
+
+static SEXP int_date_warp_distance_yday(SEXP x, int every, SEXP origin);
+static SEXP dbl_date_warp_distance_yday(SEXP x, int every, SEXP origin);
+
+static SEXP date_warp_distance_yday(SEXP x, int every, SEXP origin) {
+  switch (TYPEOF(x)) {
+  case INTSXP: return int_date_warp_distance_yday(x, every, origin);
+  case REALSXP: return dbl_date_warp_distance_yday(x, every, origin);
+  default: r_error("date_warp_distance_yday", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
+  }
+}
+
+
+static SEXP posixct_warp_distance_yday(SEXP x, int every, SEXP origin) {
+  x = PROTECT(as_posixlt_from_posixct(x));
+  SEXP out = posixlt_warp_distance_yday(x, every, origin);
+  UNPROTECT(1);
+  return out;
+}
+
+#define DAYS_IN_YEAR 365
+#define DAYS_IN_LEAP_YEAR 366
+#define is_leap_year(year) ((((year) % 4) == 0 && ((year) % 100) != 0) || ((year) % 400) == 0)
+
+static int compute_yday_distance(int days_since_epoch,
+                                 int year_offset,
+                                 int yday,
+                                 int origin_year_offset,
+                                 int origin_yday,
+                                 int origin_leap,
+                                 int units_in_leap_year,
+                                 int units_in_non_leap_year,
+                                 int every);
+
+static inline int days_before_year(int year_offset);
+
+static SEXP posixlt_warp_distance_yday(SEXP x, int every, SEXP origin) {
+  SEXP year = VECTOR_ELT(x, 5);
+  SEXP yday = VECTOR_ELT(x, 7);
+
+  if (TYPEOF(year) != INTSXP) {
+    r_error(
+      "posixlt_warp_distance_yday",
+      "Internal error: The 6th element of the POSIXlt object should be an integer."
+    );
+  }
+
+  if (TYPEOF(yday) != INTSXP) {
+    r_error(
+      "posixlt_warp_distance_yday",
+      "Internal error: The 8th element of the POSIXlt object should be an integer."
+    );
+  }
+
+  int* p_year = INTEGER(year);
+  int* p_yday = INTEGER(yday);
+
+  R_xlen_t size = Rf_xlength(year);
+
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, size));
+  double* p_out = REAL(out);
+
+  int units_in_non_leap_year = (DAYS_IN_YEAR - 1) / every + 1;
+  int units_in_leap_year = (DAYS_IN_LEAP_YEAR - 1) / every + 1;
+
+  struct warp_yday_components origin_components = get_origin_yday_components(origin);
+  int origin_year_offset = origin_components.year_offset;
+  int origin_yday = origin_components.yday;
+  bool origin_leap = is_leap_year(origin_year_offset + 1970);
+
+  for (R_xlen_t i = 0; i < size; ++i) {
+    if (p_year[i] == NA_INTEGER) {
+      p_out[i] = NA_REAL;
+      continue;
+    }
+
+    int year_offset = p_year[i] - 70;
+    int yday = p_yday[i];
+
+    int days_since_epoch = days_before_year(year_offset) + yday;
+
+    p_out[i] = compute_yday_distance(
+      days_since_epoch,
+      year_offset,
+      yday,
+      origin_year_offset,
+      origin_yday,
+      origin_leap,
+      units_in_leap_year,
+      units_in_non_leap_year,
+      every
+    );
+  }
+
+  UNPROTECT(1);
+  return out;
+}
+
+static SEXP int_date_warp_distance_yday(SEXP x, int every, SEXP origin) {
+  int* p_x = INTEGER(x);
+
+  R_xlen_t size = Rf_xlength(x);
+
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, size));
+  double* p_out = REAL(out);
+
+  int units_in_non_leap_year = (DAYS_IN_YEAR - 1) / every + 1;
+  int units_in_leap_year = (DAYS_IN_LEAP_YEAR - 1) / every + 1;
+
+  struct warp_yday_components origin_components = get_origin_yday_components(origin);
+  int origin_year_offset = origin_components.year_offset;
+  int origin_yday = origin_components.yday;
+  bool origin_leap = is_leap_year(origin_year_offset + 1970);
+
+  for (R_xlen_t i = 0; i < size; ++i) {
+    int elt = p_x[i];
+
+    if (elt == NA_INTEGER) {
+      p_out[i] = NA_REAL;
+      continue;
+    }
+
+    struct warp_components components = convert_days_to_components(elt);
+
+    p_out[i] = compute_yday_distance(
+      elt,
+      components.year_offset,
+      components.yday,
+      origin_year_offset,
+      origin_yday,
+      origin_leap,
+      units_in_leap_year,
+      units_in_non_leap_year,
+      every
+    );
+  }
+
+  UNPROTECT(1);
+  return out;
+}
+
+static SEXP dbl_date_warp_distance_yday(SEXP x, int every, SEXP origin) {
+  double* p_x = REAL(x);
+
+  R_xlen_t size = Rf_xlength(x);
+
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, size));
+  double* p_out = REAL(out);
+
+  int units_in_non_leap_year = (DAYS_IN_YEAR - 1) / every + 1;
+  int units_in_leap_year = (DAYS_IN_LEAP_YEAR - 1) / every + 1;
+
+  struct warp_yday_components origin_components = get_origin_yday_components(origin);
+  int origin_year_offset = origin_components.year_offset;
+  int origin_yday = origin_components.yday;
+  bool origin_leap = is_leap_year(origin_year_offset + 1970);
+
+  for (R_xlen_t i = 0; i < size; ++i) {
+    double x_elt = p_x[i];
+
+    if (!R_FINITE(x_elt)) {
+      p_out[i] = NA_REAL;
+      continue;
+    }
+
+    // Truncate fractional pieces towards 0
+    int elt = x_elt;
+
+    struct warp_components components = convert_days_to_components(elt);
+
+    p_out[i] = compute_yday_distance(
+      elt,
+      components.year_offset,
+      components.yday,
+      origin_year_offset,
+      origin_yday,
+      origin_leap,
+      units_in_leap_year,
+      units_in_non_leap_year,
+      every
+    );
+  }
+
+  UNPROTECT(1);
+  return out;
+}
+
+#undef DAYS_IN_YEAR
+#undef DAYS_IN_LEAP_YEAR
+
+static inline int leap_years_before_and_including_year(int year_offset);
+static inline int yday_leap_adjustment(int year_offset, int yday, bool origin_leap);
+
+static int compute_yday_distance(int days_since_epoch,
+                                 int year_offset,
+                                 int yday,
+                                 int origin_year_offset,
+                                 int origin_yday,
+                                 int origin_leap,
+                                 int units_in_leap_year,
+                                 int units_in_non_leap_year,
+                                 int every) {
+  int origin_yday_adjusted =
+    origin_yday +
+    yday_leap_adjustment(year_offset, yday, origin_leap);
+
+  int last_origin_year_offset = year_offset;
+  if (yday < origin_yday_adjusted) {
+    --last_origin_year_offset;
+  }
+
+  int last_origin =
+    days_before_year(last_origin_year_offset) +
+    origin_yday +
+    yday_leap_adjustment(last_origin_year_offset, origin_yday, origin_leap);
+
+  int days_since_last_origin = days_since_epoch - last_origin;
+
+  int units_in_year = int_div(days_since_last_origin, every);
+
+  int years_between_origins = last_origin_year_offset - origin_year_offset;
+
+  int leap_years_between_origins =
+    leap_years_before_and_including_year(last_origin_year_offset) -
+    leap_years_before_and_including_year(origin_year_offset);
+
+  int non_leap_years_between_origins =
+    years_between_origins -
+    leap_years_between_origins;
+
+  int units_between_origins =
+    units_in_leap_year * leap_years_between_origins +
+    units_in_non_leap_year * non_leap_years_between_origins;
+
+  int out = units_between_origins + units_in_year;
+
+  return out;
+}
+
+// Returns the number of days between 1970-01-01 and the beginning of the `year`
+// defined as the number of `year_offset` from 1970, 0-based
+// Not 1969 because `year_offset` is 0 based already
+#define YEARS_FROM_0001_01_01_TO_EPOCH 1970
+#define DAYS_FROM_0001_01_01_TO_EPOCH 719162
+#define LEAP_YEARS_FROM_0001_01_01_TO_EPOCH 477
+
+static inline int days_before_year(int year_offset) {
+  int year = year_offset + YEARS_FROM_0001_01_01_TO_EPOCH;
+  --year;
+
+  int days = year * 365 +
+    int_div(year, 4) -
+    int_div(year, 100) +
+    int_div(year, 400);
+
+  days -= DAYS_FROM_0001_01_01_TO_EPOCH;
+
+  return days;
+}
+
+static inline int leap_years_before_and_including_year(int year_offset) {
+  int year = year_offset + YEARS_FROM_0001_01_01_TO_EPOCH;
+
+  int n_leap_years =
+    int_div(year, 4) -
+    int_div(year, 100) +
+    int_div(year, 400);
+
+  n_leap_years -= LEAP_YEARS_FROM_0001_01_01_TO_EPOCH;
+
+  return n_leap_years;
+}
+
+#undef YEARS_FROM_0001_01_01_TO_EPOCH
+#undef DAYS_FROM_0001_01_01_TO_EPOCH
+#undef LEAP_YEARS_FROM_0001_01_01_TO_EPOCH
+
+static inline int yday_leap_adjustment(int year_offset, int yday, bool origin_leap) {
+  // No adjustment to make if before or equal to Feb 28th
+  if (yday < 58) {
+    return 0;
+  }
+
+  int year = year_offset + 1970;
+
+  bool year_is_leap = is_leap_year(year);
+
+  if (origin_leap) {
+    if (year_is_leap) {
+      return 0;
+    } else {
+      return -1;
+    }
+  } else {
+    if (year_is_leap) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+}
+
+#undef is_leap_year
 
 // -----------------------------------------------------------------------------
 
@@ -1393,7 +1685,7 @@ static int origin_to_days_from_epoch(SEXP origin) {
 
   double out = REAL(origin)[0];
 
-  if (out == NA_REAL) {
+  if (!R_FINITE(out)) {
     r_error("origin_to_days_from_epoch", "`origin` must not be `NA`.");
   }
 
@@ -1406,8 +1698,8 @@ static int64_t origin_to_seconds_from_epoch(SEXP origin) {
 
   double origin_value = REAL(origin)[0];
 
-  if (origin_value == NA_REAL) {
-    r_error("origin_to_seconds_from_epoch", "`origin` must not be `NA`.");
+  if (!R_FINITE(origin_value)) {
+    r_error("origin_to_seconds_from_epoch", "`origin` must be finite.");
   }
 
   int64_t out = guarded_floor(origin_value);
@@ -1421,8 +1713,8 @@ static int64_t origin_to_milliseconds_from_epoch(SEXP origin) {
 
   double origin_value = REAL(origin)[0];
 
-  if (origin_value == NA_REAL) {
-    r_error("origin_to_milliseconds_from_epoch", "`origin` must not be `NA`.");
+  if (!R_FINITE(origin_value)) {
+    r_error("origin_to_milliseconds_from_epoch", "`origin` must be finite.");
   }
 
   int64_t out = guarded_floor_to_millisecond(origin_value);

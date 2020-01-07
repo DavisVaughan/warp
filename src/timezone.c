@@ -91,12 +91,6 @@ SEXP get_origin_epoch_in_time_zone(SEXP x) {
   return out;
 }
 
-// For testing
-// [[ export() ]]
-SEXP warp_get_origin_epoch_in_time_zone(SEXP x) {
-  return get_origin_epoch_in_time_zone(x);
-}
-
 static SEXP make_tzone(const char* time_zone) {
   SEXP out = PROTECT(Rf_allocVector(STRSXP, 1));
 

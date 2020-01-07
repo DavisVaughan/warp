@@ -523,24 +523,24 @@ test_that("can warp_distance() by month with POSIXlt", {
 })
 
 # ------------------------------------------------------------------------------
-# warp_distance(<Date>, period = "week")
+# warp_distance(<Date>, period = "yweek")
 
-test_that("can warp_distance() by week with Date", {
+test_that("can warp_distance() by yweek with Date", {
   x <- as.Date("1970-01-01")
-  expect_identical(warp_distance(x, "week"), 0)
+  expect_identical(warp_distance(x, "yweek"), 0)
 
   x <- as.Date("1970-01-08")
-  expect_identical(warp_distance(x, "week"), 1)
+  expect_identical(warp_distance(x, "yweek"), 1)
 
   x <- as.Date("1971-01-01")
-  expect_identical(warp_distance(x, "week"), 53)
+  expect_identical(warp_distance(x, "yweek"), 53)
 })
 
 test_that("Date + UTC origin does not emit a warning", {
   x <- as.Date("1971-01-01")
   origin <- as.POSIXct("1971-01-01", tz = "UTC")
 
-  expect_identical(warp_distance(x, "week", origin = origin), 0)
+  expect_identical(warp_distance(x, "yweek", origin = origin), 0)
 })
 
 test_that("Date + non-UTC origin converts with a warning", {
@@ -550,47 +550,52 @@ test_that("Date + non-UTC origin converts with a warning", {
 
   expect_identical(
     expect_warning(
-      warp_distance(x, "week", origin = origin),
+      warp_distance(x, "yweek", origin = origin),
       "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
     ),
-    warp_distance(x_with_tz, "week", origin = origin)
+    warp_distance(x_with_tz, "yweek", origin = origin)
   )
 })
 
 test_that("can use integer Dates", {
   x <- structure(0L, class = "Date")
-  expect_identical(warp_distance(x, "week"), 0)
+  expect_identical(warp_distance(x, "yweek"), 0)
 
   x <- structure(31L, class = "Date")
-  expect_identical(warp_distance(x, "week"), 4)
+  expect_identical(warp_distance(x, "yweek"), 4)
 })
 
 test_that("can handle `every` with default origin", {
   x <- as.Date(c(
+    "1969-12-02",
+    "1969-12-09", "1969-12-16",
     "1969-12-23", "1969-12-30",
     "1969-12-31", "1970-01-01",
     "1970-01-08", "1970-01-15",
     "1970-01-22"
   ))
 
-  expect_equal(warp_distance(x, period = "week", every = 2L), c(-2, -1, -1, 0, 0, 1, 1))
-  expect_equal(warp_distance(x, period = "week", every = 3L), c(-1, -1, -1, 0, 0, 0, 1))
-  expect_equal(warp_distance(x, period = "week", every = 4L), c(-1, -1, -1, 0, 0, 0, 0))
+  expect_equal(warp_distance(x, period = "yweek", every = 2L), c(-4, -3, -3, -2, -2, -1, 0, 0, 1, 1))
+  expect_equal(warp_distance(x, period = "yweek", every = 3L), c(-3, -2, -2, -2, -1, -1, 0, 0, 0, 1))
+  expect_equal(warp_distance(x, period = "yweek", every = 4L), c(-3, -2, -2, -2, -2, -1, 0, 0, 0, 0))
 })
 
 test_that("can handle `every` with altered origin", {
   x <- as.Date(c(
+    "1969-12-02",
+    "1969-12-09", "1969-12-16",
     "1969-12-23", "1969-12-30",
     "1969-12-31", "1970-01-01",
+    "1970-01-06", "1970-01-07",
     "1970-01-08", "1970-01-15",
     "1970-01-22"
   ))
 
   origin <- as.Date("1970-01-08")
 
-  expect_equal(warp_distance(x, period = "week", every = 2L, origin = origin), c(-2, -2, -1, -1, 0, 0, 1))
-  expect_equal(warp_distance(x, period = "week", every = 3L, origin = origin), c(-2, -1, -1, -1, 0, 0, 0))
-  expect_equal(warp_distance(x, period = "week", every = 4L, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, period = "yweek", every = 2L, origin = origin), c(-4, -4, -3, -3, -2, -2, -2, -2, -1, 0, 0, 1))
+  expect_equal(warp_distance(x, period = "yweek", every = 3L, origin = origin), c(-3, -3, -2, -2, -2, -1, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, period = "yweek", every = 4L, origin = origin), c(-3, -3, -2, -2, -2, -2, -2, -2, -1, 0, 0, 0))
 })
 
 test_that("fractional Date pieces are ignored", {
@@ -599,50 +604,147 @@ test_that("fractional Date pieces are ignored", {
   x <- structure(-0.0001, class = "Date")
 
   # But we really treat this as `new_date(0)`
-  expect_equal(warp_distance(x, period = "week"), 0)
+  expect_equal(warp_distance(x, period = "yweek"), 0)
 })
 
 test_that("size 0 input works - integer Dates", {
   x <- structure(integer(), class = "Date")
 
-  expect_equal(warp_distance(x, period = "week"), numeric())
-  expect_equal(warp_distance(x, period = "week", every = 2), numeric())
+  expect_equal(warp_distance(x, period = "yweek"), numeric())
+  expect_equal(warp_distance(x, period = "yweek", every = 2), numeric())
 })
 
 test_that("size 0 input works - numeric Dates", {
   x <- structure(numeric(), class = "Date")
 
-  expect_equal(warp_distance(x, period = "week"), numeric())
-  expect_equal(warp_distance(x, period = "week", every = 2), numeric())
+  expect_equal(warp_distance(x, period = "yweek"), numeric())
+  expect_equal(warp_distance(x, period = "yweek", every = 2), numeric())
 })
 
 test_that("going backwards in time still uses groups computed from the first of the year", {
-  # The 53rd week of 1969
+  # The 53rd yweek of 1969
   x <- as.Date("1969-12-31")
-  # The 52nd week of 1969
+  # The 52nd yweek of 1969
   y <- as.Date("1969-12-30")
-  expect_identical(warp_distance(x, "week"), -1)
-  expect_identical(warp_distance(y, "week"), -2)
+  expect_identical(warp_distance(x, "yweek"), -1)
+  expect_identical(warp_distance(y, "yweek"), -2)
+})
+
+test_that("leap years in `x` affect the yweek group", {
+  origin <- as.Date("1999-03-01")
+
+  x <- as.Date(c("1999-02-27", "1999-02-28", "1999-03-01", "1999-03-02", "1999-03-07", "1999-03-08"))
+  y <- as.Date(c("2000-02-27", "2000-02-28", "2000-02-29", "2000-03-01", "2000-03-02", "2000-03-07", "2000-03-08"))
+  z <- as.Date(c("2001-02-27", "2001-02-28", "2001-03-01", "2001-03-02", "2001-03-07", "2001-03-08"))
+
+  # 1998-03-01 -> 1999-02-21 = 51 full weeks
+  # [1999-02-21, 1999-02-28) = -2
+  # [1999-02-28, 1999-03-01) = -1
+  # [1999-03-01, 1999-03-08) = 0
+  # [1999-03-08, 1999-03-15) = 1
+  expect_identical(warp_distance(x, period = "yweek", every = 1, origin = origin), c(-2, -1, 0, 0, 0, 1))
+
+  # 1999-03-01 -> 2000-02-21 = 51 full weeks
+  # [2000-02-21, 2000-02-28) = 51
+  # [2000-02-28, 2000-03-01) = 52
+  # [2000-03-01, 2000-03-08) = 53
+  # [2000-03-08, 2000-03-15) = 54
+  expect_identical(warp_distance(y, period = "yweek", every = 1, origin = origin), c(51, 52, 52, 53, 53, 53, 54))
+
+  # 2000-03-01 -> 2001-02-21 = 51 full weeks
+  # [2001-02-21, 2001-02-28) = 104
+  # [2001-02-28, 2001-03-01) = 105
+  # [2001-03-01, 2001-03-08) = 106
+  # [2001-03-08, 2001-03-15) = 107
+  expect_identical(warp_distance(z, period = "yweek", every = 1, origin = origin), c(104, 105, 106, 106, 106, 107))
+})
+
+test_that("leap years in `origin` affect the yweek group", {
+  origin <- as.Date("2000-03-01")
+
+  x <- as.Date(c("1999-02-27", "1999-02-28", "1999-03-01", "1999-03-02", "1999-03-07", "1999-03-08"))
+  y <- as.Date(c("2000-02-27", "2000-02-28", "2000-02-29", "2000-03-01", "2000-03-02", "2000-03-07", "2000-03-08"))
+  z <- as.Date(c("2001-02-27", "2001-02-28", "2001-03-01", "2001-03-02", "2001-03-07", "2001-03-08"))
+
+  # 1998-03-01 -> 1999-02-21 = 51 full weeks
+  # [1999-02-21, 1999-02-28) = -55
+  # [1999-02-28, 1999-03-01) = -54
+  # [1999-03-01, 1999-03-08) = -53
+  # [1999-03-08, 1999-03-15) = -52
+  expect_identical(warp_distance(x, period = "yweek", every = 1, origin = origin), c(-55, -54, -53, -53, -53, -52))
+
+  # 1999-03-01 -> 2000-02-21 = 51 full weeks
+  # [2000-02-21, 2000-02-28) = -2
+  # [2000-02-28, 2000-03-01) = -1
+  # [2000-03-01, 2000-03-08) = 0
+  # [2000-03-08, 2000-03-15) = 1
+  expect_identical(warp_distance(y, period = "yweek", every = 1, origin = origin), c(-2, -1, -1, 0, 0, 0, 1))
+
+  # 2000-03-01 -> 2001-02-21 = 51 full weeks
+  # [2001-02-21, 2001-02-28) = 104
+  # [2001-02-28, 2001-03-01) = 105
+  # [2001-03-01, 2001-03-08) = 106
+  # [2001-03-08, 2001-03-15) = 107
+  expect_identical(warp_distance(z, period = "yweek", every = 1, origin = origin), c(51, 52, 53, 53, 53, 54))
+})
+
+test_that("`origin` value can be on the leap day", {
+  origin <- as.Date("2000-02-29")
+
+  # Non-leap years start that group on 02/28
+  x <- as.Date(c("1999-02-27", "1999-02-28", "1999-03-01", "1999-03-02", "1999-03-07", "1999-03-08"))
+  y <- as.Date(c("2000-02-27", "2000-02-28", "2000-02-29", "2000-03-01", "2000-03-02", "2000-03-07", "2000-03-08"))
+  z <- as.Date(c("2001-02-27", "2001-02-28", "2001-03-01", "2001-03-02", "2001-03-07", "2001-03-08"))
+
+  # 1998-02-28 -> 1999-02-27 = 52 full weeks
+  # [1999-02-27, 1999-02-28) = -54
+  # [1999-02-28, 1999-03-07) = -53
+  # [1999-03-07, 1999-03-15) = -52
+  expect_identical(warp_distance(x, period = "yweek", every = 1, origin = origin), c(-54, -53, -53, -53, -52, -52))
+
+  # 1999-02-28 -> 2000-02-27 = 52 full weeks
+  # [2000-02-27, 2000-02-29) = -1
+  # [2000-02-29, 2000-03-07) = 0
+  # [2000-03-07, 2000-03-15) = 1
+  expect_identical(warp_distance(y, period = "yweek", every = 1, origin = origin), c(-1, -1, 0, 0, 0, 1, 1))
+
+  # 2000-02-29 -> 2001-02-27 = 52 full weeks
+  # [2001-02-27, 2001-02-28) = 52
+  # [2001-02-28, 2001-03-07) = 53
+  # [2001-03-07, 2001-03-15) = 54
+  expect_identical(warp_distance(z, period = "yweek", every = 1, origin = origin), c(52, 53, 53, 53, 54, 54))
+})
+
+test_that("Ignoring the leap adjustment if before Feb 28th is required", {
+  origin <- as.Date("1970-01-01")
+  x <- as.Date(c("2019-12-31", "2020-01-01"))
+
+  # if we don't ignore the leap adjustment we end up with both at 2649
+  expect_identical(warp_distance(x, "yweek", origin = origin), c(2649, 2650))
+})
+
+test_that("sanity check `every`", {
+  expect_error(warp_distance(as.Date("1970-01-01"), "yweek", every = 53), "is 52")
 })
 
 # ------------------------------------------------------------------------------
-# warp_distance(<POSIXct>, period = "week")
+# warp_distance(<POSIXct>, period = "yweek")
 
-test_that("can warp_distance() by week with POSIXct", {
+test_that("can warp_distance() by yweek with POSIXct", {
   x <- as.POSIXct("1970-01-01", tz = "UTC")
-  expect_identical(warp_distance(x, "week"), 0)
+  expect_identical(warp_distance(x, "yweek"), 0)
 
   x <- as.POSIXct("1970-01-08", tz = "UTC")
-  expect_identical(warp_distance(x, "week"), 1)
+  expect_identical(warp_distance(x, "yweek"), 1)
 })
 
 test_that("UTC POSIXct + UTC origin does not emit a warning", {
   x <- as.POSIXct("1971-01-01", tz = "UTC")
 
-  expect_warning(warp_distance(x, "week"), NA)
+  expect_warning(warp_distance(x, "yweek"), NA)
 
-  expect_identical(warp_distance(x, "week"), 53)
-  expect_identical(warp_distance(x, "week", origin = x), 0)
+  expect_identical(warp_distance(x, "yweek"), 53)
+  expect_identical(warp_distance(x, "yweek", origin = x), 0)
 })
 
 test_that("UTC POSIXct + Date origin does not emit a warning", {
@@ -650,10 +752,10 @@ test_that("UTC POSIXct + Date origin does not emit a warning", {
   origin1 <- as.Date("1971-01-01")
   origin2 <- as.Date("1972-01-01")
 
-  expect_warning(warp_distance(x, "week", origin = origin1), NA)
+  expect_warning(warp_distance(x, "yweek", origin = origin1), NA)
 
-  expect_identical(warp_distance(x, "week", origin = origin1), 0)
-  expect_identical(warp_distance(x, "week", origin = origin2), -53)
+  expect_identical(warp_distance(x, "yweek", origin = origin1), 0)
+  expect_identical(warp_distance(x, "yweek", origin = origin2), -53)
 })
 
 test_that("UTC POSIXct + non-UTC origin converts with a warning", {
@@ -663,10 +765,10 @@ test_that("UTC POSIXct + non-UTC origin converts with a warning", {
 
   expect_identical(
     expect_warning(
-      warp_distance(x, "week", origin = origin),
+      warp_distance(x, "yweek", origin = origin),
       "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
     ),
-    warp_distance(x_with_tz, "week", origin = origin)
+    warp_distance(x_with_tz, "yweek", origin = origin)
   )
 })
 
@@ -676,7 +778,7 @@ test_that("local time POSIXct + UTC origin converts with a warning", {
     origin <- as.POSIXct("1971-01-01", tz = "UTC")
 
     expect_identical(
-      expect_warning(warp_distance(x, "week", origin = origin)),
+      expect_warning(warp_distance(x, "yweek", origin = origin)),
       0
     )
   })
@@ -684,67 +786,75 @@ test_that("local time POSIXct + UTC origin converts with a warning", {
 
 test_that("can use integer POSIXct", {
   x <- structure(-1L, tzone = "UTC", class = c("POSIXct", "POSIXt"))
-  expect_identical(warp_distance(x, "week"), -1)
+  expect_identical(warp_distance(x, "yweek"), -1)
 })
 
 test_that("can handle `NA` dates", {
   x <- structure(NA_real_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
-  expect_identical(warp_distance(x, "week"), NA_real_)
+  expect_identical(warp_distance(x, "yweek"), NA_real_)
 
   x <- structure(NA_integer_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
-  expect_identical(warp_distance(x, "week"), NA_real_)
+  expect_identical(warp_distance(x, "yweek"), NA_real_)
 })
 
 test_that("can handle `every` with default origin", {
   x <- as.POSIXct(c(
+    "1969-12-02",
+    "1969-12-09", "1969-12-16",
     "1969-12-23", "1969-12-30",
     "1969-12-31", "1970-01-01",
     "1970-01-08", "1970-01-15",
     "1970-01-22"
   ), tz = "UTC")
 
-  expect_equal(warp_distance(x, period = "week", every = 2L), c(-2, -1, -1, 0, 0, 1, 1))
-  expect_equal(warp_distance(x, period = "week", every = 3L), c(-1, -1, -1, 0, 0, 0, 1))
-  expect_equal(warp_distance(x, period = "week", every = 4L), c(-1, -1, -1, 0, 0, 0, 0))
+  expect_equal(warp_distance(x, period = "yweek", every = 2L), c(-4, -3, -3, -2, -2, -1, 0, 0, 1, 1))
+  expect_equal(warp_distance(x, period = "yweek", every = 3L), c(-3, -2, -2, -2, -1, -1, 0, 0, 0, 1))
+  expect_equal(warp_distance(x, period = "yweek", every = 4L), c(-3, -2, -2, -2, -2, -1, 0, 0, 0, 0))
 })
 
 test_that("can handle `every` with altered origin", {
   x <- as.POSIXct(c(
+    "1969-12-02",
+    "1969-12-09", "1969-12-16",
     "1969-12-23", "1969-12-30",
     "1969-12-31", "1970-01-01",
+    "1970-01-06", "1970-01-07",
     "1970-01-08", "1970-01-15",
     "1970-01-22"
   ), tz = "UTC")
 
   origin <- as.Date("1970-01-08")
 
-  expect_equal(warp_distance(x, period = "week", every = 2L, origin = origin), c(-2, -2, -1, -1, 0, 0, 1))
-  expect_equal(warp_distance(x, period = "week", every = 3L, origin = origin), c(-2, -1, -1, -1, 0, 0, 0))
-  expect_equal(warp_distance(x, period = "week", every = 4L, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, period = "yweek", every = 2L, origin = origin), c(-4, -4, -3, -3, -2, -2, -2, -2, -1, 0, 0, 1))
+  expect_equal(warp_distance(x, period = "yweek", every = 3L, origin = origin), c(-3, -3, -2, -2, -2, -1, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, period = "yweek", every = 4L, origin = origin), c(-3, -3, -2, -2, -2, -2, -2, -2, -1, 0, 0, 0))
 })
 
 test_that("can handle `every` with altered origin and altered timezone", {
   x <- as.POSIXct(c(
+    "1969-12-02",
+    "1969-12-09", "1969-12-16",
     "1969-12-23", "1969-12-30",
     "1969-12-31", "1970-01-01",
+    "1970-01-06", "1970-01-07",
     "1970-01-08", "1970-01-15",
     "1970-01-22"
   ), tz = "America/New_York")
 
   origin <- as.POSIXct("1970-01-08", tz = "America/New_York")
 
-  expect_equal(warp_distance(x, period = "week", every = 2L, origin = origin), c(-2, -2, -1, -1, 0, 0, 1))
-  expect_equal(warp_distance(x, period = "week", every = 3L, origin = origin), c(-2, -1, -1, -1, 0, 0, 0))
-  expect_equal(warp_distance(x, period = "week", every = 4L, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, period = "yweek", every = 2L, origin = origin), c(-4, -4, -3, -3, -2, -2, -2, -2, -1, 0, 0, 1))
+  expect_equal(warp_distance(x, period = "yweek", every = 3L, origin = origin), c(-3, -3, -2, -2, -2, -1, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, period = "yweek", every = 4L, origin = origin), c(-3, -3, -2, -2, -2, -2, -2, -2, -1, 0, 0, 0))
 })
 
 test_that("going backwards in time still uses groups computed from the first of the year", {
-  # The 53rd week of 1969
+  # The 53rd yweek of 1969
   x <- as.POSIXct("1969-12-31", "UTC")
-  # The 52nd week of 1969
+  # The 52nd yweek of 1969
   y <- as.POSIXct("1969-12-30", "UTC")
-  expect_identical(warp_distance(x, "week"), -1)
-  expect_identical(warp_distance(y, "week"), -2)
+  expect_identical(warp_distance(x, "yweek"), -1)
+  expect_identical(warp_distance(y, "yweek"), -2)
 })
 
 test_that("default `origin` results in epoch in the time zone of `x`", {
@@ -752,22 +862,102 @@ test_that("default `origin` results in epoch in the time zone of `x`", {
   y <- as.POSIXct("1969-12-31 23:00:00", tz = "UTC")
 
   expect_equal(
-    warp_distance(x, period = "week"),
-    warp_distance(y, period = "week")
+    warp_distance(x, period = "yweek"),
+    warp_distance(y, period = "yweek")
+  )
+})
+
+test_that("`origin` value can be on the leap day", {
+  origin <- as.POSIXct("2000-02-29", "UTC")
+
+  # Non-leap years start that group on 02/28
+  x <- as.POSIXct(c("1999-02-27", "1999-02-28", "1999-03-01", "1999-03-02", "1999-03-07", "1999-03-08"), "UTC")
+  y <- as.POSIXct(c("2000-02-27", "2000-02-28", "2000-02-29", "2000-03-01", "2000-03-02", "2000-03-07", "2000-03-08"), "UTC")
+  z <- as.POSIXct(c("2001-02-27", "2001-02-28", "2001-03-01", "2001-03-02", "2001-03-07", "2001-03-08"), "UTC")
+
+  # 1998-02-28 -> 1999-02-27 = 52 full weeks
+  # [1999-02-27, 1999-02-28) = -54
+  # [1999-02-28, 1999-03-07) = -53
+  # [1999-03-07, 1999-03-15) = -52
+  expect_identical(warp_distance(x, period = "yweek", every = 1, origin = origin), c(-54, -53, -53, -53, -52, -52))
+
+  # 1999-02-28 -> 2000-02-27 = 52 full weeks
+  # [2000-02-27, 2000-02-29) = -1
+  # [2000-02-29, 2000-03-07) = 0
+  # [2000-03-07, 2000-03-15) = 1
+  expect_identical(warp_distance(y, period = "yweek", every = 1, origin = origin), c(-1, -1, 0, 0, 0, 1, 1))
+
+  # 2000-02-29 -> 2001-02-27 = 52 full weeks
+  # [2001-02-27, 2001-02-28) = 52
+  # [2001-02-28, 2001-03-07) = 53
+  # [2001-03-07, 2001-03-15) = 54
+  expect_identical(warp_distance(z, period = "yweek", every = 1, origin = origin), c(52, 53, 53, 53, 54, 54))
+})
+
+# ------------------------------------------------------------------------------
+# warp_distance(<POSIXlt>, period = "yweek")
+
+test_that("can warp_distance() by yweek with POSIXlt", {
+  x <- as.POSIXct("1970-01-01", tz = "UTC")
+  x <- as.POSIXlt(x)
+  expect_identical(warp_distance(x, "yweek"), 0)
+
+  x <- as.POSIXct("1971-01-01", tz = "UTC")
+  x <- as.POSIXlt(x)
+  expect_identical(warp_distance(x, "yweek"), 53)
+})
+
+# ------------------------------------------------------------------------------
+# warp_distance(<Date>, period = "week")
+
+# Mainly tested in `period = "day"`
+
+test_that("warp_distance() with week period works through day", {
+  x <- as.Date("1970-01-01") + 0:500
+
+  expect_identical(
+    warp_distance(x, "week"),
+    warp_distance(x, "day", every = 7)
   )
 })
 
 # ------------------------------------------------------------------------------
-# warp_distance(<POSIXlt>, period = "week")
+# warp_distance(<Date>, period = "yday")
 
-test_that("can warp_distance() by week with POSIXlt", {
-  x <- as.POSIXct("1970-01-01", tz = "UTC")
-  x <- as.POSIXlt(x)
-  expect_identical(warp_distance(x, "week"), 0)
+# Mainly tested in `period = "yweek"`
 
-  x <- as.POSIXct("1971-01-01", tz = "UTC")
-  x <- as.POSIXlt(x)
-  expect_identical(warp_distance(x, "week"), 53)
+test_that("warp_distance() with yday period works", {
+  x <- as.Date("1970-01-01") + 0:500
+
+  expect_identical(
+    warp_distance(x, "yday", every = 7),
+    warp_distance(x, "yweek")
+  )
+})
+
+test_that("sanity check `every`", {
+  expect_error(warp_distance(new_date(0), "yday", every = 365), "is 364")
+})
+
+test_that("can use an integer Date origin with yday", {
+  origin <- structure(1L, class = "Date")
+  expect_identical(warp_distance(new_date(0), "yday", origin = origin), -1)
+})
+
+test_that("integer Date origin that is NA is an error", {
+  origin <- structure(NA_integer_, class = "Date")
+  expect_error(warp_distance(new_date(0), "yday", origin = origin), "cannot be `NA`")
+})
+
+test_that("double Date origin that is NA / NaN / Inf is an error", {
+  origin <- structure(NA_real_, class = "Date")
+  expect_error(warp_distance(new_date(0), "yday", origin = origin), "must be finite")
+
+  origin <- structure(NaN, class = "Date")
+  expect_error(warp_distance(new_date(0), "yday", origin = origin), "must be finite")
+
+  origin <- structure(Inf, class = "Date")
+  expect_error(warp_distance(new_date(0), "yday", origin = origin), "must be finite")
 })
 
 # ------------------------------------------------------------------------------
@@ -1269,15 +1459,15 @@ test_that("can ignore fractional pieces in Dates", {
 test_that("size 0 input works - integer Dates", {
   x <- structure(integer(), class = "Date")
 
-  expect_equal(warp_distance(x, period = "hour"), numeric())
-  expect_equal(warp_distance(x, period = "hour", every = 2), numeric())
+  expect_identical(warp_distance(x, period = "hour"), numeric())
+  expect_identical(warp_distance(x, period = "hour", every = 2), numeric())
 })
 
 test_that("size 0 input works - numeric Dates", {
   x <- structure(numeric(), class = "Date")
 
-  expect_equal(warp_distance(x, period = "hour"), numeric())
-  expect_equal(warp_distance(x, period = "hour", every = 2), numeric())
+  expect_identical(warp_distance(x, period = "hour"), numeric())
+  expect_identical(warp_distance(x, period = "hour", every = 2), numeric())
 })
 
 # ------------------------------------------------------------------------------
@@ -1550,6 +1740,56 @@ test_that("half-hour offset time zones are correct (#13)", {
     warp_distance(x, period = "hour"),
     warp_distance(y, period = "hour")
   )
+})
+
+test_that("can have an integer POSIXct origin", {
+  x <- new_datetime(60 * 60, "UTC")
+
+  origin <- structure(0L, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+
+  expect_identical(
+    warp_distance(x, period = "hour", origin = origin),
+    1
+  )
+})
+
+test_that("integer Date `origin` cannot be NA_integer_", {
+  x <- new_datetime(0, "UTC")
+  origin <- structure(NA_integer_, class = "Date")
+  expect_error(warp_distance(x, period = "hour", origin = origin), "`origin` must be finite")
+})
+
+test_that("double Date `origin` cannot be NA_real_ / NaN / Inf", {
+  x <- new_datetime(0, "UTC")
+
+  origin <- structure(NA_real_, class = "Date")
+  expect_error(warp_distance(x, period = "hour", origin = origin), "`origin` must be finite")
+
+  origin <- structure(NaN, class = "Date")
+  expect_error(warp_distance(x, period = "hour", origin = origin), "`origin` must be finite")
+
+  origin <- structure(Inf, class = "Date")
+  expect_error(warp_distance(x, period = "hour", origin = origin), "`origin` must be finite")
+})
+
+test_that("double POSIXct `origin` cannot be NA_real_ / NaN / Inf", {
+  x <- new_datetime(0, "UTC")
+
+  origin <- structure(NA_real_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_error(warp_distance(x, period = "hour", origin = origin), "`origin` must be finite")
+
+  origin <- structure(NaN, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_error(warp_distance(x, period = "hour", origin = origin), "`origin` must be finite")
+
+  origin <- structure(Inf, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_error(warp_distance(x, period = "hour", origin = origin), "`origin` must be finite")
+})
+
+test_that("integer POSIXct `origin` cannot be NA_integer_", {
+  x <- new_datetime(0, "UTC")
+
+  origin <- structure(NA_integer_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_error(warp_distance(x, period = "hour", origin = origin), "`origin` must be finite")
 })
 
 # ------------------------------------------------------------------------------

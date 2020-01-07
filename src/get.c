@@ -14,11 +14,6 @@
  * `get_day_offset()`
  *   Extract the number of days offset from 1970.
  *   Return an integer vector.
- *
- * `get_week_offset()`
- *   Extract the number of weeks offset from 1970, with a restart of the 7
- *   day counter every January 1st.
- *   Return an integer vector
  */
 
 // -----------------------------------------------------------------------------
@@ -178,7 +173,7 @@ static SEXP dbl_date_get_day_offset(SEXP x) {
 
   // Truncate any fractional pieces towards 0
   for (R_xlen_t i = 0; i < size; ++i) {
-    if (p_x[i] == NA_REAL) {
+    if (!R_FINITE(p_x[i])) {
       p_out[i] = NA_INTEGER;
       continue;
     }
@@ -261,65 +256,65 @@ static inline int days_before_year(int year) {
 
 // -----------------------------------------------------------------------------
 
-static SEXP posixct_get_week_offset(SEXP x);
-static SEXP posixlt_get_week_offset(SEXP x);
+static struct warp_yday_components posixct_get_origin_yday_components(SEXP origin);
+static struct warp_yday_components posixlt_get_origin_yday_components(SEXP origin);
 
-// [[ "utils.h" ]]
-SEXP get_week_offset(SEXP x) {
-  switch(time_class_type(x)) {
-  case warp_class_date: return date_get_week_offset(x);
-  case warp_class_posixct: return posixct_get_week_offset(x);
-  case warp_class_posixlt: return posixlt_get_week_offset(x);
-  default: r_error("get_week_offset", "Internal error: Unknown date time class.");
+// [[ include("utils.h") ]]
+struct warp_yday_components get_origin_yday_components(SEXP origin) {
+  if (origin == R_NilValue) {
+    struct warp_yday_components out;
+    out.year_offset = 0;
+    out.yday = 0;
+    return out;
+  }
+
+  switch(time_class_type(origin)) {
+  case warp_class_date: return date_get_origin_yday_components(origin);
+  case warp_class_posixct: return posixct_get_origin_yday_components(origin);
+  case warp_class_posixlt: return posixlt_get_origin_yday_components(origin);
+  default: r_error("get_origin_yday_components", "Internal error: Unknown date time class.");
   }
 }
 
-static SEXP posixct_get_week_offset(SEXP x) {
-  x = PROTECT(as_posixlt_from_posixct(x));
-  SEXP out = posixlt_get_week_offset(x);
+static struct warp_yday_components posixct_get_origin_yday_components(SEXP origin) {
+  origin = PROTECT(as_posixlt_from_posixct(origin));
+  struct warp_yday_components out = posixlt_get_origin_yday_components(origin);
   UNPROTECT(1);
   return out;
 }
 
-#define WEEKS_IN_YEAR 53
+static struct warp_yday_components posixlt_get_origin_yday_components(SEXP origin) {
+  SEXP origin_year = VECTOR_ELT(origin, 5);
+  SEXP origin_yday = VECTOR_ELT(origin, 7);
 
-static SEXP posixlt_get_week_offset(SEXP x) {
-  SEXP year = VECTOR_ELT(x, 5);
-  SEXP yday = VECTOR_ELT(x, 7);
-
-  if (TYPEOF(year) != INTSXP) {
+  if (TYPEOF(origin_year) != INTSXP) {
     r_error(
-      "posixlt_get_week_offset",
+      "posixlt_get_origin_yday_components",
       "Internal error: The 6th element of the POSIXlt object should be an integer."
     );
   }
 
-  if (TYPEOF(yday) != INTSXP) {
+  if (TYPEOF(origin_yday) != INTSXP) {
     r_error(
-      "posixlt_get_week_offset",
+      "posixlt_get_origin_yday_components",
       "Internal error: The 8th element of the POSIXlt object should be an integer."
     );
   }
 
-  int* p_year = INTEGER(year);
-  int* p_yday = INTEGER(yday);
+  int year = INTEGER(origin_year)[0];
+  int yday = INTEGER(origin_yday)[0];
 
-  R_xlen_t size = Rf_xlength(year);
-
-  SEXP out = PROTECT(Rf_allocVector(INTSXP, size));
-  int* p_out = INTEGER(out);
-
-  for (R_xlen_t i = 0; i < size; ++i) {
-    if (p_year[i] == NA_INTEGER) {
-      p_out[i] = NA_INTEGER;
-      continue;
-    }
-
-    p_out[i] = (p_year[i] - 70) * WEEKS_IN_YEAR + p_yday[i] / 7;
+  if (year == NA_INTEGER || yday == NA_INTEGER) {
+    r_error(
+      "posixlt_get_origin_yday_components",
+      "The `origin` cannot be `NA`."
+    );
   }
 
-  UNPROTECT(1);
+  struct warp_yday_components out;
+
+  out.year_offset = year - 70;
+  out.yday = yday;
+
   return out;
 }
-
-#undef WEEKS_IN_YEAR
