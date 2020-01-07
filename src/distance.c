@@ -298,7 +298,8 @@ static SEXP posixct_warp_distance_yday(SEXP x, int every, SEXP origin) {
 #define DAYS_IN_LEAP_YEAR 366
 #define is_leap_year(year) ((((year) % 4) == 0 && ((year) % 100) != 0) || ((year) % 400) == 0)
 
-static int compute_yday_distance(int year_offset,
+static int compute_yday_distance(int days_since_epoch,
+                                 int year_offset,
                                  int yday,
                                  int origin_year_offset,
                                  int origin_yday,
@@ -306,6 +307,8 @@ static int compute_yday_distance(int year_offset,
                                  int units_in_leap_year,
                                  int units_in_non_leap_year,
                                  int every);
+
+static inline int days_before_year(int year_offset);
 
 static SEXP posixlt_warp_distance_yday(SEXP x, int every, SEXP origin) {
   SEXP year = VECTOR_ELT(x, 5);
@@ -350,7 +353,10 @@ static SEXP posixlt_warp_distance_yday(SEXP x, int every, SEXP origin) {
     int year_offset = p_year[i] - 70;
     int yday = p_yday[i];
 
+    int days_since_epoch = days_before_year(year_offset) + yday;
+
     p_out[i] = compute_yday_distance(
+      days_since_epoch,
       year_offset,
       yday,
       origin_year_offset,
@@ -393,6 +399,7 @@ static SEXP int_date_warp_distance_yday(SEXP x, int every, SEXP origin) {
     struct warp_components components = convert_days_to_components(elt);
 
     p_out[i] = compute_yday_distance(
+      elt,
       components.year_offset,
       components.yday,
       origin_year_offset,
@@ -438,6 +445,7 @@ static SEXP dbl_date_warp_distance_yday(SEXP x, int every, SEXP origin) {
     struct warp_components components = convert_days_to_components(elt);
 
     p_out[i] = compute_yday_distance(
+      elt,
       components.year_offset,
       components.yday,
       origin_year_offset,
@@ -456,11 +464,11 @@ static SEXP dbl_date_warp_distance_yday(SEXP x, int every, SEXP origin) {
 #undef DAYS_IN_YEAR
 #undef DAYS_IN_LEAP_YEAR
 
-static inline int days_before_year(int year_offset);
 static inline int leap_years_before_and_including_year(int year_offset);
 static inline int yday_leap_adjustment(int year_offset, int yday, bool origin_leap);
 
-static int compute_yday_distance(int year_offset,
+static int compute_yday_distance(int days_since_epoch,
+                                 int year_offset,
                                  int yday,
                                  int origin_year_offset,
                                  int origin_yday,
@@ -481,8 +489,6 @@ static int compute_yday_distance(int year_offset,
     days_before_year(last_origin_year_offset) +
     origin_yday +
     yday_leap_adjustment(last_origin_year_offset, origin_yday, origin_leap);
-
-  int days_since_epoch = days_before_year(year_offset) + yday;
 
   int days_since_last_origin = days_since_epoch - last_origin;
 
