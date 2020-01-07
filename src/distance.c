@@ -337,9 +337,9 @@ static SEXP posixlt_warp_distance_yday(SEXP x, int every, SEXP origin) {
   int units_in_non_leap_year = (DAYS_IN_YEAR - 1) / every + 1;
   int units_in_leap_year = (DAYS_IN_LEAP_YEAR - 1) / every + 1;
 
-  SEXP components = PROTECT(get_origin_yday_components(origin));
-  int origin_year_offset = INTEGER(VECTOR_ELT(components, 0))[0];
-  int origin_yday = INTEGER(VECTOR_ELT(components, 1))[0];
+  struct warp_yday_components origin_components = get_origin_yday_components(origin);
+  int origin_year_offset = origin_components.year_offset;
+  int origin_yday = origin_components.yday;
   bool origin_leap = is_leap_year(origin_year_offset + 1970);
 
   for (R_xlen_t i = 0; i < size; ++i) {
@@ -363,7 +363,7 @@ static SEXP posixlt_warp_distance_yday(SEXP x, int every, SEXP origin) {
     );
   }
 
-  UNPROTECT(2);
+  UNPROTECT(1);
   return out;
 }
 
@@ -378,9 +378,9 @@ static SEXP int_date_warp_distance_yday(SEXP x, int every, SEXP origin) {
   int units_in_non_leap_year = (DAYS_IN_YEAR - 1) / every + 1;
   int units_in_leap_year = (DAYS_IN_LEAP_YEAR - 1) / every + 1;
 
-  SEXP components = PROTECT(get_origin_yday_components(origin));
-  int origin_year_offset = INTEGER(VECTOR_ELT(components, 0))[0];
-  int origin_yday = INTEGER(VECTOR_ELT(components, 1))[0];
+  struct warp_yday_components origin_components = get_origin_yday_components(origin);
+  int origin_year_offset = origin_components.year_offset;
+  int origin_yday = origin_components.yday;
   bool origin_leap = is_leap_year(origin_year_offset + 1970);
 
   for (R_xlen_t i = 0; i < size; ++i) {
@@ -405,7 +405,7 @@ static SEXP int_date_warp_distance_yday(SEXP x, int every, SEXP origin) {
     );
   }
 
-  UNPROTECT(2);
+  UNPROTECT(1);
   return out;
 }
 
@@ -420,9 +420,9 @@ static SEXP dbl_date_warp_distance_yday(SEXP x, int every, SEXP origin) {
   int units_in_non_leap_year = (DAYS_IN_YEAR - 1) / every + 1;
   int units_in_leap_year = (DAYS_IN_LEAP_YEAR - 1) / every + 1;
 
-  SEXP components = PROTECT(get_origin_yday_components(origin));
-  int origin_year_offset = INTEGER(VECTOR_ELT(components, 0))[0];
-  int origin_yday = INTEGER(VECTOR_ELT(components, 1))[0];
+  struct warp_yday_components origin_components = get_origin_yday_components(origin);
+  int origin_year_offset = origin_components.year_offset;
+  int origin_yday = origin_components.yday;
   bool origin_leap = is_leap_year(origin_year_offset + 1970);
 
   for (R_xlen_t i = 0; i < size; ++i) {
@@ -450,7 +450,7 @@ static SEXP dbl_date_warp_distance_yday(SEXP x, int every, SEXP origin) {
     );
   }
 
-  UNPROTECT(2);
+  UNPROTECT(1);
   return out;
 }
 

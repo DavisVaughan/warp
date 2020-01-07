@@ -155,11 +155,11 @@ static SEXP dbl_date_get_month_offset(SEXP x) {
 
 // -----------------------------------------------------------------------------
 
-static SEXP int_date_get_origin_yday_components(SEXP origin);
-static SEXP dbl_date_get_origin_yday_components(SEXP origin);
+static struct warp_yday_components int_date_get_origin_yday_components(SEXP origin);
+static struct warp_yday_components dbl_date_get_origin_yday_components(SEXP origin);
 
 // [[ include("utils.h") ]]
-SEXP date_get_origin_yday_components(SEXP origin) {
+struct warp_yday_components date_get_origin_yday_components(SEXP origin) {
   switch (TYPEOF(origin)) {
   case INTSXP: return int_date_get_origin_yday_components(origin);
   case REALSXP: return dbl_date_get_origin_yday_components(origin);
@@ -167,7 +167,7 @@ SEXP date_get_origin_yday_components(SEXP origin) {
   }
 }
 
-static SEXP int_date_get_origin_yday_components(SEXP origin) {
+static struct warp_yday_components int_date_get_origin_yday_components(SEXP origin) {
   int elt = INTEGER(origin)[0];
 
   if (elt == NA_INTEGER) {
@@ -179,16 +179,15 @@ static SEXP int_date_get_origin_yday_components(SEXP origin) {
 
   struct warp_components components = convert_days_to_components(elt);
 
-  SEXP out = PROTECT(Rf_allocVector(VECSXP, 2));
+  struct warp_yday_components out;
 
-  SET_VECTOR_ELT(out, 0, Rf_ScalarInteger(components.year));
-  SET_VECTOR_ELT(out, 1, Rf_ScalarInteger(components.yday));
+  out.year_offset = components.year;
+  out.yday = components.yday;
 
-  UNPROTECT(1);
   return out;
 }
 
-static SEXP dbl_date_get_origin_yday_components(SEXP origin) {
+static struct warp_yday_components dbl_date_get_origin_yday_components(SEXP origin) {
   double origin_elt = REAL(origin)[0];
 
   if (origin_elt == NA_REAL) {
@@ -203,12 +202,11 @@ static SEXP dbl_date_get_origin_yday_components(SEXP origin) {
 
   struct warp_components components = convert_days_to_components(elt);
 
-  SEXP out = PROTECT(Rf_allocVector(VECSXP, 2));
+  struct warp_yday_components out;
 
-  SET_VECTOR_ELT(out, 0, Rf_ScalarInteger(components.year));
-  SET_VECTOR_ELT(out, 1, Rf_ScalarInteger(components.yday));
+  out.year_offset = components.year;
+  out.yday = components.yday;
 
-  UNPROTECT(1);
   return out;
 }
 

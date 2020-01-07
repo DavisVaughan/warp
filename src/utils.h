@@ -38,6 +38,19 @@ enum warp_class_type time_class_type(SEXP x);
 
 // -----------------------------------------------------------------------------
 
+struct warp_yday_components {
+  int year_offset;
+  int yday;
+};
+
+// In `get.c`
+struct warp_yday_components get_origin_yday_components(SEXP origin);
+
+// In `date.c`
+struct warp_yday_components date_get_origin_yday_components(SEXP origin);
+
+// -----------------------------------------------------------------------------
+
 int pull_every(SEXP every);
 
 void __attribute__((noreturn)) never_reached(const char* fn);
@@ -59,12 +72,10 @@ int units_before_year(int year_offset,
 SEXP get_year_offset(SEXP x);
 SEXP get_month_offset(SEXP x);
 SEXP get_day_offset(SEXP x);
-SEXP get_origin_yday_components(SEXP origin);
 
 // In `date.c`
 SEXP date_get_year_offset(SEXP x);
 SEXP date_get_month_offset(SEXP x);
-SEXP date_get_origin_yday_components(SEXP origin);
 
 // In `coercion.c`
 SEXP as_datetime(SEXP x);

@@ -256,16 +256,15 @@ static inline int days_before_year(int year) {
 
 // -----------------------------------------------------------------------------
 
-static SEXP posixct_get_origin_yday_components(SEXP origin);
-static SEXP posixlt_get_origin_yday_components(SEXP origin);
+static struct warp_yday_components posixct_get_origin_yday_components(SEXP origin);
+static struct warp_yday_components posixlt_get_origin_yday_components(SEXP origin);
 
 // [[ include("utils.h") ]]
-SEXP get_origin_yday_components(SEXP origin) {
+struct warp_yday_components get_origin_yday_components(SEXP origin) {
   if (origin == R_NilValue) {
-    SEXP out = PROTECT(Rf_allocVector(VECSXP, 2));
-    SET_VECTOR_ELT(out, 0, Rf_ScalarInteger(0));
-    SET_VECTOR_ELT(out, 1, Rf_ScalarInteger(0));
-    UNPROTECT(1);
+    struct warp_yday_components out;
+    out.year_offset = 0;
+    out.yday = 0;
     return out;
   }
 
@@ -277,14 +276,14 @@ SEXP get_origin_yday_components(SEXP origin) {
   }
 }
 
-static SEXP posixct_get_origin_yday_components(SEXP origin) {
+static struct warp_yday_components posixct_get_origin_yday_components(SEXP origin) {
   origin = PROTECT(as_posixlt_from_posixct(origin));
-  SEXP out = posixlt_get_origin_yday_components(origin);
+  struct warp_yday_components out = posixlt_get_origin_yday_components(origin);
   UNPROTECT(1);
   return out;
 }
 
-static SEXP posixlt_get_origin_yday_components(SEXP origin) {
+static struct warp_yday_components posixlt_get_origin_yday_components(SEXP origin) {
   SEXP origin_year = VECTOR_ELT(origin, 5);
   SEXP origin_yday = VECTOR_ELT(origin, 7);
 
@@ -312,11 +311,10 @@ static SEXP posixlt_get_origin_yday_components(SEXP origin) {
     );
   }
 
-  SEXP out = PROTECT(Rf_allocVector(VECSXP, 2));
+  struct warp_yday_components out;
 
-  SET_VECTOR_ELT(out, 0, Rf_ScalarInteger(year - 70));
-  SET_VECTOR_ELT(out, 1, Rf_ScalarInteger(yday));
+  out.year_offset = year - 70;
+  out.yday = yday;
 
-  UNPROTECT(1);
   return out;
 }
