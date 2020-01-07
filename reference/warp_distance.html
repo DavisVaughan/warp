@@ -138,8 +138,8 @@ from the <code>origin</code>.</p>
       <th>period</th>
       <td><p><code>[character(1)]</code></p>
 <p>A string defining the period to group by. Valid inputs are:</p>
-<p><code>"year"</code>, <code>"quarter"</code>, <code>"month"</code>, <code>"week"</code>, <code>"day"</code>, <code>"hour"</code>, <code>"minute"</code>,
-<code>"second"</code>, <code>"millisecond"</code></p></td>
+<p><code>"year"</code>, <code>"quarter"</code>, <code>"month"</code>, <code>"week"</code>, <code>"yweek"</code>, <code>"day"</code>, <code>"yday"</code>,
+<code>"hour"</code>, <code>"minute"</code>, <code>"second"</code>, <code>"millisecond"</code></p></td>
     </tr>
     <tr>
       <th>every</th>
@@ -196,14 +196,18 @@ on the 15th of the month.</p>
 <code>period = "month", every = every * 3</code>. This means that for <code>"quarter"</code>
 the month specified for the <code>origin</code> will be used as the month to start
 counting from to generate the 3 month quarter.</p>
-<p>The <code>period</code> value of <code>"week"</code> is computed in the same way as
-<code>lubridate::week()</code>. Week groups are defined as complete 7 day periods,
-with the 7 day counter resetting every January 1st. To mimic the behavior
-of <code>lubridate::floor_date()</code>, use <code>period = "day"</code> and multiply <code>every</code> by 7.
-To mimic the <code>week_start</code> argument of <code>floor_date()</code>, set <code>origin</code> to a date
+<p>To mimic the behavior of <code>lubridate::floor_date()</code>, use <code>period = "week"</code>.
+Internally this is just <code>period = "day", every = every * 7</code>. To mimic the
+<code>week_start</code> argument of <code>floor_date()</code>, set <code>origin</code> to a date
 with a week day identical to the one you want the week to start from. For
 example, the default origin of <code>1970-01-01</code> is a Thursday, so this would be
 generate groups identical to <code>floor_date(week_start = 4)</code>.</p>
+<p>The <code>period</code> value of <code>"yday"</code> is computed as complete <code>every</code>-day periods
+from the <code>origin</code>, with a forced reset of the <code>every</code>-day counter every
+time you hit the month-day value of the <code>origin</code>. <code>"yweek"</code> is built on top
+of this internally as <code>period = "yday", every = every * 7</code>. This ends up
+using an algorithm very similar to <code>lubridate::week()</code>, with the added
+benefit of being able to control the <code>origin</code> date.</p>
     <h2 class="hasAnchor" id="precision"><a class="anchor" href="#precision"></a>Precision</h2>
 
     
@@ -245,6 +249,9 @@ to work with microseconds, by, say, bucketing them by millisecond distances.</p>
 <span class='co'># [1970-01-01 00:00:11, 1970-01-01 00:00:16) = 2</span>
 <span class='no'>origin</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.POSIXlt.html'>as.POSIXct</a></span>(<span class='st'>"1970-01-01 00:00:01"</span>, <span class='st'>"UTC"</span>)
 <span class='fu'>warp_distance</span>(<span class='no'>y</span>, <span class='st'>"second"</span>, <span class='kw'>every</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='no'>origin</span>)</div><div class='output co'>#&gt; [1] 0 0 0 0 1 1 2</div><div class='input'>
+<span class='co'># ---------------------------------------------------------------------------</span>
+<span class='co'># Time zones</span>
+
 <span class='co'># When `x` is not UTC and `origin` is left as `NULL`, the origin is set as</span>
 <span class='co'># 1970-01-01 00:00:00 in the time zone of `x`. This seems to be the most</span>
 <span class='co'># practically useful default.</span>
@@ -260,7 +267,40 @@ to work with microseconds, by, say, bucketing them by millisecond distances.</p>
 <span class='co'># UTC the value becomes `1970-01-01 04:00:00 UTC`, a different year. Because</span>
 <span class='co'># this is generally surprising, a warning is thrown.</span>
 <span class='no'>origin</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.POSIXlt.html'>as.POSIXct</a></span>(<span class='st'>"1970-01-01 00:00:00"</span>, <span class='kw'>tz</span> <span class='kw'>=</span> <span class='st'>"UTC"</span>)
-<span class='fu'>warp_distance</span>(<span class='no'>z</span>, <span class='st'>"year"</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='no'>origin</span>)</div><div class='output co'>#&gt; [1] -1</div><div class='input'><span class='fu'>warp_distance</span>(<span class='no'>z_in_nyc</span>, <span class='st'>"year"</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='no'>origin</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: `x` (America/New_York) and `origin` (UTC) do not have the same time zone. Converting `x` to the time zone of `origin`. It is highly advised to provide `x` and `origin` with the same time zone.</span></div><div class='output co'>#&gt; [1] 0</div></pre>
+<span class='fu'>warp_distance</span>(<span class='no'>z</span>, <span class='st'>"year"</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='no'>origin</span>)</div><div class='output co'>#&gt; [1] -1</div><div class='input'><span class='fu'>warp_distance</span>(<span class='no'>z_in_nyc</span>, <span class='st'>"year"</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='no'>origin</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: `x` (America/New_York) and `origin` (UTC) do not have the same time zone. Converting `x` to the time zone of `origin`. It is highly advised to provide `x` and `origin` with the same time zone.</span></div><div class='output co'>#&gt; [1] 0</div><div class='input'>
+<span class='co'># ---------------------------------------------------------------------------</span>
+<span class='co'># `period = "yweek"`</span>
+
+<span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"2019-12-23"</span>) + <span class='fl'>0</span>:<span class='fl'>16</span>
+<span class='no'>origin</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"1970-01-01"</span>)
+
+<span class='co'># `"week"` counts the number of 7 day periods from the `origin`</span>
+<span class='co'># `"yweek"` restarts the 7 day counter every time you hit the month-day</span>
+<span class='co'># value of the `origin`. Notice how, for the `yweek` column, only 1 day was</span>
+<span class='co'># in the week starting with `2019-12-31`. This is because the next day is</span>
+<span class='co'># `2020-01-01`, which aligns with the month-day value of the `origin`.</span>
+<span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(
+  <span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>x</span>,
+  <span class='kw'>week</span> <span class='kw'>=</span> <span class='fu'>warp_distance</span>(<span class='no'>x</span>, <span class='st'>"week"</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='no'>origin</span>),
+  <span class='kw'>yweek</span> <span class='kw'>=</span> <span class='fu'>warp_distance</span>(<span class='no'>x</span>, <span class='st'>"yweek"</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='no'>origin</span>)
+)</div><div class='output co'>#&gt;             x week yweek
+#&gt; 1  2019-12-23 2607  2647
+#&gt; 2  2019-12-24 2607  2648
+#&gt; 3  2019-12-25 2607  2648
+#&gt; 4  2019-12-26 2608  2648
+#&gt; 5  2019-12-27 2608  2648
+#&gt; 6  2019-12-28 2608  2648
+#&gt; 7  2019-12-29 2608  2648
+#&gt; 8  2019-12-30 2608  2648
+#&gt; 9  2019-12-31 2608  2649
+#&gt; 10 2020-01-01 2608  2650
+#&gt; 11 2020-01-02 2609  2650
+#&gt; 12 2020-01-03 2609  2650
+#&gt; 13 2020-01-04 2609  2650
+#&gt; 14 2020-01-05 2609  2650
+#&gt; 15 2020-01-06 2609  2650
+#&gt; 16 2020-01-07 2609  2650
+#&gt; 17 2020-01-08 2609  2651</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
