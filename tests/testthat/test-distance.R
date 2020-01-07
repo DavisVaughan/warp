@@ -586,15 +586,16 @@ test_that("can handle `every` with altered origin", {
     "1969-12-09", "1969-12-16",
     "1969-12-23", "1969-12-30",
     "1969-12-31", "1970-01-01",
+    "1970-01-06", "1970-01-07",
     "1970-01-08", "1970-01-15",
     "1970-01-22"
   ))
 
   origin <- as.Date("1970-01-08")
 
-  expect_equal(warp_distance(x, period = "yweek", every = 2L, origin = origin), c(-4, -4, -3, -3, -2, -2, -1, 0, 0, 1))
-  expect_equal(warp_distance(x, period = "yweek", every = 3L, origin = origin), c(-3, -3, -2, -2, -2, -1, -1, 0, 0, 0))
-  expect_equal(warp_distance(x, period = "yweek", every = 4L, origin = origin), c(-3, -3, -2, -2, -2, -2, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, period = "yweek", every = 2L, origin = origin), c(-4, -4, -3, -3, -2, -2, -2, -2, -1, 0, 0, 1))
+  expect_equal(warp_distance(x, period = "yweek", every = 3L, origin = origin), c(-3, -3, -2, -2, -2, -1, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, period = "yweek", every = 4L, origin = origin), c(-3, -3, -2, -2, -2, -2, -2, -2, -1, 0, 0, 0))
 })
 
 test_that("fractional Date pieces are ignored", {
@@ -629,128 +630,89 @@ test_that("going backwards in time still uses groups computed from the first of 
   expect_identical(warp_distance(y, "yweek"), -2)
 })
 
-test_that("`origin` values don't have to be on 7-day increments from January 1st", {
-  x <- as.Date(c(
-    "1969-12-02",
-    "1969-12-09", "1969-12-16",
-    "1969-12-23", "1969-12-30",
-    "1969-12-31", "1970-01-01",
-    "1970-01-08", "1970-01-15",
-    "1970-01-22"
-  ))
-
-  origin <- as.Date("1970-01-02")
-
-  # [1969-01-02, 1969-01-09)
-  # [1969-01-09, 1969-01-16)
-  # ...
-  # [1969-11-27, 1969-12-04) = -6
-  # [1969-12-04, 1969-12-11) = -5
-  # [1969-12-11, 1969-12-18) = -4
-  # [1969-12-18, 1969-12-25) = -3
-  # [1969-12-25, 1970-01-01) = -2
-  # [1970-01-01, 1970-01-02) = -1
-  # [1970-01-02, 1970-01-09) = 0
-  # [1970-01-09, 1970-01-16) = 1
-  # [1970-01-16, 1970-01-23) = 2
-  expect_equal(warp_distance(x, "yweek", every = 1, origin = origin), c(-6, -5, -4, -3, -2, -2, -1, 0, 1, 2))
-
-  # [1969-01-02, 1969-01-16)
-  # ...
-  # [1969-12-04, 1969-12-18) = -3
-  # [1969-12-18, 1970-01-01) = -2
-  # [1970-01-01, 1970-01-02) = -1
-  # [1970-01-02, 1970-01-16) = 0
-  # [1970-01-16, 1970-01-30) = 1
-  expect_equal(warp_distance(x, "yweek", every = 2, origin = origin), c(-4, -3, -3, -2, -2, -2, -1, 0, 0, 1))
-})
-
 test_that("leap years in `x` affect the yweek group", {
   origin <- as.Date("1999-03-01")
 
-  x <- as.Date(c("1999-02-21", "1999-02-22", "1999-02-23", "1999-03-06", "1999-03-07", "1999-03-08"))
-  y <- as.Date(c("2000-02-21", "2000-02-22", "2000-02-23", "2000-03-06", "2000-03-07", "2000-03-08"))
-  z <- as.Date(c("2001-02-21", "2001-02-22", "2001-02-23", "2001-03-06", "2001-03-07", "2001-03-08"))
+  x <- as.Date(c("1999-02-27", "1999-02-28", "1999-03-01", "1999-03-02", "1999-03-07", "1999-03-08"))
+  y <- as.Date(c("2000-02-27", "2000-02-28", "2000-02-29", "2000-03-01", "2000-03-02", "2000-03-07", "2000-03-08"))
+  z <- as.Date(c("2001-02-27", "2001-02-28", "2001-03-01", "2001-03-02", "2001-03-07", "2001-03-08"))
 
-  # 1999-01-01 -> 1999-02-19 = 7 full weeks
-  # [1999-02-19, 1999-02-26) = -2
-  # [1999-02-26, 1999-03-01) = -1
+  # 1998-03-01 -> 1999-02-21 = 51 full weeks
+  # [1999-02-21, 1999-02-28) = -2
+  # [1999-02-28, 1999-03-01) = -1
   # [1999-03-01, 1999-03-08) = 0
   # [1999-03-08, 1999-03-15) = 1
-  expect_identical(warp_distance(x, period = "yweek", every = 1, origin = origin), c(-2, -2, -2, 0, 0, 1))
+  expect_identical(warp_distance(x, period = "yweek", every = 1, origin = origin), c(-2, -1, 0, 0, 0, 1))
 
-  # 2000-01-01 -> 2000-02-19 = 7 full weeks
-  # [2000-02-19, 2000-02-26) = 51
-  # [2000-02-26, 2000-03-01) = 52
+  # 1999-03-01 -> 2000-02-21 = 51 full weeks
+  # [2000-02-21, 2000-02-28) = 51
+  # [2000-02-28, 2000-03-01) = 52
   # [2000-03-01, 2000-03-08) = 53
   # [2000-03-08, 2000-03-15) = 54
-  expect_identical(warp_distance(y, period = "yweek", every = 1, origin = origin), c(51, 51, 51, 53, 53, 54))
+  expect_identical(warp_distance(y, period = "yweek", every = 1, origin = origin), c(51, 52, 52, 53, 53, 53, 54))
 
-  # 2001-01-01 -> 2001-02-19 = 7 full weeks
-  # [2001-02-19, 2001-02-26) = 104
-  # [2001-02-26, 2001-03-01) = 105
+  # 2000-03-01 -> 2001-02-21 = 51 full weeks
+  # [2001-02-21, 2001-02-28) = 104
+  # [2001-02-28, 2001-03-01) = 105
   # [2001-03-01, 2001-03-08) = 106
   # [2001-03-08, 2001-03-15) = 107
-  expect_identical(warp_distance(z, period = "yweek", every = 1, origin = origin), c(104, 104, 104, 106, 106, 107))
+  expect_identical(warp_distance(z, period = "yweek", every = 1, origin = origin), c(104, 105, 106, 106, 106, 107))
 })
 
 test_that("leap years in `origin` affect the yweek group", {
   origin <- as.Date("2000-03-01")
 
-  x <- as.Date(c("1999-02-21", "1999-02-22", "1999-02-23", "1999-03-06", "1999-03-07", "1999-03-08"))
-  y <- as.Date(c("2000-02-21", "2000-02-22", "2000-02-23", "2000-03-06", "2000-03-07", "2000-03-08"))
-  z <- as.Date(c("2001-02-21", "2001-02-22", "2001-02-23", "2001-03-06", "2001-03-07", "2001-03-08"))
+  x <- as.Date(c("1999-02-27", "1999-02-28", "1999-03-01", "1999-03-02", "1999-03-07", "1999-03-08"))
+  y <- as.Date(c("2000-02-27", "2000-02-28", "2000-02-29", "2000-03-01", "2000-03-02", "2000-03-07", "2000-03-08"))
+  z <- as.Date(c("2001-02-27", "2001-02-28", "2001-03-01", "2001-03-02", "2001-03-07", "2001-03-08"))
 
-  # 1999-01-01 -> 1999-02-19 = 7 full weeks
-  # [1999-02-19, 1999-02-26) = -55
-  # [1999-02-26, 1999-03-01) = -54
+  # 1998-03-01 -> 1999-02-21 = 51 full weeks
+  # [1999-02-21, 1999-02-28) = -55
+  # [1999-02-28, 1999-03-01) = -54
   # [1999-03-01, 1999-03-08) = -53
   # [1999-03-08, 1999-03-15) = -52
-  expect_identical(warp_distance(x, period = "yweek", every = 1, origin = origin), c(-55, -55, -55, -53, -53, -52))
+  expect_identical(warp_distance(x, period = "yweek", every = 1, origin = origin), c(-55, -54, -53, -53, -53, -52))
 
-  # 2000-01-01 -> 2000-02-19 = 7 full weeks
-  # [2000-02-19, 2000-02-26) = -2
-  # [2000-02-26, 2000-03-01) = -1
+  # 1999-03-01 -> 2000-02-21 = 51 full weeks
+  # [2000-02-21, 2000-02-28) = -2
+  # [2000-02-28, 2000-03-01) = -1
   # [2000-03-01, 2000-03-08) = 0
   # [2000-03-08, 2000-03-15) = 1
-  expect_identical(warp_distance(y, period = "yweek", every = 1, origin = origin), c(-2, -2, -2, 0, 0, 1))
+  expect_identical(warp_distance(y, period = "yweek", every = 1, origin = origin), c(-2, -1, -1, 0, 0, 0, 1))
 
-  # 2000-01-01 -> 2000-02-19 = 7 full weeks
-  # [2000-02-19, 2000-02-26) = 51
-  # [2000-02-26, 2000-03-01) = 52
-  # [2000-03-01, 2000-03-08) = 53
-  # [2000-03-08, 2000-03-15) = 54
-  expect_identical(warp_distance(z, period = "yweek", every = 1, origin = origin), c(51, 51, 51, 53, 53, 54))
+  # 2000-03-01 -> 2001-02-21 = 51 full weeks
+  # [2001-02-21, 2001-02-28) = 104
+  # [2001-02-28, 2001-03-01) = 105
+  # [2001-03-01, 2001-03-08) = 106
+  # [2001-03-08, 2001-03-15) = 107
+  expect_identical(warp_distance(z, period = "yweek", every = 1, origin = origin), c(51, 52, 53, 53, 53, 54))
 })
 
 test_that("`origin` value can be on the leap day", {
   origin <- as.Date("2000-02-29")
 
   # Non-leap years start that group on 02/28
-  x <- as.Date(c("1999-02-20", "1999-02-21", "1999-02-22", "1999-02-28", "1999-03-06", "1999-03-07", "1999-03-08"))
-  y <- as.Date(c("2000-02-20", "2000-02-21", "2000-02-22", "2000-02-28", "2000-03-06", "2000-03-07", "2000-03-08"))
-  z <- as.Date(c("2001-02-20", "2001-02-21", "2001-02-22", "2001-02-28", "2001-03-06", "2001-03-07", "2001-03-08"))
+  x <- as.Date(c("1999-02-27", "1999-02-28", "1999-03-01", "1999-03-02", "1999-03-07", "1999-03-08"))
+  y <- as.Date(c("2000-02-27", "2000-02-28", "2000-02-29", "2000-03-01", "2000-03-02", "2000-03-07", "2000-03-08"))
+  z <- as.Date(c("2001-02-27", "2001-02-28", "2001-03-01", "2001-03-02", "2001-03-07", "2001-03-08"))
 
-  # 1999-01-01 -> 1999-02-19 = 7 full weeks
-  # [1999-02-19, 1999-02-26) = -55
-  # [1999-02-26, 1999-02-28) = -54
+  # 1998-02-28 -> 1999-02-27 = 52 full weeks
+  # [1999-02-27, 1999-02-28) = -54
   # [1999-02-28, 1999-03-07) = -53
-  # [1999-03-07, 1999-03-14) = -52
-  expect_identical(warp_distance(x, period = "yweek", every = 1, origin = origin), c(-55, -55, -55, -53, -53, -52, -52))
+  # [1999-03-07, 1999-03-15) = -52
+  expect_identical(warp_distance(x, period = "yweek", every = 1, origin = origin), c(-54, -53, -53, -53, -52, -52))
 
-  # 2000-01-01 -> 2000-02-19 = 7 full weeks
-  # [2000-02-19, 2000-02-26) = -2
-  # [2000-02-26, 2000-02-29) = -1
+  # 1999-02-28 -> 2000-02-27 = 52 full weeks
+  # [2000-02-27, 2000-02-29) = -1
   # [2000-02-29, 2000-03-07) = 0
-  # [2000-03-07, 2000-03-14) = 1
-  expect_identical(warp_distance(y, period = "yweek", every = 1, origin = origin), c(-2, -2, -2, -1, 0, 1, 1))
+  # [2000-03-07, 2000-03-15) = 1
+  expect_identical(warp_distance(y, period = "yweek", every = 1, origin = origin), c(-1, -1, 0, 0, 0, 1, 1))
 
-  # 2001-01-01 -> 2001-02-19 = 7 full weeks
-  # [2001-02-19, 2001-02-26) = 51
-  # [2001-02-26, 2001-02-28) = 52
+  # 2000-02-29 -> 2001-02-27 = 52 full weeks
+  # [2001-02-27, 2001-02-28) = 52
   # [2001-02-28, 2001-03-07) = 53
-  # [2001-03-07, 2001-03-14) = 54
-  expect_identical(warp_distance(z, period = "yweek", every = 1, origin = origin), c(51, 51, 51, 53, 53, 54, 54))
+  # [2001-03-07, 2001-03-15) = 54
+  expect_identical(warp_distance(z, period = "yweek", every = 1, origin = origin), c(52, 53, 53, 53, 54, 54))
 })
 
 test_that("Ignoring the leap adjustment if before Feb 28th is required", {
@@ -852,15 +814,16 @@ test_that("can handle `every` with altered origin", {
     "1969-12-09", "1969-12-16",
     "1969-12-23", "1969-12-30",
     "1969-12-31", "1970-01-01",
+    "1970-01-06", "1970-01-07",
     "1970-01-08", "1970-01-15",
     "1970-01-22"
   ), tz = "UTC")
 
   origin <- as.Date("1970-01-08")
 
-  expect_equal(warp_distance(x, period = "yweek", every = 2L, origin = origin), c(-4, -4, -3, -3, -2, -2, -1, 0, 0, 1))
-  expect_equal(warp_distance(x, period = "yweek", every = 3L, origin = origin), c(-3, -3, -2, -2, -2, -1, -1, 0, 0, 0))
-  expect_equal(warp_distance(x, period = "yweek", every = 4L, origin = origin), c(-3, -3, -2, -2, -2, -2, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, period = "yweek", every = 2L, origin = origin), c(-4, -4, -3, -3, -2, -2, -2, -2, -1, 0, 0, 1))
+  expect_equal(warp_distance(x, period = "yweek", every = 3L, origin = origin), c(-3, -3, -2, -2, -2, -1, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, period = "yweek", every = 4L, origin = origin), c(-3, -3, -2, -2, -2, -2, -2, -2, -1, 0, 0, 0))
 })
 
 test_that("can handle `every` with altered origin and altered timezone", {
@@ -869,15 +832,16 @@ test_that("can handle `every` with altered origin and altered timezone", {
     "1969-12-09", "1969-12-16",
     "1969-12-23", "1969-12-30",
     "1969-12-31", "1970-01-01",
+    "1970-01-06", "1970-01-07",
     "1970-01-08", "1970-01-15",
     "1970-01-22"
   ), tz = "America/New_York")
 
   origin <- as.POSIXct("1970-01-08", tz = "America/New_York")
 
-  expect_equal(warp_distance(x, period = "yweek", every = 2L, origin = origin), c(-4, -4, -3, -3, -2, -2, -1, 0, 0, 1))
-  expect_equal(warp_distance(x, period = "yweek", every = 3L, origin = origin), c(-3, -3, -2, -2, -2, -1, -1, 0, 0, 0))
-  expect_equal(warp_distance(x, period = "yweek", every = 4L, origin = origin), c(-3, -3, -2, -2, -2, -2, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, period = "yweek", every = 2L, origin = origin), c(-4, -4, -3, -3, -2, -2, -2, -2, -1, 0, 0, 1))
+  expect_equal(warp_distance(x, period = "yweek", every = 3L, origin = origin), c(-3, -3, -2, -2, -2, -1, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, period = "yweek", every = 4L, origin = origin), c(-3, -3, -2, -2, -2, -2, -2, -2, -1, 0, 0, 0))
 })
 
 test_that("going backwards in time still uses groups computed from the first of the year", {
@@ -899,70 +863,31 @@ test_that("default `origin` results in epoch in the time zone of `x`", {
   )
 })
 
-test_that("`origin` values don't have to be on 7-day increments from January 1st", {
-  x <- as.POSIXct(c(
-    "1969-12-02",
-    "1969-12-09", "1969-12-16",
-    "1969-12-23", "1969-12-30",
-    "1969-12-31", "1970-01-01",
-    "1970-01-08", "1970-01-15",
-    "1970-01-22"
-  ), tz = "UTC")
-
-  origin <- as.POSIXct("1970-01-02", tz = "UTC")
-
-  # [1969-01-02, 1969-01-09)
-  # [1969-01-09, 1969-01-16)
-  # ...
-  # [1969-11-27, 1969-12-04) = -6
-  # [1969-12-04, 1969-12-11) = -5
-  # [1969-12-11, 1969-12-18) = -4
-  # [1969-12-18, 1969-12-25) = -3
-  # [1969-12-25, 1970-01-01) = -2
-  # [1970-01-01, 1970-01-02) = -1
-  # [1970-01-02, 1970-01-09) = 0
-  # [1970-01-09, 1970-01-16) = 1
-  # [1970-01-16, 1970-01-23) = 2
-  expect_equal(warp_distance(x, "yweek", every = 1, origin = origin), c(-6, -5, -4, -3, -2, -2, -1, 0, 1, 2))
-
-  # [1969-01-02, 1969-01-16)
-  # ...
-  # [1969-12-04, 1969-12-18) = -3
-  # [1969-12-18, 1970-01-01) = -2
-  # [1970-01-01, 1970-01-02) = -1
-  # [1970-01-02, 1970-01-16) = 0
-  # [1970-01-16, 1970-01-30) = 1
-  expect_equal(warp_distance(x, "yweek", every = 2, origin = origin), c(-4, -3, -3, -2, -2, -2, -1, 0, 0, 1))
-})
-
 test_that("`origin` value can be on the leap day", {
   origin <- as.POSIXct("2000-02-29", "UTC")
 
   # Non-leap years start that group on 02/28
-  x <- as.POSIXct(c("1999-02-20", "1999-02-21", "1999-02-22", "1999-02-28", "1999-03-06", "1999-03-07", "1999-03-08"), "UTC")
-  y <- as.POSIXct(c("2000-02-20", "2000-02-21", "2000-02-22", "2000-02-28", "2000-03-06", "2000-03-07", "2000-03-08"), "UTC")
-  z <- as.POSIXct(c("2001-02-20", "2001-02-21", "2001-02-22", "2001-02-28", "2001-03-06", "2001-03-07", "2001-03-08"), "UTC")
+  x <- as.POSIXct(c("1999-02-27", "1999-02-28", "1999-03-01", "1999-03-02", "1999-03-07", "1999-03-08"), "UTC")
+  y <- as.POSIXct(c("2000-02-27", "2000-02-28", "2000-02-29", "2000-03-01", "2000-03-02", "2000-03-07", "2000-03-08"), "UTC")
+  z <- as.POSIXct(c("2001-02-27", "2001-02-28", "2001-03-01", "2001-03-02", "2001-03-07", "2001-03-08"), "UTC")
 
-  # 1999-01-01 -> 1999-02-19 = 7 full weeks
-  # [1999-02-19, 1999-02-26) = -55
-  # [1999-02-26, 1999-02-28) = -54
+  # 1998-02-28 -> 1999-02-27 = 52 full weeks
+  # [1999-02-27, 1999-02-28) = -54
   # [1999-02-28, 1999-03-07) = -53
-  # [1999-03-07, 1999-03-14) = -52
-  expect_identical(warp_distance(x, period = "yweek", every = 1, origin = origin), c(-55, -55, -55, -53, -53, -52, -52))
+  # [1999-03-07, 1999-03-15) = -52
+  expect_identical(warp_distance(x, period = "yweek", every = 1, origin = origin), c(-54, -53, -53, -53, -52, -52))
 
-  # 2000-01-01 -> 2000-02-19 = 7 full weeks
-  # [2000-02-19, 2000-02-26) = -2
-  # [2000-02-26, 2000-02-29) = -1
+  # 1999-02-28 -> 2000-02-27 = 52 full weeks
+  # [2000-02-27, 2000-02-29) = -1
   # [2000-02-29, 2000-03-07) = 0
-  # [2000-03-07, 2000-03-14) = 1
-  expect_identical(warp_distance(y, period = "yweek", every = 1, origin = origin), c(-2, -2, -2, -1, 0, 1, 1))
+  # [2000-03-07, 2000-03-15) = 1
+  expect_identical(warp_distance(y, period = "yweek", every = 1, origin = origin), c(-1, -1, 0, 0, 0, 1, 1))
 
-  # 2001-01-01 -> 2001-02-19 = 7 full weeks
-  # [2001-02-19, 2001-02-26) = 51
-  # [2001-02-26, 2001-02-28) = 52
+  # 2000-02-29 -> 2001-02-27 = 52 full weeks
+  # [2001-02-27, 2001-02-28) = 52
   # [2001-02-28, 2001-03-07) = 53
-  # [2001-03-07, 2001-03-14) = 54
-  expect_identical(warp_distance(z, period = "yweek", every = 1, origin = origin), c(51, 51, 51, 53, 53, 54, 54))
+  # [2001-03-07, 2001-03-15) = 54
+  expect_identical(warp_distance(z, period = "yweek", every = 1, origin = origin), c(52, 53, 53, 53, 54, 54))
 })
 
 # ------------------------------------------------------------------------------

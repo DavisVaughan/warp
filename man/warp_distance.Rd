@@ -90,12 +90,11 @@ example, the default origin of \code{1970-01-01} is a Thursday, so this would be
 generate groups identical to \code{floor_date(week_start = 4)}.
 
 The \code{period} value of \code{"yday"} is computed as complete \code{every}-day periods
-from the \code{origin}, with a forced reset of the \code{every}-day counter on
-January 1st. \code{"yweek"} is built on top of this internally as
-\verb{period = "yday", every = every * 7}. This ends up using an algorithm very
-similar to \code{lubridate::week()}, with the added benefit of being able to
-control the \code{origin} date, which can be used like \code{week_start} from
-\code{lubridate::floor_date()}.
+from the \code{origin}, with a forced reset of the \code{every}-day counter every
+time you hit the month-day value of the \code{origin}. \code{"yweek"} is built on top
+of this internally as \verb{period = "yday", every = every * 7}. This ends up
+using an algorithm very similar to \code{lubridate::week()}, with the added
+benefit of being able to control the \code{origin} date.
 }
 
 \section{Precision}{
@@ -173,15 +172,12 @@ x <- as.Date("2019-12-23") + 0:16
 origin <- as.Date("1970-01-01")
 
 # `"week"` counts the number of 7 day periods from the `origin`
-# `"yweek"` restarts the 7 day counter every January 1st. Notice how
-# only 1 day was in the week starting with `2019-12-31`.
+# `"yweek"` restarts the 7 day counter every time you hit the month-day
+# value of the `origin`. Notice how, for the `yweek` column, only 1 day was
+# in the week starting with `2019-12-31`.
 data.frame(
   x = x,
   week = warp_distance(x, "week", origin = origin),
   yweek = warp_distance(x, "yweek", origin = origin)
 )
-
-
-
-
 }
