@@ -14,11 +14,6 @@
  * `get_day_offset()`
  *   Extract the number of days offset from 1970.
  *   Return an integer vector.
- *
- * `get_yday_offset()`
- *   Extract the number of days offset from 1970, with a restart of the 7
- *   day counter every January 1st.
- *   Return an integer vector.
  */
 
 // -----------------------------------------------------------------------------
@@ -261,76 +256,67 @@ static inline int days_before_year(int year) {
 
 // -----------------------------------------------------------------------------
 
-static SEXP posixct_get_yday_offset(SEXP x, int every);
-static SEXP posixlt_get_yday_offset(SEXP x, int every);
+static SEXP posixct_get_origin_yday_components(SEXP origin);
+static SEXP posixlt_get_origin_yday_components(SEXP origin);
 
-// [[ "utils.h" ]]
-SEXP get_yday_offset(SEXP x, int every) {
-  switch(time_class_type(x)) {
-  case warp_class_date: return date_get_yday_offset(x, every);
-  case warp_class_posixct: return posixct_get_yday_offset(x, every);
-  case warp_class_posixlt: return posixlt_get_yday_offset(x, every);
-  default: r_error("get_yday_offset", "Internal error: Unknown date time class.");
+// [[ include("utils.h") ]]
+SEXP get_origin_yday_components(SEXP origin) {
+  if (origin == R_NilValue) {
+    SEXP out = PROTECT(Rf_allocVector(VECSXP, 2));
+    SET_VECTOR_ELT(out, 0, Rf_ScalarInteger(0));
+    SET_VECTOR_ELT(out, 1, Rf_ScalarInteger(0));
+    UNPROTECT(1);
+    return out;
+  }
+
+  switch(time_class_type(origin)) {
+  case warp_class_date: return date_get_origin_yday_components(origin);
+  case warp_class_posixct: return posixct_get_origin_yday_components(origin);
+  case warp_class_posixlt: return posixlt_get_origin_yday_components(origin);
+  default: r_error("get_origin_yday_components", "Internal error: Unknown date time class.");
   }
 }
 
-static SEXP posixct_get_yday_offset(SEXP x, int every) {
-  x = PROTECT(as_posixlt_from_posixct(x));
-  SEXP out = posixlt_get_yday_offset(x, every);
+static SEXP posixct_get_origin_yday_components(SEXP origin) {
+  origin = PROTECT(as_posixlt_from_posixct(origin));
+  SEXP out = posixlt_get_origin_yday_components(origin);
   UNPROTECT(1);
   return out;
 }
 
-#define DAYS_IN_YEAR 365
-#define DAYS_IN_LEAP_YEAR 366
+static SEXP posixlt_get_origin_yday_components(SEXP origin) {
+  SEXP origin_year = VECTOR_ELT(origin, 5);
+  SEXP origin_yday = VECTOR_ELT(origin, 7);
 
-static SEXP posixlt_get_yday_offset(SEXP x, int every) {
-  SEXP year = VECTOR_ELT(x, 5);
-  SEXP yday = VECTOR_ELT(x, 7);
-
-  if (TYPEOF(year) != INTSXP) {
+  if (TYPEOF(origin_year) != INTSXP) {
     r_error(
-      "posixlt_get_yday_offset",
+      "posixlt_get_origin_yday_components",
       "Internal error: The 6th element of the POSIXlt object should be an integer."
     );
   }
 
-  if (TYPEOF(yday) != INTSXP) {
+  if (TYPEOF(origin_yday) != INTSXP) {
     r_error(
-      "posixlt_get_yday_offset",
+      "posixlt_get_origin_yday_components",
       "Internal error: The 8th element of the POSIXlt object should be an integer."
     );
   }
 
-  int* p_year = INTEGER(year);
-  int* p_yday = INTEGER(yday);
+  int year = INTEGER(origin_year)[0];
+  int yday = INTEGER(origin_yday)[0];
 
-  R_xlen_t size = Rf_xlength(year);
-
-  SEXP out = PROTECT(Rf_allocVector(INTSXP, size));
-  int* p_out = INTEGER(out);
-
-  int units_in_non_leap_year = (DAYS_IN_YEAR - 1) / every + 1;
-  int units_in_leap_year = (DAYS_IN_LEAP_YEAR - 1) / every + 1;
-
-  for (R_xlen_t i = 0; i < size; ++i) {
-    if (p_year[i] == NA_INTEGER) {
-      p_out[i] = NA_INTEGER;
-      continue;
-    }
-
-    int day_units_before_year = units_before_year(
-      p_year[i] - 70,
-      units_in_non_leap_year,
-      units_in_leap_year
+  if (year == NA_INTEGER || yday == NA_INTEGER) {
+    r_error(
+      "posixlt_get_origin_yday_components",
+      "The `origin` cannot be `NA`."
     );
-
-    p_out[i] = day_units_before_year + p_yday[i] / every;
   }
+
+  SEXP out = PROTECT(Rf_allocVector(VECSXP, 2));
+
+  SET_VECTOR_ELT(out, 0, Rf_ScalarInteger(year - 70));
+  SET_VECTOR_ELT(out, 1, Rf_ScalarInteger(yday));
 
   UNPROTECT(1);
   return out;
 }
-
-#undef DAYS_IN_YEAR
-#undef DAYS_IN_LEAP_YEAR

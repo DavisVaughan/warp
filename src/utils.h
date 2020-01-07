@@ -59,12 +59,12 @@ int units_before_year(int year_offset,
 SEXP get_year_offset(SEXP x);
 SEXP get_month_offset(SEXP x);
 SEXP get_day_offset(SEXP x);
-SEXP get_yday_offset(SEXP x, int every);
+SEXP get_origin_yday_components(SEXP origin);
 
 // In `date.c`
 SEXP date_get_year_offset(SEXP x);
 SEXP date_get_month_offset(SEXP x);
-SEXP date_get_yday_offset(SEXP x, int every);
+SEXP date_get_origin_yday_components(SEXP origin);
 
 // In `coercion.c`
 SEXP as_datetime(SEXP x);

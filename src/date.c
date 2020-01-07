@@ -1,4 +1,5 @@
 #include "utils.h"
+#include "date.h"
 #include "divmod.h"
 
 /*
@@ -7,25 +8,6 @@
  * Python's datetime library for the computation of the year and month
  * components. It is both much faster and highly memory efficient.
  */
-
-/*
- * @member year
- *   The year offset. The number of years since 1970.
- * @member month
- *   The month. Mapped to the range of 0-11, where 0 is January.
- * @member day
- *   The day of month. Mapped to the range of 0-30.
- * @member yday
- *   The day of the year. Mapped to the range of 0-365.
- */
-struct warp_components {
-  int year;
-  int month;
-  int day;
-  int yday;
-};
-
-static struct warp_components convert_days_to_components(int n);
 
 // -----------------------------------------------------------------------------
 
@@ -173,94 +155,62 @@ static SEXP dbl_date_get_month_offset(SEXP x) {
 
 // -----------------------------------------------------------------------------
 
-static SEXP int_date_get_yday_offset(SEXP x, int every);
-static SEXP dbl_date_get_yday_offset(SEXP x, int every);
+static SEXP int_date_get_origin_yday_components(SEXP origin);
+static SEXP dbl_date_get_origin_yday_components(SEXP origin);
 
 // [[ include("utils.h") ]]
-SEXP date_get_yday_offset(SEXP x, int every) {
-  switch (TYPEOF(x)) {
-  case INTSXP: return int_date_get_yday_offset(x, every);
-  case REALSXP: return dbl_date_get_yday_offset(x, every);
-  default: r_error("date_get_yday_offset", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
+SEXP date_get_origin_yday_components(SEXP origin) {
+  switch (TYPEOF(origin)) {
+  case INTSXP: return int_date_get_origin_yday_components(origin);
+  case REALSXP: return dbl_date_get_origin_yday_components(origin);
+  default: r_error("date_get_origin_yday_components", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(origin)));
   }
 }
 
-#define DAYS_IN_YEAR 365
-#define DAYS_IN_LEAP_YEAR 366
+static SEXP int_date_get_origin_yday_components(SEXP origin) {
+  int elt = INTEGER(origin)[0];
 
-static SEXP int_date_get_yday_offset(SEXP x, int every) {
-  int* p_x = INTEGER(x);
-
-  R_xlen_t size = Rf_xlength(x);
-
-  SEXP out = PROTECT(Rf_allocVector(INTSXP, size));
-  int* p_out = INTEGER(out);
-
-  int units_in_non_leap_year = (DAYS_IN_YEAR - 1) / every + 1;
-  int units_in_leap_year = (DAYS_IN_LEAP_YEAR - 1) / every + 1;
-
-  for (R_xlen_t i = 0; i < size; ++i) {
-    int elt = p_x[i];
-
-    if (elt == NA_INTEGER) {
-      p_out[i] = NA_INTEGER;
-      continue;
-    }
-
-    struct warp_components components = convert_days_to_components(elt);
-
-    int day_units_before_year = units_before_year(
-      components.year,
-      units_in_non_leap_year,
-      units_in_leap_year
+  if (elt == NA_INTEGER) {
+    r_error(
+      "int_date_get_origin_yday_components",
+      "The `origin` cannot be `NA`."
     );
-
-    p_out[i] = day_units_before_year + components.yday / every;
   }
+
+  struct warp_components components = convert_days_to_components(elt);
+
+  SEXP out = PROTECT(Rf_allocVector(VECSXP, 2));
+
+  SET_VECTOR_ELT(out, 0, Rf_ScalarInteger(components.year));
+  SET_VECTOR_ELT(out, 1, Rf_ScalarInteger(components.yday));
 
   UNPROTECT(1);
   return out;
 }
 
-static SEXP dbl_date_get_yday_offset(SEXP x, int every) {
-  double* p_x = REAL(x);
+static SEXP dbl_date_get_origin_yday_components(SEXP origin) {
+  double origin_elt = REAL(origin)[0];
 
-  R_xlen_t size = Rf_xlength(x);
-
-  SEXP out = PROTECT(Rf_allocVector(INTSXP, size));
-  int* p_out = INTEGER(out);
-
-  int units_in_non_leap_year = (DAYS_IN_YEAR - 1) / every + 1;
-  int units_in_leap_year = (DAYS_IN_LEAP_YEAR - 1) / every + 1;
-
-  for (R_xlen_t i = 0; i < size; ++i) {
-    double x_elt = p_x[i];
-
-    if (!R_FINITE(x_elt)) {
-      p_out[i] = NA_INTEGER;
-      continue;
-    }
-
-    // Truncate fractional pieces towards 0
-    int elt = x_elt;
-
-    struct warp_components components = convert_days_to_components(elt);
-
-    int day_units_before_year = units_before_year(
-      components.year,
-      units_in_non_leap_year,
-      units_in_leap_year
+  if (origin_elt == NA_REAL) {
+    r_error(
+      "dbl_date_get_origin_yday_components",
+      "The `origin` cannot be `NA`."
     );
-
-    p_out[i] = day_units_before_year + components.yday / every;
   }
+
+  // Drop fractional part
+  int elt = origin_elt;
+
+  struct warp_components components = convert_days_to_components(elt);
+
+  SEXP out = PROTECT(Rf_allocVector(VECSXP, 2));
+
+  SET_VECTOR_ELT(out, 0, Rf_ScalarInteger(components.year));
+  SET_VECTOR_ELT(out, 1, Rf_ScalarInteger(components.yday));
 
   UNPROTECT(1);
   return out;
 }
-
-#undef DAYS_IN_YEAR
-#undef DAYS_IN_LEAP_YEAR
 
 // -----------------------------------------------------------------------------
 
@@ -324,7 +274,7 @@ static const int DAYS_UP_TO_MONTH[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243,
  * far, we adjust it back by 1 month.
  */
 
-static struct warp_components convert_days_to_components(int n) {
+struct warp_components convert_days_to_components(int n) {
   struct warp_components components;
 
   int n_1_year_cycles;

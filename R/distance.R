@@ -48,14 +48,20 @@
 #' the month specified for the `origin` will be used as the month to start
 #' counting from to generate the 3 month quarter.
 #'
-#' The `period` value of `"yweek"` is computed in the same way as
-#' `lubridate::week()`. Week groups are defined as complete 7 day periods,
-#' with the 7 day counter resetting every January 1st. To mimic the behavior
-#' of `lubridate::floor_date()`, use `period = "week"`.
-#' To mimic the `week_start` argument of `floor_date()`, set `origin` to a date
+#' To mimic the behavior of `lubridate::floor_date()`, use `period = "week"`.
+#' Internally this is just `period = "day", every = every * 7`. To mimic the
+#' `week_start` argument of `floor_date()`, set `origin` to a date
 #' with a week day identical to the one you want the week to start from. For
 #' example, the default origin of `1970-01-01` is a Thursday, so this would be
 #' generate groups identical to `floor_date(week_start = 4)`.
+#'
+#' The `period` value of `"yday"` is computed as complete `every`-day periods
+#' from the `origin`, with a forced reset of the `every`-day counter on
+#' January 1st. `"yweek"` is built on top of this internally as
+#' `period = "yday", every = every * 7`. This ends up using an algorithm very
+#' similar to `lubridate::week()`, with the added benefit of being able to
+#' control the `origin` date, which can be used like `week_start` from
+#' `lubridate::floor_date()`.
 #'
 #' @section Precision:
 #'
@@ -130,6 +136,9 @@
 #' origin <- as.POSIXct("1970-01-01 00:00:01", "UTC")
 #' warp_distance(y, "second", every = 5, origin = origin)
 #'
+#' # ---------------------------------------------------------------------------
+#' # Time zones
+#'
 #' # When `x` is not UTC and `origin` is left as `NULL`, the origin is set as
 #' # 1970-01-01 00:00:00 in the time zone of `x`. This seems to be the most
 #' # practically useful default.
@@ -149,6 +158,25 @@
 #' origin <- as.POSIXct("1970-01-01 00:00:00", tz = "UTC")
 #' warp_distance(z, "year", origin = origin)
 #' warp_distance(z_in_nyc, "year", origin = origin)
+#'
+#' # ---------------------------------------------------------------------------
+#' # `period = "yweek"`
+#'
+#' x <- as.Date("2019-12-23") + 0:16
+#' origin <- as.Date("1970-01-01")
+#'
+#' # `"week"` counts the number of 7 day periods from the `origin`
+#' # `"yweek"` restarts the 7 day counter every January 1st. Notice how
+#' # only 1 day was in the week starting with `2019-12-31`.
+#' data.frame(
+#'   x = x,
+#'   week = warp_distance(x, "week", origin = origin),
+#'   yweek = warp_distance(x, "yweek", origin = origin)
+#' )
+#'
+#'
+#'
+#'
 warp_distance <- function(x, period = "year", every = 1L, origin = NULL) {
   .Call(warp_warp_distance, x, period, every, origin)
 }
