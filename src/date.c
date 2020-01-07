@@ -211,6 +211,63 @@ static struct warp_yday_components dbl_date_get_origin_yday_components(SEXP orig
 
 // -----------------------------------------------------------------------------
 
+static struct warp_mday_components int_date_get_origin_mday_components(SEXP origin);
+static struct warp_mday_components dbl_date_get_origin_mday_components(SEXP origin);
+
+// [[ include("utils.h") ]]
+struct warp_mday_components date_get_origin_mday_components(SEXP origin) {
+  switch (TYPEOF(origin)) {
+  case INTSXP: return int_date_get_origin_mday_components(origin);
+  case REALSXP: return dbl_date_get_origin_mday_components(origin);
+  default: r_error("date_get_origin_mday_components", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(origin)));
+  }
+}
+
+static struct warp_mday_components int_date_get_origin_mday_components(SEXP origin) {
+  int elt = INTEGER(origin)[0];
+
+  if (elt == NA_INTEGER) {
+    r_error(
+      "int_date_get_origin_mday_components",
+      "The `origin` cannot be `NA`."
+    );
+  }
+
+  struct warp_components components = convert_days_to_components(elt);
+
+  struct warp_mday_components out;
+
+  out.year_offset = components.year_offset;
+  out.month = components.month;
+
+  return out;
+}
+
+static struct warp_mday_components dbl_date_get_origin_mday_components(SEXP origin) {
+  double origin_elt = REAL(origin)[0];
+
+  if (!R_FINITE(origin_elt)) {
+    r_error(
+      "dbl_date_get_origin_mday_components",
+      "The `origin` must be finite."
+    );
+  }
+
+  // Drop fractional part
+  int elt = origin_elt;
+
+  struct warp_components components = convert_days_to_components(elt);
+
+  struct warp_mday_components out;
+
+  out.year_offset = components.year_offset;
+  out.month = components.month;
+
+  return out;
+}
+
+// -----------------------------------------------------------------------------
+
 static const int DAYS_IN_MONTH[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 static const int DAYS_UP_TO_MONTH[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
 

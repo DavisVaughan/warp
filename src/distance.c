@@ -21,6 +21,7 @@ static SEXP warp_distance_week(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_yweek(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_day(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_yday(SEXP x, int every, SEXP origin);
+static SEXP warp_distance_mday(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_hour(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_minute(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_second(SEXP x, int every, SEXP origin);
@@ -51,6 +52,7 @@ SEXP warp_distance(SEXP x, enum warp_period_type type, int every, SEXP origin) {
   case warp_period_yweek: out = PROTECT(warp_distance_yweek(x, every, origin)); break;
   case warp_period_day: out = PROTECT(warp_distance_day(x, every, origin)); break;
   case warp_period_yday: out = PROTECT(warp_distance_yday(x, every, origin)); break;
+  case warp_period_mday: out = PROTECT(warp_distance_mday(x, every, origin)); break;
   case warp_period_hour: out = PROTECT(warp_distance_hour(x, every, origin)); break;
   case warp_period_minute: out = PROTECT(warp_distance_minute(x, every, origin)); break;
   case warp_period_second: out = PROTECT(warp_distance_second(x, every, origin)); break;
@@ -478,7 +480,6 @@ static SEXP dbl_date_warp_distance_yday(SEXP x, int every, SEXP origin) {
 #undef DAYS_IN_YEAR
 #undef DAYS_IN_LEAP_YEAR
 
-static inline int leap_years_before_and_including_year(int year_offset);
 static inline int yday_leap_adjustment(int year_offset, int yday, bool origin_leap);
 
 static int compute_yday_distance(int days_since_epoch,
@@ -548,19 +549,6 @@ static inline int days_before_year(int year_offset) {
   return days;
 }
 
-static inline int leap_years_before_and_including_year(int year_offset) {
-  int year = year_offset + YEARS_FROM_0001_01_01_TO_EPOCH;
-
-  int n_leap_years =
-    int_div(year, 4) -
-    int_div(year, 100) +
-    int_div(year, 400);
-
-  n_leap_years -= LEAP_YEARS_FROM_0001_01_01_TO_EPOCH;
-
-  return n_leap_years;
-}
-
 #undef YEARS_FROM_0001_01_01_TO_EPOCH
 #undef DAYS_FROM_0001_01_01_TO_EPOCH
 #undef LEAP_YEARS_FROM_0001_01_01_TO_EPOCH
@@ -591,6 +579,215 @@ static inline int yday_leap_adjustment(int year_offset, int yday, bool origin_le
 }
 
 #undef is_leap_year
+
+// -----------------------------------------------------------------------------
+
+static SEXP date_warp_distance_mday(SEXP x, int every, SEXP origin);
+static SEXP posixct_warp_distance_mday(SEXP x, int every, SEXP origin);
+static SEXP posixlt_warp_distance_mday(SEXP x, int every, SEXP origin);
+
+static SEXP warp_distance_mday(SEXP x, int every, SEXP origin) {
+  if (every > 30) {
+    r_error(
+      "warp_distance_mday",
+      "The maximum allowed value of `every` for `period = 'mday'` is 30."
+    );
+  }
+
+  switch (time_class_type(x)) {
+  case warp_class_date: return date_warp_distance_mday(x, every, origin);
+  case warp_class_posixct: return posixct_warp_distance_mday(x, every, origin);
+  case warp_class_posixlt: return posixlt_warp_distance_mday(x, every, origin);
+  default: r_error("warp_distance_mday", "Unknown object with type, %s.", Rf_type2char(TYPEOF(x)));
+  }
+}
+
+
+static SEXP int_date_warp_distance_mday(SEXP x, int every, SEXP origin);
+static SEXP dbl_date_warp_distance_mday(SEXP x, int every, SEXP origin);
+
+static SEXP date_warp_distance_mday(SEXP x, int every, SEXP origin) {
+  switch (TYPEOF(x)) {
+  case INTSXP: return int_date_warp_distance_mday(x, every, origin);
+  case REALSXP: return dbl_date_warp_distance_mday(x, every, origin);
+  default: r_error("date_warp_distance_mday", "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
+  }
+}
+
+
+static SEXP posixct_warp_distance_mday(SEXP x, int every, SEXP origin) {
+  x = PROTECT(as_posixlt_from_posixct(x));
+  SEXP out = posixlt_warp_distance_mday(x, every, origin);
+  UNPROTECT(1);
+  return out;
+}
+
+static const int DAYS_IN_MONTH[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+static const int DAYS_IN_MONTH_LEAP[12] = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+static const int DAYS_UP_TO_MONTH[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
+static const int DAYS_UP_TO_MONTH_LEAP[12] = {0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335};
+
+#define is_leap_year(year) ((((year) % 4) == 0 && ((year) % 100) != 0) || ((year) % 400) == 0)
+
+static void fill_units_per_month(int* x, int every);
+static void fill_units_per_month_leap(int* x, int every);
+static int units_per_year(int* x);
+static int units_up_to_month(int month, const int* units_in_month, int every);
+
+static SEXP posixlt_warp_distance_mday(SEXP x, int every, SEXP origin) {
+  SEXP year = VECTOR_ELT(x, 5);
+  SEXP mday = VECTOR_ELT(x, 7);
+
+  if (TYPEOF(year) != INTSXP) {
+    r_error(
+      "posixlt_warp_distance_mday",
+      "Internal error: The 6th element of the POSIXlt object should be an integer."
+    );
+  }
+
+  if (TYPEOF(mday) != INTSXP) {
+    r_error(
+      "posixlt_warp_distance_mday",
+      "Internal error: The 8th element of the POSIXlt object should be an integer."
+    );
+  }
+
+  int* p_year = INTEGER(year);
+  int* p_mday = INTEGER(mday);
+
+  R_xlen_t size = Rf_xlength(year);
+
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, size));
+  double* p_out = REAL(out);
+
+  return out;
+}
+
+static SEXP int_date_warp_distance_mday(SEXP x, int every, SEXP origin) {
+  return x;
+}
+
+static SEXP dbl_date_warp_distance_mday(SEXP x, int every, SEXP origin) {
+  double* p_x = REAL(x);
+
+  R_xlen_t size = Rf_xlength(x);
+
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, size));
+  double* p_out = REAL(out);
+
+  int units_per_month_non_leap_year[12];
+  int units_per_month_leap_year[12];
+
+  fill_units_per_month(units_per_month_non_leap_year, every);
+  fill_units_per_month_leap(units_per_month_leap_year, every);
+
+  int units_per_year_non_leap_year = units_per_year(units_per_month_non_leap_year);
+  int units_per_year_leap_year = units_per_year(units_per_month_leap_year);
+
+  struct warp_mday_components origin_components = get_origin_mday_components(origin);
+  int origin_year_offset = origin_components.year_offset;
+  int origin_year = origin_year_offset + 1970;
+  int origin_month = origin_components.month;
+
+  int* units_per_month =
+    is_leap_year(origin_year) ?
+    units_per_month_leap_year :
+    units_per_month_non_leap_year;
+
+  int units_up_to_origin_month = units_up_to_month(
+    origin_month,
+    units_per_month,
+    every
+  );
+
+  int leap_years_before_and_including_origin_year =
+    leap_years_before_and_including_year(origin_year_offset);
+
+  for (R_xlen_t i = 0; i < size; ++i) {
+    double x_elt = p_x[i];
+
+    if (!R_FINITE(x_elt)) {
+      p_out[i] = NA_REAL;
+      continue;
+    }
+
+    // Truncate fractional pieces towards 0
+    int elt = x_elt;
+
+    struct warp_components components = convert_days_to_components(elt);
+
+    int years_between = components.year_offset - origin_year_offset;
+
+    int leap_years_between =
+      leap_years_before_and_including_year(components.year_offset) -
+      leap_years_before_and_including_origin_year;
+
+    int non_leap_years_between =
+      years_between -
+      leap_years_between;
+
+    int units_between_years =
+      leap_years_between * units_per_year_leap_year +
+      non_leap_years_between * units_per_year_non_leap_year;
+
+    int year = components.year_offset + 1970;
+    bool is_leap = is_leap_year(year);
+
+    int* units_per_month =
+      is_leap_year(year) ?
+      units_per_month_leap_year :
+      units_per_month_non_leap_year;
+
+    int units_up_to_elt_month = units_up_to_month(
+      components.month,
+      units_per_month,
+      every
+    );
+
+    int units_in_month = components.day / every;
+
+    p_out[i] =
+      units_between_years -
+      units_up_to_origin_month +
+      units_up_to_elt_month +
+      units_in_month;
+  }
+
+  UNPROTECT(1);
+  return out;
+}
+
+static void fill_units_per_month(int* x, int every) {
+  for (int i = 0; i < 12; ++i) {
+    x[i] = (DAYS_IN_MONTH[i] - 1) / every + 1;
+  }
+}
+
+static void fill_units_per_month_leap(int* x, int every) {
+  for (int i = 0; i < 12; ++i) {
+    x[i] = (DAYS_IN_MONTH_LEAP[i] - 1) / every + 1;
+  }
+}
+
+static int units_per_year(int* x) {
+  int out = 0;
+
+  for (int i = 0; i < 12; ++i) {
+    out += x[i];
+  }
+
+  return out;
+}
+
+static int units_up_to_month(int month, const int* units_per_month, int every) {
+  int out = 0;
+
+  for (int i = 0; i < month; ++i) {
+    out += units_per_month[i];
+  }
+
+  return out;
+}
 
 // -----------------------------------------------------------------------------
 

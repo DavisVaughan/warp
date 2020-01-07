@@ -318,3 +318,68 @@ static struct warp_yday_components posixlt_get_origin_yday_components(SEXP origi
 
   return out;
 }
+
+// -----------------------------------------------------------------------------
+
+static struct warp_mday_components posixct_get_origin_mday_components(SEXP origin);
+static struct warp_mday_components posixlt_get_origin_mday_components(SEXP origin);
+
+// [[ include("utils.h") ]]
+struct warp_mday_components get_origin_mday_components(SEXP origin) {
+  if (origin == R_NilValue) {
+    struct warp_mday_components out;
+    out.year_offset = 0;
+    out.month = 0;
+    return out;
+  }
+
+  switch(time_class_type(origin)) {
+  case warp_class_date: return date_get_origin_mday_components(origin);
+  case warp_class_posixct: return posixct_get_origin_mday_components(origin);
+  case warp_class_posixlt: return posixlt_get_origin_mday_components(origin);
+  default: r_error("get_origin_mday_components", "Internal error: Unknown date time class.");
+  }
+}
+
+static struct warp_mday_components posixct_get_origin_mday_components(SEXP origin) {
+  origin = PROTECT(as_posixlt_from_posixct(origin));
+  struct warp_mday_components out = posixlt_get_origin_mday_components(origin);
+  UNPROTECT(1);
+  return out;
+}
+
+static struct warp_mday_components posixlt_get_origin_mday_components(SEXP origin) {
+  SEXP origin_year = VECTOR_ELT(origin, 5);
+  SEXP origin_month = VECTOR_ELT(origin, 4);
+
+  if (TYPEOF(origin_year) != INTSXP) {
+    r_error(
+      "posixlt_get_origin_mday_components",
+      "Internal error: The 6th element of the POSIXlt object should be an integer."
+    );
+  }
+
+  if (TYPEOF(origin_month) != INTSXP) {
+    r_error(
+      "posixlt_get_origin_mday_components",
+      "Internal error: The 4th element of the POSIXlt object should be an integer."
+    );
+  }
+
+  int year = INTEGER(origin_year)[0];
+  int month = INTEGER(origin_month)[0];
+
+  if (year == NA_INTEGER || month == NA_INTEGER) {
+    r_error(
+      "posixlt_get_origin_mday_components",
+      "The `origin` cannot be `NA`."
+    );
+  }
+
+  struct warp_mday_components out;
+
+  out.year_offset = year - 70;
+  out.month = month;
+
+  return out;
+}
