@@ -1,7 +1,6 @@
 #include "warp.h"
 #include "utils.h"
 #include "divmod.h"
-#include "date.h"
 #include <stdint.h> // For int64_t (especially on Windows)
 
 // Helpers defined at the bottom of the file
