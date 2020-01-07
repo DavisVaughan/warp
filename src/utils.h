@@ -39,7 +39,7 @@ enum warp_class_type time_class_type(SEXP x);
 // -----------------------------------------------------------------------------
 
 /*
- * @member year
+ * @member year_offset
  *   The year offset. The number of years since 1970.
  * @member month
  *   The month. Mapped to the range of 0-11, where 0 is January.
@@ -49,7 +49,7 @@ enum warp_class_type time_class_type(SEXP x);
  *   The day of the year. Mapped to the range of 0-365.
  */
 struct warp_components {
-  int year;
+  int year_offset;
   int month;
   int day;
   int yday;

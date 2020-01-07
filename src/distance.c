@@ -393,7 +393,7 @@ static SEXP int_date_warp_distance_yday(SEXP x, int every, SEXP origin) {
     struct warp_components components = convert_days_to_components(elt);
 
     p_out[i] = compute_yday_distance(
-      components.year,
+      components.year_offset,
       components.yday,
       origin_year_offset,
       origin_yday,
@@ -438,7 +438,7 @@ static SEXP dbl_date_warp_distance_yday(SEXP x, int every, SEXP origin) {
     struct warp_components components = convert_days_to_components(elt);
 
     p_out[i] = compute_yday_distance(
-      components.year,
+      components.year_offset,
       components.yday,
       origin_year_offset,
       origin_yday,

@@ -45,7 +45,7 @@ static SEXP int_date_get_year_offset(SEXP x) {
 
     struct warp_components components = convert_days_to_components(elt);
 
-    p_out[i] = components.year;
+    p_out[i] = components.year_offset;
   }
 
   UNPROTECT(1);
@@ -73,7 +73,7 @@ static SEXP dbl_date_get_year_offset(SEXP x) {
 
     struct warp_components components = convert_days_to_components(elt);
 
-    p_out[i] = components.year;
+    p_out[i] = components.year_offset;
   }
 
   UNPROTECT(1);
@@ -117,7 +117,7 @@ static SEXP int_date_get_month_offset(SEXP x) {
 
     struct warp_components components = convert_days_to_components(elt);
 
-    p_out[i] = components.year * 12 + components.month;
+    p_out[i] = components.year_offset * 12 + components.month;
   }
 
   UNPROTECT(1);
@@ -145,7 +145,7 @@ static SEXP dbl_date_get_month_offset(SEXP x) {
 
     struct warp_components components = convert_days_to_components(elt);
 
-    p_out[i] = components.year * 12 + components.month;
+    p_out[i] = components.year_offset * 12 + components.month;
   }
 
   UNPROTECT(1);
@@ -180,7 +180,7 @@ static struct warp_yday_components int_date_get_origin_yday_components(SEXP orig
 
   struct warp_yday_components out;
 
-  out.year_offset = components.year;
+  out.year_offset = components.year_offset;
   out.yday = components.yday;
 
   return out;
@@ -203,7 +203,7 @@ static struct warp_yday_components dbl_date_get_origin_yday_components(SEXP orig
 
   struct warp_yday_components out;
 
-  out.year_offset = components.year;
+  out.year_offset = components.year_offset;
   out.yday = components.yday;
 
   return out;
@@ -307,7 +307,7 @@ struct warp_components convert_days_to_components(int n) {
   // Edge case adjustment required if we are on the border of a
   // 4 year or 400 year cycle boundary (i.e. `n = -1L`)
   if (n_1_year_cycles == 4 || n_100_year_cycles == 4) {
-    components.year = (year - 1) + YEAR_OFFSET_FROM_EPOCH;
+    components.year_offset = (year - 1) + YEAR_OFFSET_FROM_EPOCH;
     components.month = 12 + MONTH_ADJUSTMENT_TO_0_TO_11_RANGE;
     components.day = 31 + DAY_ADJUSTMENT_TO_0_TO_30_RANGE;
     components.yday = 365;
@@ -337,7 +337,7 @@ struct warp_components convert_days_to_components(int n) {
   // It will be 0-30 based already
   n -= preceding;
 
-  components.year = year + YEAR_OFFSET_FROM_EPOCH;
+  components.year_offset = year + YEAR_OFFSET_FROM_EPOCH;
   components.month = month + MONTH_ADJUSTMENT_TO_0_TO_11_RANGE;
   components.day = n;
 
@@ -368,7 +368,7 @@ SEXP warp_convert_days_to_components(SEXP n) {
 
   SEXP out = PROTECT(Rf_allocVector(INTSXP, 4));
 
-  INTEGER(out)[0] = components.year;
+  INTEGER(out)[0] = components.year_offset;
   INTEGER(out)[1] = components.month;
   INTEGER(out)[2] = components.day;
   INTEGER(out)[3] = components.yday;
