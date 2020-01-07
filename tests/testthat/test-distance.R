@@ -939,6 +939,27 @@ test_that("sanity check `every`", {
   expect_error(warp_distance(new_date(0), "yday", every = 365), "is 364")
 })
 
+test_that("can use an integer Date origin with yday", {
+  origin <- structure(1L, class = "Date")
+  expect_identical(warp_distance(new_date(0), "yday", origin = origin), -1)
+})
+
+test_that("integer Date origin that is NA is an error", {
+  origin <- structure(NA_integer_, class = "Date")
+  expect_error(warp_distance(new_date(0), "yday", origin = origin), "cannot be `NA`")
+})
+
+test_that("double Date origin that is NA / NaN / Inf is an error", {
+  origin <- structure(NA_real_, class = "Date")
+  expect_error(warp_distance(new_date(0), "yday", origin = origin), "must be finite")
+
+  origin <- structure(NaN, class = "Date")
+  expect_error(warp_distance(new_date(0), "yday", origin = origin), "must be finite")
+
+  origin <- structure(Inf, class = "Date")
+  expect_error(warp_distance(new_date(0), "yday", origin = origin), "must be finite")
+})
+
 # ------------------------------------------------------------------------------
 # warp_distance(<Date>, period = "day")
 

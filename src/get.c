@@ -173,7 +173,7 @@ static SEXP dbl_date_get_day_offset(SEXP x) {
 
   // Truncate any fractional pieces towards 0
   for (R_xlen_t i = 0; i < size; ++i) {
-    if (p_x[i] == NA_REAL) {
+    if (!R_FINITE(p_x[i])) {
       p_out[i] = NA_INTEGER;
       continue;
     }

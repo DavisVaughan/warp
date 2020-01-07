@@ -189,10 +189,10 @@ static struct warp_yday_components int_date_get_origin_yday_components(SEXP orig
 static struct warp_yday_components dbl_date_get_origin_yday_components(SEXP origin) {
   double origin_elt = REAL(origin)[0];
 
-  if (origin_elt == NA_REAL) {
+  if (!R_FINITE(origin_elt)) {
     r_error(
       "dbl_date_get_origin_yday_components",
-      "The `origin` cannot be `NA`."
+      "The `origin` must be finite."
     );
   }
 
