@@ -167,7 +167,8 @@
 #' # `"week"` counts the number of 7 day periods from the `origin`
 #' # `"yweek"` restarts the 7 day counter every time you hit the month-day
 #' # value of the `origin`. Notice how, for the `yweek` column, only 1 day was
-#' # in the week starting with `2019-12-31`.
+#' # in the week starting with `2019-12-31`. This is because the next day is
+#' # `2020-01-01`, which aligns with the month-day value of the `origin`.
 #' data.frame(
 #'   x = x,
 #'   week = warp_distance(x, "week", origin = origin),
