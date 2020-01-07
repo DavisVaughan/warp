@@ -322,6 +322,7 @@ static int compute_yday_distance(int days_since_epoch,
                                  int origin_leap,
                                  int units_in_leap_year,
                                  int units_in_non_leap_year,
+                                 int leap_years_before_and_including_origin_year,
                                  int every);
 
 static inline int days_before_year(int year_offset);
@@ -360,6 +361,9 @@ static SEXP posixlt_warp_distance_yday(SEXP x, int every, SEXP origin) {
   int origin_yday = origin_components.yday;
   bool origin_leap = is_leap_year(origin_year_offset + 1970);
 
+  int leap_years_before_and_including_origin_year =
+    leap_years_before_and_including_year(origin_year_offset);
+
   for (R_xlen_t i = 0; i < size; ++i) {
     if (p_year[i] == NA_INTEGER) {
       p_out[i] = NA_REAL;
@@ -380,6 +384,7 @@ static SEXP posixlt_warp_distance_yday(SEXP x, int every, SEXP origin) {
       origin_leap,
       units_in_leap_year,
       units_in_non_leap_year,
+      leap_years_before_and_including_origin_year,
       every
     );
   }
@@ -404,6 +409,9 @@ static SEXP int_date_warp_distance_yday(SEXP x, int every, SEXP origin) {
   int origin_yday = origin_components.yday;
   bool origin_leap = is_leap_year(origin_year_offset + 1970);
 
+  int leap_years_before_and_including_origin_year =
+    leap_years_before_and_including_year(origin_year_offset);
+
   for (R_xlen_t i = 0; i < size; ++i) {
     int elt = p_x[i];
 
@@ -423,6 +431,7 @@ static SEXP int_date_warp_distance_yday(SEXP x, int every, SEXP origin) {
       origin_leap,
       units_in_leap_year,
       units_in_non_leap_year,
+      leap_years_before_and_including_origin_year,
       every
     );
   }
@@ -447,6 +456,9 @@ static SEXP dbl_date_warp_distance_yday(SEXP x, int every, SEXP origin) {
   int origin_yday = origin_components.yday;
   bool origin_leap = is_leap_year(origin_year_offset + 1970);
 
+  int leap_years_before_and_including_origin_year =
+    leap_years_before_and_including_year(origin_year_offset);
+
   for (R_xlen_t i = 0; i < size; ++i) {
     double x_elt = p_x[i];
 
@@ -469,6 +481,7 @@ static SEXP dbl_date_warp_distance_yday(SEXP x, int every, SEXP origin) {
       origin_leap,
       units_in_leap_year,
       units_in_non_leap_year,
+      leap_years_before_and_including_origin_year,
       every
     );
   }
@@ -490,6 +503,7 @@ static int compute_yday_distance(int days_since_epoch,
                                  int origin_leap,
                                  int units_in_leap_year,
                                  int units_in_non_leap_year,
+                                 int leap_years_before_and_including_origin_year,
                                  int every) {
   int origin_yday_adjusted =
     origin_yday +
@@ -513,7 +527,7 @@ static int compute_yday_distance(int days_since_epoch,
 
   int leap_years_between_origins =
     leap_years_before_and_including_year(last_origin_year_offset) -
-    leap_years_before_and_including_year(origin_year_offset);
+    leap_years_before_and_including_origin_year;
 
   int non_leap_years_between_origins =
     years_between_origins -
