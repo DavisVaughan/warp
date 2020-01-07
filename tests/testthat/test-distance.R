@@ -1753,6 +1753,45 @@ test_that("can have an integer POSIXct origin", {
   )
 })
 
+test_that("integer Date `origin` cannot be NA_integer_", {
+  x <- new_datetime(0, "UTC")
+  origin <- structure(NA_integer_, class = "Date")
+  expect_error(warp_distance(x, period = "hour", origin = origin), "`origin` must be finite")
+})
+
+test_that("double Date `origin` cannot be NA_real_ / NaN / Inf", {
+  x <- new_datetime(0, "UTC")
+
+  origin <- structure(NA_real_, class = "Date")
+  expect_error(warp_distance(x, period = "hour", origin = origin), "`origin` must be finite")
+
+  origin <- structure(NaN, class = "Date")
+  expect_error(warp_distance(x, period = "hour", origin = origin), "`origin` must be finite")
+
+  origin <- structure(Inf, class = "Date")
+  expect_error(warp_distance(x, period = "hour", origin = origin), "`origin` must be finite")
+})
+
+test_that("double POSIXct `origin` cannot be NA_real_ / NaN / Inf", {
+  x <- new_datetime(0, "UTC")
+
+  origin <- structure(NA_real_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_error(warp_distance(x, period = "hour", origin = origin), "`origin` must be finite")
+
+  origin <- structure(NaN, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_error(warp_distance(x, period = "hour", origin = origin), "`origin` must be finite")
+
+  origin <- structure(Inf, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_error(warp_distance(x, period = "hour", origin = origin), "`origin` must be finite")
+})
+
+test_that("integer POSIXct `origin` cannot be NA_integer_", {
+  x <- new_datetime(0, "UTC")
+
+  origin <- structure(NA_integer_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_error(warp_distance(x, period = "hour", origin = origin), "`origin` must be finite")
+})
+
 # ------------------------------------------------------------------------------
 # warp_distance(<POSIXlt>, period = "hour")
 

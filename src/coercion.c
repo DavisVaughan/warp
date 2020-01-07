@@ -23,13 +23,13 @@ SEXP as_datetime(SEXP x) {
   never_reached("as_datetime");
 }
 
-#define AS_DATETIME_FROM_DATE_LOOP(CTYPE, CONST_DEREF, NA_VALUE) {   \
+#define AS_DATETIME_FROM_DATE_LOOP(CTYPE, CONST_DEREF, NA_CHECK) {   \
   const CTYPE* p_x = CONST_DEREF(x);                                 \
                                                                      \
   for (R_xlen_t i = 0; i < x_size; ++i) {                            \
     const CTYPE elt = p_x[i];                                        \
                                                                      \
-    if (elt == NA_VALUE) {                                           \
+    if (NA_CHECK) {                                                  \
       p_out[i] = NA_REAL;                                            \
       continue;                                                      \
     }                                                                \
@@ -45,8 +45,8 @@ static SEXP as_datetime_from_date(SEXP x) {
   double* p_out = REAL(out);
 
   switch (TYPEOF(x)) {
-  case INTSXP: AS_DATETIME_FROM_DATE_LOOP(int, INTEGER_RO, NA_INTEGER); break;
-  case REALSXP: AS_DATETIME_FROM_DATE_LOOP(double, REAL_RO, NA_REAL); break;
+  case INTSXP: AS_DATETIME_FROM_DATE_LOOP(int, INTEGER_RO, elt == NA_INTEGER); break;
+  case REALSXP: AS_DATETIME_FROM_DATE_LOOP(double, REAL_RO, !R_FINITE(elt)); break;
   default: Rf_errorcall(R_NilValue, "Unknown `Date` type %s.", Rf_type2char(TYPEOF(x)));
   }
 

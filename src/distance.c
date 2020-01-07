@@ -1685,7 +1685,7 @@ static int origin_to_days_from_epoch(SEXP origin) {
 
   double out = REAL(origin)[0];
 
-  if (out == NA_REAL) {
+  if (!R_FINITE(out)) {
     r_error("origin_to_days_from_epoch", "`origin` must not be `NA`.");
   }
 
@@ -1698,8 +1698,8 @@ static int64_t origin_to_seconds_from_epoch(SEXP origin) {
 
   double origin_value = REAL(origin)[0];
 
-  if (origin_value == NA_REAL) {
-    r_error("origin_to_seconds_from_epoch", "`origin` must not be `NA`.");
+  if (!R_FINITE(origin_value)) {
+    r_error("origin_to_seconds_from_epoch", "`origin` must be finite.");
   }
 
   int64_t out = guarded_floor(origin_value);
@@ -1713,8 +1713,8 @@ static int64_t origin_to_milliseconds_from_epoch(SEXP origin) {
 
   double origin_value = REAL(origin)[0];
 
-  if (origin_value == NA_REAL) {
-    r_error("origin_to_milliseconds_from_epoch", "`origin` must not be `NA`.");
+  if (!R_FINITE(origin_value)) {
+    r_error("origin_to_milliseconds_from_epoch", "`origin` must be finite.");
   }
 
   int64_t out = guarded_floor_to_millisecond(origin_value);
