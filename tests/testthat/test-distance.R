@@ -723,6 +723,10 @@ test_that("Ignoring the leap adjustment if before Feb 28th is required", {
   expect_identical(warp_distance(x, "yweek", origin = origin), c(2649, 2650))
 })
 
+test_that("sanity check `every`", {
+  expect_error(warp_distance(as.Date("1970-01-01"), "yweek", every = 53), "is 52")
+})
+
 # ------------------------------------------------------------------------------
 # warp_distance(<POSIXct>, period = "yweek")
 
@@ -901,6 +905,38 @@ test_that("can warp_distance() by yweek with POSIXlt", {
   x <- as.POSIXct("1971-01-01", tz = "UTC")
   x <- as.POSIXlt(x)
   expect_identical(warp_distance(x, "yweek"), 53)
+})
+
+# ------------------------------------------------------------------------------
+# warp_distance(<Date>, period = "week")
+
+# Mainly tested in `period = "day"`
+
+test_that("warp_distance() with week period works through day", {
+  x <- as.Date("1970-01-01") + 0:500
+
+  expect_identical(
+    warp_distance(x, "week"),
+    warp_distance(x, "day", every = 7)
+  )
+})
+
+# ------------------------------------------------------------------------------
+# warp_distance(<Date>, period = "yday")
+
+# Mainly tested in `period = "yweek"`
+
+test_that("warp_distance() with yday period works", {
+  x <- as.Date("1970-01-01") + 0:500
+
+  expect_identical(
+    warp_distance(x, "yday", every = 7),
+    warp_distance(x, "yweek")
+  )
+})
+
+test_that("sanity check `every`", {
+  expect_error(warp_distance(new_date(0), "yday", every = 365), "is 364")
 })
 
 # ------------------------------------------------------------------------------

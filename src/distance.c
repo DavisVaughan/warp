@@ -198,6 +198,13 @@ static SEXP warp_distance_week(SEXP x, int every, SEXP origin) {
 // -----------------------------------------------------------------------------
 
 static SEXP warp_distance_yweek(SEXP x, int every, SEXP origin) {
+  if (every > 52) {
+    r_error(
+      "warp_distance_yweek",
+      "The maximum allowed value of `every` for `period = 'yweek'` is 52."
+    );
+  }
+
   return warp_distance_yday(x, every * 7, origin);
 }
 
@@ -266,6 +273,13 @@ static SEXP posixct_warp_distance_yday(SEXP x, int every, SEXP origin);
 static SEXP posixlt_warp_distance_yday(SEXP x, int every, SEXP origin);
 
 static SEXP warp_distance_yday(SEXP x, int every, SEXP origin) {
+  if (every > 364) {
+    r_error(
+      "warp_distance_yday",
+      "The maximum allowed value of `every` for `period = 'yday'` is 364."
+    );
+  }
+
   switch (time_class_type(x)) {
   case warp_class_date: return date_warp_distance_yday(x, every, origin);
   case warp_class_posixct: return posixct_warp_distance_yday(x, every, origin);
