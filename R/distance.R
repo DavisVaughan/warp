@@ -62,6 +62,14 @@
 #' using an algorithm very similar to `lubridate::week()`, with the added
 #' benefit of being able to control the `origin` date.
 #'
+#' The `period` value of `"mday"` is computed as `every`-day periods within
+#' each month, with a forced reset of the `every`-day counter
+#' on the first day of each month. The most useful application of this is
+#' `"mweek"`, which is implemented as `period = "mday", every = every * 7`. This
+#' allows you to group by the "week of the month". For `"mday"` and `"mweek"`,
+#' only the year and month parts of the `origin` value are used. Because of
+#' this, the `origin` argument is not that interesting for these periods.
+#'
 #' @section Precision:
 #'
 #' With `POSIXct`, the limit of precision is approximately the microsecond
@@ -79,10 +87,13 @@
 #'
 #' @param period `[character(1)]`
 #'
-#'   A string defining the period to group by. Valid inputs are:
+#'   A string defining the period to group by. Valid inputs can be roughly
+#'   broken into:
 #'
-#'   `"year"`, `"quarter"`, `"month"`, `"week"`, `"yweek"`, `"day"`, `"yday"`,
-#'   `"hour"`, `"minute"`, `"second"`, `"millisecond"`
+#'   - `"year"`, `"quarter"`, `"month"`
+#'   - `"week"`, `"yweek"`, `"mweek"`
+#'   - `"day"`, `"yday"`, `"mday"`
+#'   - `"hour"`, `"minute"`, `"second"`, `"millisecond"`
 #'
 #' @param every `[positive integer(1)]`
 #'
@@ -174,6 +185,21 @@
 #'   week = warp_distance(x, "week", origin = origin),
 #'   yweek = warp_distance(x, "yweek", origin = origin)
 #' )
+#'
+#' # ---------------------------------------------------------------------------
+#' # `period = "mweek"`
+#'
+#' x <- as.Date("2019-12-23") + 0:16
+#'
+#' # `"mweek"` breaks `x` up into weeks of the month. Notice how days 1-7
+#' # of 2020-01 all have the same distance value. A forced reset of the 7 day
+#' # counter is done at the 1st of every month. This results in the 3 day
+#' # week of the month at the end of 2019-12, from 29-31.
+#' data.frame(
+#'   x = x,
+#'   mweek = warp_distance(x, "mweek")
+#' )
+#'
 warp_distance <- function(x, period = "year", every = 1L, origin = NULL) {
   .Call(warp_warp_distance, x, period, every, origin)
 }

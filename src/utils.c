@@ -105,6 +105,27 @@ int pull_every(SEXP every) {
 
 // -----------------------------------------------------------------------------
 
+#define YEARS_FROM_0001_01_01_TO_EPOCH 1969
+#define LEAP_YEARS_FROM_0001_01_01_TO_EPOCH 477
+
+int leap_years_before_and_including_year(int year_offset) {
+  int year = year_offset + YEARS_FROM_0001_01_01_TO_EPOCH;
+
+  int n_leap_years =
+    int_div(year, 4) -
+    int_div(year, 100) +
+    int_div(year, 400);
+
+  n_leap_years -= LEAP_YEARS_FROM_0001_01_01_TO_EPOCH;
+
+  return n_leap_years;
+}
+
+#undef YEARS_FROM_0001_01_01_TO_EPOCH
+#undef LEAP_YEARS_FROM_0001_01_01_TO_EPOCH
+
+// -----------------------------------------------------------------------------
+
 // [[ include("utils.h") ]]
 bool str_equal(const char* x, const char* y) {
   return strcmp(x, y) == 0;
@@ -140,12 +161,20 @@ enum warp_period_type as_period_type(SEXP period) {
     return warp_period_yweek;
   }
 
+  if (str_equal(type, "mweek")) {
+    return warp_period_mweek;
+  }
+
   if (str_equal(type, "day") || str_equal(type, "days") || str_equal(type, "daily")) {
     return warp_period_day;
   }
 
   if (str_equal(type, "yday")) {
     return warp_period_yday;
+  }
+
+  if (str_equal(type, "mday")) {
+    return warp_period_mday;
   }
 
   if (str_equal(type, "hour") || str_equal(type, "hours") || str_equal(type, "hourly")) {

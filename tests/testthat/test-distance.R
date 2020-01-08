@@ -908,6 +908,24 @@ test_that("can warp_distance() by yweek with POSIXlt", {
 })
 
 # ------------------------------------------------------------------------------
+# warp_distance(<Date>, period = "mweek")
+
+# Mainly tested in `period = "mday"`
+
+test_that("warp_distance() with mweek period works", {
+  x <- as.Date("1970-01-01") + 0:500
+
+  expect_identical(
+    warp_distance(x, "mweek"),
+    warp_distance(x, "mday", every = 7)
+  )
+})
+
+test_that("sanity check `every`", {
+  expect_error(warp_distance(new_date(0), "mweek", every = 5), "is 4")
+})
+
+# ------------------------------------------------------------------------------
 # warp_distance(<Date>, period = "week")
 
 # Mainly tested in `period = "day"`
@@ -958,6 +976,296 @@ test_that("double Date origin that is NA / NaN / Inf is an error", {
 
   origin <- structure(Inf, class = "Date")
   expect_error(warp_distance(new_date(0), "yday", origin = origin), "must be finite")
+})
+
+# ------------------------------------------------------------------------------
+# warp_distance(<Date>, period = "mday")
+
+test_that("can warp_distance() by mday with Date", {
+  x <- as.Date("1970-01-01")
+  expect_identical(warp_distance(x, "mday"), warp_distance(x, "day"))
+
+  x <- as.Date("1970-01-08")
+  expect_identical(warp_distance(x, "mday"), warp_distance(x, "day"))
+
+  x <- as.Date("1971-01-01")
+  expect_identical(warp_distance(x, "mday"), warp_distance(x, "day"))
+})
+
+test_that("Date + UTC origin does not emit a warning", {
+  x <- as.Date("1971-01-01")
+  origin <- as.POSIXct("1971-01-01", tz = "UTC")
+
+  expect_identical(warp_distance(x, "mday", origin = origin), 0)
+})
+
+test_that("Date + non-UTC origin converts with a warning", {
+  x <- as.Date("1971-01-01")
+  x_with_tz <- structure(unclass(x) * 86400, tzone = "America/New_York", class = c("POSIXct", "POSIXt"))
+  origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
+
+  expect_identical(
+    expect_warning(
+      warp_distance(x, "mday", origin = origin),
+      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
+    ),
+    warp_distance(x_with_tz, "mday", origin = origin)
+  )
+})
+
+test_that("can use integer Dates", {
+  x <- structure(0L, class = "Date")
+  expect_identical(warp_distance(x, "mday"), 0)
+
+  x <- structure(31L, class = "Date")
+  expect_identical(warp_distance(x, "mday"), 31)
+})
+
+test_that("leap year borders are handled correctly", {
+  x <- as.Date(c("1968-12-31", "1969-01-01"))
+  origin <- as.Date("1969-01-01")
+
+  expect_equal(warp_distance(x, "mday", every = 2, origin = origin), c(-1, 0))
+})
+
+test_that("can handle `every` with default origin", {
+  x <- as.Date(c(
+    "1968-12-31", "1969-01-01",
+    "1969-11-30", "1969-12-01",
+    "1969-12-28", "1969-12-29",
+    "1969-12-30", "1969-12-31",
+    "1970-01-01",
+    "1970-01-02", "1970-01-03"
+  ))
+
+  expect_equal(warp_distance(x, period = "mday", every = 2L), c(-187, -186, -17, -16, -3, -2, -2, -1, 0, 0, 1))
+  expect_equal(warp_distance(x, period = "mday", every = 3L), c(-128, -127, -12, -11, -2, -2, -2, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, period = "mday", every = 4L), c(-96, -95, -9, -8, -2, -1, -1, -1, 0, 0, 0))
+})
+
+test_that("can handle `every` with altered origin", {
+  x <- as.Date(c(
+    "1968-12-31", "1969-01-01",
+    "1969-11-30", "1969-12-01",
+    "1969-12-28", "1969-12-29",
+    "1969-12-30", "1969-12-31",
+    "1970-01-01",
+    "1970-01-02", "1970-01-03"
+  ))
+
+  origin <- as.Date("1969-12-01")
+
+  expect_equal(warp_distance(x, period = "mday", every = 2L, origin = origin), c(-171, -170, -1, 0, 13, 14, 14, 15, 16, 16, 17))
+  expect_equal(warp_distance(x, period = "mday", every = 3L, origin = origin), c(-117, -116, -1, 0, 9, 9, 9, 10, 11, 11, 11))
+  expect_equal(warp_distance(x, period = "mday", every = 4L, origin = origin), c(-88, -87, -1, 0, 6, 7, 7, 7, 8, 8, 8))
+})
+
+test_that("fractional Date pieces are ignored", {
+  # "1969-12-31 23:59:52 UTC"
+  # .POSIXct(-0.0001 * 86400, "UTC")
+  x <- structure(-0.0001, class = "Date")
+
+  # But we really treat this as `new_date(0)`
+  expect_equal(warp_distance(x, period = "mday"), 0)
+})
+
+test_that("size 0 input works - integer Dates", {
+  x <- structure(integer(), class = "Date")
+
+  expect_equal(warp_distance(x, period = "mday"), numeric())
+  expect_equal(warp_distance(x, period = "mday", every = 2), numeric())
+})
+
+test_that("size 0 input works - numeric Dates", {
+  x <- structure(numeric(), class = "Date")
+
+  expect_equal(warp_distance(x, period = "mday"), numeric())
+  expect_equal(warp_distance(x, period = "mday", every = 2), numeric())
+})
+
+test_that("going backwards in time still uses groups computed from the first of the year", {
+  # The 53rd mday of 1969
+  x <- as.Date("1969-12-31")
+  # The 52nd mday of 1969
+  y <- as.Date("1969-12-30")
+  expect_identical(warp_distance(x, "mday"), -1)
+  expect_identical(warp_distance(y, "mday"), -2)
+})
+
+test_that("sanity check `every`", {
+  expect_error(warp_distance(as.Date("1970-01-01"), "mday", every = 31), "is 30")
+})
+
+test_that("can use an integer Date origin with mday", {
+  origin <- structure(-1L, class = "Date")
+  expect_identical(warp_distance(new_date(0), "mday", origin = origin), 31)
+})
+
+test_that("integer Date origin that is NA is an error", {
+  origin <- structure(NA_integer_, class = "Date")
+  expect_error(warp_distance(new_date(0), "mday", origin = origin), "cannot be `NA`")
+})
+
+test_that("double Date origin that is NA / NaN / Inf is an error", {
+  origin <- structure(NA_real_, class = "Date")
+  expect_error(warp_distance(new_date(0), "mday", origin = origin), "must be finite")
+
+  origin <- structure(NaN, class = "Date")
+  expect_error(warp_distance(new_date(0), "mday", origin = origin), "must be finite")
+
+  origin <- structure(Inf, class = "Date")
+  expect_error(warp_distance(new_date(0), "mday", origin = origin), "must be finite")
+})
+
+# ------------------------------------------------------------------------------
+# warp_distance(<POSIXct>, period = "mday")
+
+test_that("can warp_distance() by mday with POSIXct", {
+  x <- as.POSIXct("1970-01-01", tz = "UTC")
+  expect_identical(warp_distance(x, "mday"), warp_distance(x, "day"))
+
+  x <- as.POSIXct("1970-01-08", tz = "UTC")
+  expect_identical(warp_distance(x, "mday"), warp_distance(x, "day"))
+})
+
+test_that("UTC POSIXct + UTC origin does not emit a warning", {
+  x <- as.POSIXct("1971-01-01", tz = "UTC")
+
+  expect_warning(warp_distance(x, "mday"), NA)
+
+  expect_identical(warp_distance(x, "mday"), 365)
+  expect_identical(warp_distance(x, "mday", origin = x), 0)
+})
+
+test_that("UTC POSIXct + Date origin does not emit a warning", {
+  x <- as.POSIXct("1971-01-01", tz = "UTC")
+  origin1 <- as.Date("1971-01-01")
+  origin2 <- as.Date("1972-01-01")
+
+  expect_warning(warp_distance(x, "mday", origin = origin1), NA)
+
+  expect_identical(warp_distance(x, "mday", origin = origin1), 0)
+  expect_identical(warp_distance(x, "mday", origin = origin2), -365)
+})
+
+test_that("UTC POSIXct + non-UTC origin converts with a warning", {
+  x <- as.POSIXct("1971-01-01", tz = "UTC")
+  x_with_tz <- structure(x, tzone = "America/New_York")
+  origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
+
+  expect_identical(
+    expect_warning(
+      warp_distance(x, "mday", origin = origin),
+      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
+    ),
+    warp_distance(x_with_tz, "mday", origin = origin)
+  )
+})
+
+test_that("local time POSIXct + UTC origin converts with a warning", {
+  with_envvar(list(TZ = "America/New_York"), {
+    x <- as.POSIXct("1970-12-31 23:00:00") # in UTC this is in 1971-01
+    origin <- as.POSIXct("1971-01-01", tz = "UTC")
+
+    expect_identical(
+      expect_warning(warp_distance(x, "mday", origin = origin)),
+      0
+    )
+  })
+})
+
+test_that("can use integer POSIXct", {
+  x <- structure(-1L, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_identical(warp_distance(x, "mday"), -1)
+})
+
+test_that("can handle `NA` dates", {
+  x <- structure(NA_real_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_identical(warp_distance(x, "mday"), NA_real_)
+
+  x <- structure(NA_integer_, tzone = "UTC", class = c("POSIXct", "POSIXt"))
+  expect_identical(warp_distance(x, "mday"), NA_real_)
+})
+
+test_that("can handle `every` with default origin", {
+  x <- as.POSIXct(c(
+    "1968-12-31", "1969-01-01",
+    "1969-11-30", "1969-12-01",
+    "1969-12-28", "1969-12-29",
+    "1969-12-30", "1969-12-31",
+    "1970-01-01",
+    "1970-01-02", "1970-01-03"
+  ), tz = "UTC")
+
+  expect_equal(warp_distance(x, period = "mday", every = 2L), c(-187, -186, -17, -16, -3, -2, -2, -1, 0, 0, 1))
+  expect_equal(warp_distance(x, period = "mday", every = 3L), c(-128, -127, -12, -11, -2, -2, -2, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, period = "mday", every = 4L), c(-96, -95, -9, -8, -2, -1, -1, -1, 0, 0, 0))
+})
+
+test_that("can handle `every` with altered origin", {
+  x <- as.POSIXct(c(
+    "1968-12-31", "1969-01-01",
+    "1969-11-30", "1969-12-01",
+    "1969-12-28", "1969-12-29",
+    "1969-12-30", "1969-12-31",
+    "1970-01-01",
+    "1970-01-02", "1970-01-03"
+  ), tz = "UTC")
+
+  origin <- as.POSIXct("1969-12-01", "UTC")
+
+  expect_equal(warp_distance(x, period = "mday", every = 2L, origin = origin), c(-171, -170, -1, 0, 13, 14, 14, 15, 16, 16, 17))
+  expect_equal(warp_distance(x, period = "mday", every = 3L, origin = origin), c(-117, -116, -1, 0, 9, 9, 9, 10, 11, 11, 11))
+  expect_equal(warp_distance(x, period = "mday", every = 4L, origin = origin), c(-88, -87, -1, 0, 6, 7, 7, 7, 8, 8, 8))
+})
+
+test_that("can handle `every` with altered origin and altered timezone", {
+  x <- as.POSIXct(c(
+    "1968-12-31", "1969-01-01",
+    "1969-11-30", "1969-12-01",
+    "1969-12-28", "1969-12-29",
+    "1969-12-30", "1969-12-31",
+    "1970-01-01",
+    "1970-01-02", "1970-01-03"
+  ), tz = "America/New_York")
+
+  origin <- as.POSIXct("1969-12-01", tz = "America/New_York")
+
+  expect_equal(warp_distance(x, period = "mday", every = 2L, origin = origin), c(-171, -170, -1, 0, 13, 14, 14, 15, 16, 16, 17))
+  expect_equal(warp_distance(x, period = "mday", every = 3L, origin = origin), c(-117, -116, -1, 0, 9, 9, 9, 10, 11, 11, 11))
+  expect_equal(warp_distance(x, period = "mday", every = 4L, origin = origin), c(-88, -87, -1, 0, 6, 7, 7, 7, 8, 8, 8))
+})
+
+test_that("going backwards in time still uses groups computed from the first of the year", {
+  # The 53rd mday of 1969
+  x <- as.POSIXct("1969-12-31", "UTC")
+  # The 52nd mday of 1969
+  y <- as.POSIXct("1969-12-30", "UTC")
+  expect_identical(warp_distance(x, "mday"), -1)
+  expect_identical(warp_distance(y, "mday"), -2)
+})
+
+test_that("default `origin` results in epoch in the time zone of `x`", {
+  x <- as.POSIXct("1969-12-31 23:00:00", tz = "America/New_York")
+  y <- as.POSIXct("1969-12-31 23:00:00", tz = "UTC")
+
+  expect_equal(
+    warp_distance(x, period = "mday"),
+    warp_distance(y, period = "mday")
+  )
+})
+
+# ------------------------------------------------------------------------------
+# warp_distance(<POSIXlt>, period = "mday")
+
+test_that("can warp_distance() by mday with POSIXlt", {
+  x <- as.POSIXct("1970-01-01", tz = "UTC")
+  x <- as.POSIXlt(x)
+  expect_identical(warp_distance(x, "mday"), 0)
+
+  x <- as.POSIXct("1971-01-01", tz = "UTC")
+  x <- as.POSIXlt(x)
+  expect_identical(warp_distance(x, "mday"), 365)
 })
 
 # ------------------------------------------------------------------------------

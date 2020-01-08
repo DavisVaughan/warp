@@ -15,8 +15,10 @@ enum warp_period_type {
   warp_period_month,
   warp_period_week,
   warp_period_yweek,
+  warp_period_mweek,
   warp_period_day,
   warp_period_yday,
+  warp_period_mday,
   warp_period_hour,
   warp_period_minute,
   warp_period_second,
@@ -64,11 +66,18 @@ struct warp_yday_components {
   int yday;
 };
 
+struct warp_mday_components {
+  int year_offset;
+  int month;
+};
+
 // In `get.c`
 struct warp_yday_components get_origin_yday_components(SEXP origin);
+struct warp_mday_components get_origin_mday_components(SEXP origin);
 
 // In `date.c`
 struct warp_yday_components date_get_origin_yday_components(SEXP origin);
+struct warp_mday_components date_get_origin_mday_components(SEXP origin);
 
 // -----------------------------------------------------------------------------
 
@@ -80,6 +89,8 @@ void __attribute__((noreturn)) r_error(const char* where, const char* why, ...);
 SEXP r_maybe_duplicate(SEXP x);
 
 bool str_equal(const char* x, const char* y);
+
+int leap_years_before_and_including_year(int year_offset);
 
 SEXP as_posixct_from_posixlt(SEXP x);
 SEXP as_posixlt_from_posixct(SEXP x);
