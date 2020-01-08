@@ -16,10 +16,10 @@ A date time vector.}
 A string defining the period to group by. Valid inputs can be roughly
 broken into:
 \itemize{
-\item \code{"year"}, \code{"quarter"}, \code{"month"}
-\item \code{"week"}, \code{"yweek"}, \code{"mweek"}
-\item \code{"day"}, \code{"yday"}, \code{"mday"}
+\item \code{"year"}, \code{"quarter"}, \code{"month"}, \code{"week"}, \code{"day"}
 \item \code{"hour"}, \code{"minute"}, \code{"second"}, \code{"millisecond"}
+\item \code{"yweek"}, \code{"mweek"}
+\item \code{"yday"}, \code{"mday"}
 }}
 
 \item{every}{\verb{[positive integer(1)]}

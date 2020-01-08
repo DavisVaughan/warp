@@ -90,10 +90,10 @@
 #'   A string defining the period to group by. Valid inputs can be roughly
 #'   broken into:
 #'
-#'   - `"year"`, `"quarter"`, `"month"`
-#'   - `"week"`, `"yweek"`, `"mweek"`
-#'   - `"day"`, `"yday"`, `"mday"`
+#'   - `"year"`, `"quarter"`, `"month"`, `"week"`, `"day"`
 #'   - `"hour"`, `"minute"`, `"second"`, `"millisecond"`
+#'   - `"yweek"`, `"mweek"`
+#'   - `"yday"`, `"mday"`
 #'
 #' @param every `[positive integer(1)]`
 #'

@@ -4,9 +4,14 @@
 \name{warp-package}
 \alias{warp}
 \alias{warp-package}
-\title{warp: Group Dates and Datetimes}
+\title{warp: Group Dates}
 \description{
-What the package does (one paragraph).
+Tooling to group dates by a variety of periods
+    including: yearly, monthly, by second, by week of the month, and more.
+    The groups are defined in such a way that they also represent the
+    distance between dates in terms of the period. This extracts valuable
+    information that can be used in further calculations that rely on a
+    specific temporal spacing between observations.
 }
 \seealso{
 Useful links:
