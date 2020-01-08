@@ -3,6 +3,12 @@ time_class_type <- function(x) {
 }
 
 # Callable from C
+# Assume POSIXct / POSIXlt
+force_utc <- function(x) {
+  time_force_tz(x, tz = "UTC")
+}
+
+# Callable from C
 as_posixct_from_posixlt <- function(x) {
   as.POSIXct.POSIXlt(x)
 }

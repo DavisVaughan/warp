@@ -48,66 +48,12 @@ const char* get_printable_time_zone(const char* time_zone) {
 
 // -----------------------------------------------------------------------------
 
-static SEXP make_tzone(const char* time_zone);
-
-SEXP get_origin_epoch_in_time_zone(SEXP x) {
-  const char* time_zone = get_time_zone(x);
-
-  // Continue using `NULL` if `x` is UTC, no origin adjustment required
-  if (str_equal(time_zone, "UTC") || str_equal(time_zone, "GMT")) {
-    return R_NilValue;
-  }
-
-  SEXP dummy = PROTECT(Rf_ScalarReal(0));
-
-  Rf_setAttrib(dummy, syms_tzone, make_tzone(time_zone));
-  Rf_setAttrib(dummy, syms_class, classes_posixct);
-
-  dummy = PROTECT(as_posixlt_from_posixct(dummy));
-
-  // gmtoff is optional, it may not be there. In those cases assume UTC.
-  if (Rf_length(dummy) != 11) {
-    UNPROTECT(3);
-    return R_NilValue;
-  }
-
-  SEXP offset_sexp = VECTOR_ELT(dummy, 10);
-  int offset = INTEGER(offset_sexp)[0];
-
-  // Documented as "unknown", assume UTC.
-  if (offset == NA_INTEGER || offset == 0) {
-    UNPROTECT(3);
-    return R_NilValue;
-  }
-
-  double epoch_seconds = offset * -1.0;
-
-  SEXP out = PROTECT(Rf_ScalarReal(epoch_seconds));
-
-  Rf_setAttrib(out, syms_tzone, make_tzone(time_zone));
-  Rf_setAttrib(out, syms_class, classes_posixct);
-
-  UNPROTECT(3);
-  return out;
-}
-
-static SEXP make_tzone(const char* time_zone) {
-  SEXP out = PROTECT(Rf_allocVector(STRSXP, 1));
-
-  SET_STRING_ELT(out, 0, Rf_mkChar(time_zone));
-
-  UNPROTECT(1);
-  return out;
-}
-
-// -----------------------------------------------------------------------------
-
 // Converts `x` to a POSIXct with the correct time zone if required
 // - Does nothing if `x` is a Date and time_zone is UTC
 // - Converts Dates to POSIXct if local time is requested
 
 // [[ include("utils.h") ]]
-SEXP convert_time_zone(SEXP x, SEXP origin) {
+SEXP maybe_convert_time_zone(SEXP x, SEXP origin) {
   const char* x_time_zone = get_time_zone(x);
   const char* origin_time_zone = get_time_zone(origin);
 
@@ -141,4 +87,45 @@ SEXP convert_time_zone(SEXP x, SEXP origin) {
 
   UNPROTECT(3);
   return out;
+}
+
+// -----------------------------------------------------------------------------
+
+// Force to UTC, keeping the appearance of the clock time.
+// This is useful for time zones that have DST when doing sub-daily
+// grouping. For example, with:
+//
+// "1970-04-26 00:00:00 EST"
+// "1970-04-26 01:00:00 EST"
+// "1970-04-26 03:00:00 EDT"
+// "1970-04-26 04:00:00 EDT"
+//
+// period = "hour", every = 2
+//
+// We want (0-1), (2-3), (4-5) to be grouped together, even though the 2 hour
+// doesn't exist because of DST. If we grouped (0-1), (3-4) together then when
+// it moved to the next day we'd end up with strange groups of (12-0), (1-2).
+// Converting to UTC essentially materializes that 2nd hour and shifts the
+// underlying numeric representation appropriately.
+
+// [[ include("utils.h") ]]
+SEXP maybe_force_utc_if_subdaily(SEXP x, enum warp_period_type type) {
+  if (type != warp_period_hour &&
+      type != warp_period_minute &&
+      type != warp_period_second &&
+      type != warp_period_millisecond) {
+    return x;
+  }
+
+  if (time_class_type(x) == warp_class_date) {
+    return x;
+  }
+
+  const char* time_zone = get_time_zone(x);
+
+  if (str_equal(time_zone, "UTC") || str_equal(time_zone, "GMT")) {
+    return x;
+  }
+
+  return force_utc(x);
 }

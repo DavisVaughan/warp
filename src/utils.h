@@ -95,6 +95,7 @@ int leap_years_before_and_including_year(int year_offset);
 SEXP as_posixct_from_posixlt(SEXP x);
 SEXP as_posixlt_from_posixct(SEXP x);
 SEXP as_date(SEXP x);
+SEXP force_utc(SEXP x);
 
 // In `get.c`
 SEXP get_year_offset(SEXP x);
@@ -109,8 +110,8 @@ SEXP date_get_month_offset(SEXP x);
 SEXP as_datetime(SEXP x);
 
 // In `timezone.c`
-SEXP get_origin_epoch_in_time_zone(SEXP x);
-SEXP convert_time_zone(SEXP x, SEXP origin);
+SEXP maybe_convert_time_zone(SEXP x, SEXP origin);
+SEXP maybe_force_utc_if_subdaily(SEXP x, enum warp_period_type type);
 
 extern SEXP syms_tzone;
 extern SEXP syms_class;

@@ -12,10 +12,12 @@ SEXP syms_class = NULL;
 SEXP syms_as_posixct_from_posixlt = NULL;
 SEXP syms_as_posixlt_from_posixct = NULL;
 SEXP syms_as_date = NULL;
+SEXP syms_force_utc = NULL;
 
 SEXP fns_as_posixct_from_posixlt = NULL;
 SEXP fns_as_posixlt_from_posixct = NULL;
 SEXP fns_as_date = NULL;
+SEXP fns_force_utc = NULL;
 
 SEXP classes_data_frame = NULL;
 SEXP classes_posixct = NULL;
@@ -395,6 +397,14 @@ SEXP as_date(SEXP x) {
   );
 }
 
+// [[ include("utils.h") ]]
+SEXP force_utc(SEXP x) {
+  return warp_dispatch1(
+    syms_force_utc, fns_force_utc,
+    syms_x, x
+  );
+}
+
 // -----------------------------------------------------------------------------
 
 void warp_init_utils(SEXP ns) {
@@ -413,10 +423,12 @@ void warp_init_utils(SEXP ns) {
   syms_as_posixct_from_posixlt = Rf_install("as_posixct_from_posixlt");
   syms_as_posixlt_from_posixct = Rf_install("as_posixlt_from_posixct");
   syms_as_date = Rf_install("as_date");
+  syms_force_utc = Rf_install("force_utc");
 
   fns_as_posixct_from_posixlt = r_env_get(warp_ns_env, syms_as_posixct_from_posixlt);
   fns_as_posixlt_from_posixct = r_env_get(warp_ns_env, syms_as_posixlt_from_posixct);
   fns_as_date = r_env_get(warp_ns_env, syms_as_date);
+  fns_force_utc = r_env_get(warp_ns_env, syms_force_utc);
 
   classes_data_frame = Rf_allocVector(STRSXP, 1);
   R_PreserveObject(classes_data_frame);

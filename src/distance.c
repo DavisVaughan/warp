@@ -30,39 +30,45 @@ static SEXP warp_distance_millisecond(SEXP x, int every, SEXP origin);
 
 // [[ include("warp.h") ]]
 SEXP warp_distance(SEXP x, enum warp_period_type type, int every, SEXP origin) {
+  int n_prot = 0;
+
   validate_origin(origin);
   validate_every(every);
 
   if (time_class_type(x) == warp_class_unknown) {
-    r_error("warp_distance", "`x` must inherit from 'Date', 'POSIXct', or 'POSIXlt'.");
+    r_error(
+      "warp_distance",
+      "`x` must inherit from 'Date', 'POSIXct', or 'POSIXlt'."
+    );
   }
 
-  if (origin == R_NilValue) {
-    origin = PROTECT(get_origin_epoch_in_time_zone(x));
-  } else {
-    x = PROTECT(convert_time_zone(x, origin));
+  if (origin != R_NilValue) {
+    x = PROTECT_N(maybe_convert_time_zone(x, origin), &n_prot);
+    origin = PROTECT_N(maybe_force_utc_if_subdaily(origin, type), &n_prot);
   }
+
+  x = PROTECT_N(maybe_force_utc_if_subdaily(x, type), &n_prot);
 
   SEXP out;
 
   switch (type) {
-  case warp_period_year: out = PROTECT(warp_distance_year(x, every, origin)); break;
-  case warp_period_quarter: out = PROTECT(warp_distance_quarter(x, every, origin)); break;
-  case warp_period_month: out = PROTECT(warp_distance_month(x, every, origin)); break;
-  case warp_period_week: out = PROTECT(warp_distance_week(x, every, origin)); break;
-  case warp_period_yweek: out = PROTECT(warp_distance_yweek(x, every, origin)); break;
-  case warp_period_mweek: out = PROTECT(warp_distance_mweek(x, every, origin)); break;
-  case warp_period_day: out = PROTECT(warp_distance_day(x, every, origin)); break;
-  case warp_period_yday: out = PROTECT(warp_distance_yday(x, every, origin)); break;
-  case warp_period_mday: out = PROTECT(warp_distance_mday(x, every, origin)); break;
-  case warp_period_hour: out = PROTECT(warp_distance_hour(x, every, origin)); break;
-  case warp_period_minute: out = PROTECT(warp_distance_minute(x, every, origin)); break;
-  case warp_period_second: out = PROTECT(warp_distance_second(x, every, origin)); break;
-  case warp_period_millisecond: out = PROTECT(warp_distance_millisecond(x, every, origin)); break;
+  case warp_period_year: out = warp_distance_year(x, every, origin); break;
+  case warp_period_quarter: out = warp_distance_quarter(x, every, origin); break;
+  case warp_period_month: out = warp_distance_month(x, every, origin); break;
+  case warp_period_week: out = warp_distance_week(x, every, origin); break;
+  case warp_period_yweek: out = warp_distance_yweek(x, every, origin); break;
+  case warp_period_mweek: out = warp_distance_mweek(x, every, origin); break;
+  case warp_period_day: out = warp_distance_day(x, every, origin); break;
+  case warp_period_yday: out = warp_distance_yday(x, every, origin); break;
+  case warp_period_mday: out = warp_distance_mday(x, every, origin); break;
+  case warp_period_hour: out = warp_distance_hour(x, every, origin); break;
+  case warp_period_minute: out = warp_distance_minute(x, every, origin); break;
+  case warp_period_second: out = warp_distance_second(x, every, origin); break;
+  case warp_period_millisecond: out = warp_distance_millisecond(x, every, origin); break;
   default: r_error("warp_distance", "Internal error: unknown `type`.");
   }
 
-  UNPROTECT(2);
+  UNPROTECT(n_prot);
   return out;
 }
 

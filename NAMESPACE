@@ -3,4 +3,5 @@
 export(warp_boundary)
 export(warp_change)
 export(warp_distance)
+importFrom(timechange,time_force_tz)
 useDynLib(warp, .registration = TRUE)
