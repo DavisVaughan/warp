@@ -559,14 +559,11 @@ static int compute_yday_distance(int days_since_epoch,
 
 // Returns the number of days between 1970-01-01 and the beginning of the `year`
 // defined as the number of `year_offset` from 1970, 0-based
-// Not 1969 because `year_offset` is 0 based already
-#define YEARS_FROM_0001_01_01_TO_EPOCH 1970
+#define YEARS_FROM_0001_01_01_TO_EPOCH 1969
 #define DAYS_FROM_0001_01_01_TO_EPOCH 719162
-#define LEAP_YEARS_FROM_0001_01_01_TO_EPOCH 477
 
 static inline int days_before_year(int year_offset) {
   int year = year_offset + YEARS_FROM_0001_01_01_TO_EPOCH;
-  --year;
 
   int days = year * 365 +
     int_div(year, 4) -
@@ -580,7 +577,6 @@ static inline int days_before_year(int year_offset) {
 
 #undef YEARS_FROM_0001_01_01_TO_EPOCH
 #undef DAYS_FROM_0001_01_01_TO_EPOCH
-#undef LEAP_YEARS_FROM_0001_01_01_TO_EPOCH
 
 static inline int yday_leap_adjustment(int year_offset, int yday, bool origin_leap) {
   // No adjustment to make if before or equal to Feb 28th

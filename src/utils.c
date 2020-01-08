@@ -105,7 +105,7 @@ int pull_every(SEXP every) {
 
 // -----------------------------------------------------------------------------
 
-#define YEARS_FROM_0001_01_01_TO_EPOCH 1970
+#define YEARS_FROM_0001_01_01_TO_EPOCH 1969
 #define LEAP_YEARS_FROM_0001_01_01_TO_EPOCH 477
 
 int leap_years_before_and_including_year(int year_offset) {
