@@ -740,6 +740,7 @@ static SEXP posixlt_warp_distance_mday(SEXP x, int every, SEXP origin) {
     }
 
     year_offset -= 70;
+    day -= 1;
 
     p_out[i] = compute_mday_distance(
       day,
