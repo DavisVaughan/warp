@@ -362,14 +362,6 @@ SEXP warp_dispatch_n(SEXP fn_sym, SEXP fn, SEXP* syms, SEXP* args) {
   return out;
 }
 
-SEXP warp_dispatch2(SEXP fn_sym, SEXP fn,
-                         SEXP x_sym, SEXP x,
-                         SEXP y_sym, SEXP y) {
-  SEXP syms[3] = { x_sym, y_sym, NULL };
-  SEXP args[3] = { x, y, NULL };
-  return warp_dispatch_n(fn_sym, fn, syms, args);
-}
-
 SEXP warp_dispatch1(SEXP fn_sym, SEXP fn,
                          SEXP x_sym, SEXP x) {
   SEXP syms[2] = { x_sym, NULL };
