@@ -15,6 +15,7 @@ enum warp_period_type {
   warp_period_month,
   warp_period_week,
   warp_period_yweek,
+  warp_period_mweek,
   warp_period_day,
   warp_period_yday,
   warp_period_mday,

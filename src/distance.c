@@ -19,6 +19,7 @@ static SEXP warp_distance_quarter(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_month(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_week(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_yweek(SEXP x, int every, SEXP origin);
+static SEXP warp_distance_mweek(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_day(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_yday(SEXP x, int every, SEXP origin);
 static SEXP warp_distance_mday(SEXP x, int every, SEXP origin);
@@ -50,6 +51,7 @@ SEXP warp_distance(SEXP x, enum warp_period_type type, int every, SEXP origin) {
   case warp_period_month: out = PROTECT(warp_distance_month(x, every, origin)); break;
   case warp_period_week: out = PROTECT(warp_distance_week(x, every, origin)); break;
   case warp_period_yweek: out = PROTECT(warp_distance_yweek(x, every, origin)); break;
+  case warp_period_mweek: out = PROTECT(warp_distance_mweek(x, every, origin)); break;
   case warp_period_day: out = PROTECT(warp_distance_day(x, every, origin)); break;
   case warp_period_yday: out = PROTECT(warp_distance_yday(x, every, origin)); break;
   case warp_period_mday: out = PROTECT(warp_distance_mday(x, every, origin)); break;
@@ -208,6 +210,19 @@ static SEXP warp_distance_yweek(SEXP x, int every, SEXP origin) {
   }
 
   return warp_distance_yday(x, every * 7, origin);
+}
+
+// -----------------------------------------------------------------------------
+
+static SEXP warp_distance_mweek(SEXP x, int every, SEXP origin) {
+  if (every > 4) {
+    r_error(
+      "warp_distance_mweek",
+      "The maximum allowed value of `every` for `period = 'mweek'` is 4."
+    );
+  }
+
+  return warp_distance_mday(x, every * 7, origin);
 }
 
 // -----------------------------------------------------------------------------
