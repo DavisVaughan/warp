@@ -1,5 +1,5 @@
 Package: warp
-Title: Group Dates and Datetimes
+Title: Group Dates
 Version: 0.0.0.9000
 Authors@R: 
     c(person(given = "Davis",
@@ -8,7 +8,12 @@ Authors@R:
              email = "davis@rstudio.com"),
       person(given = "RStudio",
              role = "cph"))
-Description: What the package does (one paragraph).
+Description: Tooling to group dates by a variety of periods including: yearly,
+    monthly, by second, by week of the month, and more. The groups are defined
+    in such a way that they also represent the distance between dates in terms
+    of the period. This extracts valuable information that can be used in
+    further calculations that rely on a specific temporal spacing between
+    observations.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
