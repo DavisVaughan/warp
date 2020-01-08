@@ -13,7 +13,9 @@ coverage](https://codecov.io/gh/DavisVaughan/warp/branch/master/graph/badge.svg)
 status](https://github.com/DavisVaughan/warp/workflows/R-CMD-check/badge.svg)](https://github.com/DavisVaughan/warp)
 <!-- badges: end -->
 
-The goal of warp is to provide tooling to group date times by period.
+The goal of warp is to provide tooling to group dates by a variety of
+periods, such as: yearly, monthly, by second, by week of the month, and
+more.
 
 ``` r
 library(warp)
