@@ -96,6 +96,7 @@ SEXP as_posixct_from_posixlt(SEXP x);
 SEXP as_posixlt_from_posixct(SEXP x);
 SEXP as_date(SEXP x);
 SEXP force_utc(SEXP x);
+SEXP force_tz(SEXP x, SEXP tz);
 
 // In `get.c`
 SEXP get_year_offset(SEXP x);
@@ -108,8 +109,10 @@ SEXP date_get_month_offset(SEXP x);
 
 // In `coercion.c`
 SEXP as_datetime(SEXP x);
+SEXP as_start_of_day_posixct_from_posixlt(SEXP x);
 
 // In `timezone.c`
+const char* get_time_zone(SEXP x);
 SEXP maybe_convert_time_zone(SEXP x, SEXP origin);
 SEXP maybe_force_utc_if_subdaily(SEXP x, enum warp_period_type type);
 
@@ -120,5 +123,6 @@ extern SEXP classes_data_frame;
 extern SEXP classes_posixct;
 
 extern SEXP strings_start_stop;
+extern SEXP strings_utc;
 
 #endif

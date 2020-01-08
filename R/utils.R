@@ -9,6 +9,12 @@ force_utc <- function(x) {
 }
 
 # Callable from C
+# Assume POSIXct
+force_tz <- function(x, tz) {
+  time_force_tz(x, tz = tz)
+}
+
+# Callable from C
 as_posixct_from_posixlt <- function(x) {
   as.POSIXct.POSIXlt(x)
 }

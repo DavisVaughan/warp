@@ -1,5 +1,6 @@
 #include "warp.h"
 #include "utils.h"
+#include "divmod.h"
 
 // -----------------------------------------------------------------------------
 
@@ -104,4 +105,96 @@ static SEXP as_datetime_from_posixct(SEXP x) {
 
 static SEXP as_datetime_from_posixlt(SEXP x) {
   return as_posixct_from_posixlt(x);
+}
+
+// -----------------------------------------------------------------------------
+
+static inline int days_before_year(int year_offset);
+static inline int days_before_month(int year, int month);
+static inline SEXP make_tzone(const char* time_zone);
+
+// [[ include("utils.h") ]]
+SEXP as_start_of_day_posixct_from_posixlt(SEXP x) {
+  SEXP year_offset = VECTOR_ELT(x, 5);
+  SEXP month = VECTOR_ELT(x, 4);
+  SEXP day = VECTOR_ELT(x, 3);
+
+  int* p_year_offset = INTEGER(year_offset);
+  int* p_month = INTEGER(month);
+  int* p_day = INTEGER(day);
+
+  R_xlen_t size = Rf_xlength(year_offset);
+
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, size));
+  double* p_out = REAL(out);
+
+  for (R_xlen_t i = 0; i < size; ++i) {
+    int elt_year_offset = p_year_offset[i];
+
+    if (elt_year_offset == NA_INTEGER) {
+      p_out[i] = NA_REAL;
+      continue;
+    }
+
+    int elt_year = elt_year_offset + 1900;
+    int elt_month = p_month[i];
+    int elt_day = p_day[i] - 1;
+
+    int days =
+      days_before_year(elt_year_offset) +
+      days_before_month(elt_year, elt_month) +
+      elt_day;
+
+    p_out[i] = days * 86400;
+  }
+
+  Rf_setAttrib(out, syms_tzone, strings_utc);
+  Rf_setAttrib(out, syms_class, classes_posixct);
+
+  const char* time_zone = get_time_zone(x);
+  out = PROTECT(force_tz(out, make_tzone(time_zone)));
+
+  UNPROTECT(2);
+  return out;
+}
+
+#define is_leap_year(year) ((((year) % 4) == 0 && ((year) % 100) != 0) || ((year) % 400) == 0)
+
+static const int DAYS_BEFORE_MONTH[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
+
+// `year` is the full year
+// `month` is 0-based
+static inline int days_before_month(int year, int month) {
+  return DAYS_BEFORE_MONTH[month] + (month > 1 && is_leap_year(year));
+}
+
+#undef is_leap_year
+
+
+#define YEARS_FROM_0001_01_01_TO_1900 1899
+#define DAYS_FROM_0001_01_01_TO_EPOCH 719162
+
+static inline int days_before_year(int year_offset) {
+  int year = year_offset + YEARS_FROM_0001_01_01_TO_1900;
+
+  int days = year * 365 +
+    int_div(year, 4) -
+    int_div(year, 100) +
+    int_div(year, 400);
+
+  days -= DAYS_FROM_0001_01_01_TO_EPOCH;
+
+  return days;
+}
+
+#undef YEARS_FROM_0001_01_01_TO_1900
+#undef DAYS_FROM_0001_01_01_TO_EPOCH
+
+static inline SEXP make_tzone(const char* time_zone) {
+  SEXP out = PROTECT(Rf_allocVector(STRSXP, 1));
+
+  SET_STRING_ELT(out, 0, Rf_mkChar(time_zone));
+
+  UNPROTECT(1);
+  return out;
 }

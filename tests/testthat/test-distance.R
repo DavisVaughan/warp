@@ -2100,6 +2100,36 @@ test_that("integer POSIXct `origin` cannot be NA_integer_", {
   expect_error(warp_distance(x, period = "hour", origin = origin), "`origin` must be finite")
 })
 
+test_that("distances are computed correctly around DST spring forwards", {
+  x <- as.POSIXct(
+    c("1970-04-26 01:00:00", "1970-04-26 03:00:00", "1970-04-26 04:00:00"),
+    "America/New_York"
+  )
+
+  expect_equal(warp_distance(x, "hour"), c(2761, 2763, 2764))
+  expect_equal(warp_distance(x, "hour", 2), c(1380, 1381, 1382))
+})
+
+test_that("distances are computed correctly around DST fallbacks", {
+  x <- as.POSIXct(
+    c("1970-10-25 01:00:00 -0400",
+      "1970-10-25 01:00:00 -0500",
+      "1970-10-25 02:00:00 -0500",
+      "1970-10-25 03:00:00 -0500"
+    ),
+    format = "%F %T %z",
+    tz = "America/New_York"
+  )
+
+  x <- as.POSIXct(
+    c("1970-10-25 00:00:00", "1970-10-25 01:00:00", "1970-10-25 03:00:00"),
+    "America/New_York"
+  )
+
+  expect_equal(warp_distance(x, "hour"), c(2761, 2763, 2764))
+  expect_equal(warp_distance(x, "hour", 2), c(1380, 1381, 1382))
+})
+
 # ------------------------------------------------------------------------------
 # warp_distance(<POSIXlt>, period = "hour")
 

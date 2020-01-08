@@ -6,6 +6,7 @@
 SEXP warp_ns_env = NULL;
 
 SEXP syms_x = NULL;
+SEXP syms_tz = NULL;
 SEXP syms_tzone = NULL;
 SEXP syms_class = NULL;
 
@@ -13,16 +14,19 @@ SEXP syms_as_posixct_from_posixlt = NULL;
 SEXP syms_as_posixlt_from_posixct = NULL;
 SEXP syms_as_date = NULL;
 SEXP syms_force_utc = NULL;
+SEXP syms_force_tz = NULL;
 
 SEXP fns_as_posixct_from_posixlt = NULL;
 SEXP fns_as_posixlt_from_posixct = NULL;
 SEXP fns_as_date = NULL;
 SEXP fns_force_utc = NULL;
+SEXP fns_force_tz = NULL;
 
 SEXP classes_data_frame = NULL;
 SEXP classes_posixct = NULL;
 
 SEXP strings_start_stop = NULL;
+SEXP strings_utc = NULL;
 
 SEXP chars = NULL;
 SEXP char_posixlt = NULL;
@@ -364,6 +368,14 @@ SEXP warp_dispatch_n(SEXP fn_sym, SEXP fn, SEXP* syms, SEXP* args) {
   return out;
 }
 
+SEXP warp_dispatch2(SEXP fn_sym, SEXP fn,
+                    SEXP x_sym, SEXP x,
+                    SEXP y_sym, SEXP y) {
+  SEXP syms[3] = { x_sym, y_sym, NULL };
+  SEXP args[3] = { x, y, NULL };
+  return warp_dispatch_n(fn_sym, fn, syms, args);
+}
+
 SEXP warp_dispatch1(SEXP fn_sym, SEXP fn,
                          SEXP x_sym, SEXP x) {
   SEXP syms[2] = { x_sym, NULL };
@@ -405,12 +417,22 @@ SEXP force_utc(SEXP x) {
   );
 }
 
+// [[ include("utils.h") ]]
+SEXP force_tz(SEXP x, SEXP tz) {
+  return warp_dispatch2(
+    syms_force_tz, fns_force_tz,
+    syms_x, x,
+    syms_tz, tz
+  );
+}
+
 // -----------------------------------------------------------------------------
 
 void warp_init_utils(SEXP ns) {
   warp_ns_env = ns;
 
   syms_x = Rf_install("x");
+  syms_tz = Rf_install("tz");
   syms_tzone = Rf_install("tzone");
   syms_class = Rf_install("class");
 
@@ -424,11 +446,13 @@ void warp_init_utils(SEXP ns) {
   syms_as_posixlt_from_posixct = Rf_install("as_posixlt_from_posixct");
   syms_as_date = Rf_install("as_date");
   syms_force_utc = Rf_install("force_utc");
+  syms_force_tz = Rf_install("force_tz");
 
   fns_as_posixct_from_posixlt = r_env_get(warp_ns_env, syms_as_posixct_from_posixlt);
   fns_as_posixlt_from_posixct = r_env_get(warp_ns_env, syms_as_posixlt_from_posixct);
   fns_as_date = r_env_get(warp_ns_env, syms_as_date);
   fns_force_utc = r_env_get(warp_ns_env, syms_force_utc);
+  fns_force_tz = r_env_get(warp_ns_env, syms_force_tz);
 
   classes_data_frame = Rf_allocVector(STRSXP, 1);
   R_PreserveObject(classes_data_frame);
@@ -443,6 +467,10 @@ void warp_init_utils(SEXP ns) {
   R_PreserveObject(strings_start_stop);
   SET_STRING_ELT(strings_start_stop, 0, Rf_mkChar("start"));
   SET_STRING_ELT(strings_start_stop, 1, Rf_mkChar("stop"));
+
+  strings_utc = Rf_allocVector(STRSXP, 1);
+  R_PreserveObject(strings_utc);
+  SET_STRING_ELT(strings_utc, 0, Rf_mkChar("UTC"));
 
   // Holds the CHARSXP objects because they can be garbage collected
   chars = Rf_allocVector(STRSXP, 4);

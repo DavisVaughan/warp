@@ -1257,6 +1257,34 @@ static SEXP dbl_posixct_warp_distance_hour(SEXP x, int every, SEXP origin) {
 
 #undef SECONDS_IN_HOUR
 
+static SEXP datetime_warp_distance_hour(SEXP x, SEXP x_day_start, int every, SEXP origin) {
+
+  UNPROTECT(1);
+  return x;
+}
+
+static SEXP posixlt_warp_distance_hour2(SEXP x, int every, SEXP origin) {
+  SEXP x_ct = PROTECT(as_posixct_from_posixlt(x));
+  SEXP x_day_start = PROTECT(as_start_of_day_posixct_from_posixlt(x));
+
+  SEXP out = datetime_warp_distance_hour(x_ct, x_day_start, every, origin);
+
+  UNPROTECT(1);
+  return out;
+}
+
+// TODO - Int vs double?
+static SEXP posixct_warp_distance_hour2(SEXP x, int every, SEXP origin) {
+  SEXP x_lt = PROTECT(as_posixlt_from_posixct(x));
+  SEXP x_day_start = PROTECT(as_start_of_day_posixct_from_posixlt(x_lt));
+
+  SEXP out = datetime_warp_distance_hour(x, x_day_start, every, origin);
+
+  UNPROTECT(1);
+  return out;
+}
+
+
 // -----------------------------------------------------------------------------
 
 static SEXP date_warp_distance_minute(SEXP x, int every, SEXP origin);

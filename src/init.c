@@ -13,6 +13,7 @@ extern SEXP warp_date_get_year_offset(SEXP);
 extern SEXP warp_date_get_month_offset(SEXP);
 extern SEXP warp_divmod(SEXP, SEXP);
 extern SEXP warp_div(SEXP, SEXP);
+extern SEXP as_start_of_day_posixct_from_posixlt(SEXP x);
 
 // Defined below
 SEXP warp_init_library(SEXP);
@@ -26,6 +27,7 @@ static const R_CallMethodDef CallEntries[] = {
   {"warp_date_get_month_offset", (DL_FUNC) &warp_date_get_month_offset, 1},
   {"warp_divmod",                (DL_FUNC) &warp_divmod, 2},
   {"warp_div",                   (DL_FUNC) &warp_div, 2},
+  {"as_start_of_day_posixct_from_posixlt",                   (DL_FUNC) &as_start_of_day_posixct_from_posixlt, 1},
   {"warp_init_library",          (DL_FUNC) &warp_init_library, 1},
   {NULL, NULL, 0}
 };
