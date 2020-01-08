@@ -141,19 +141,19 @@ enum warp_period_type as_period_type(SEXP period) {
 
   const char* type = CHAR(STRING_ELT(period, 0));
 
-  if (str_equal(type, "year") || str_equal(type, "years") || str_equal(type, "yearly")) {
+  if (str_equal(type, "year")) {
     return warp_period_year;
   }
 
-  if (str_equal(type, "quarter") || str_equal(type, "quarters") || str_equal(type, "quarterly")) {
+  if (str_equal(type, "quarter")) {
     return warp_period_quarter;
   }
 
-  if (str_equal(type, "month") || str_equal(type, "months") || str_equal(type, "monthly")) {
+  if (str_equal(type, "month")) {
     return warp_period_month;
   }
 
-  if (str_equal(type, "week") || str_equal(type, "weeks") || str_equal(type, "weekly")) {
+  if (str_equal(type, "week")) {
     return warp_period_week;
   }
 
@@ -165,7 +165,7 @@ enum warp_period_type as_period_type(SEXP period) {
     return warp_period_mweek;
   }
 
-  if (str_equal(type, "day") || str_equal(type, "days") || str_equal(type, "daily")) {
+  if (str_equal(type, "day")) {
     return warp_period_day;
   }
 
@@ -177,19 +177,19 @@ enum warp_period_type as_period_type(SEXP period) {
     return warp_period_mday;
   }
 
-  if (str_equal(type, "hour") || str_equal(type, "hours") || str_equal(type, "hourly")) {
+  if (str_equal(type, "hour")) {
     return warp_period_hour;
   }
 
-  if (str_equal(type, "minute") || str_equal(type, "minutes") || str_equal(type, "minutely")) {
+  if (str_equal(type, "minute")) {
     return warp_period_minute;
   }
 
-  if (str_equal(type, "second") || str_equal(type, "seconds") || str_equal(type, "secondly")) {
+  if (str_equal(type, "second")) {
     return warp_period_second;
   }
 
-  if (str_equal(type, "millisecond") || str_equal(type, "milliseconds")) {
+  if (str_equal(type, "millisecond")) {
     return warp_period_millisecond;
   }
 
