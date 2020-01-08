@@ -13,10 +13,14 @@ A date time vector.}
 
 \item{period}{\verb{[character(1)]}
 
-A string defining the period to group by. Valid inputs are:
-
-\code{"year"}, \code{"quarter"}, \code{"month"}, \code{"week"}, \code{"yweek"}, \code{"day"}, \code{"yday"},
-\code{"hour"}, \code{"minute"}, \code{"second"}, \code{"millisecond"}}
+A string defining the period to group by. Valid inputs can be roughly
+broken into:
+\itemize{
+\item \code{"year"}, \code{"quarter"}, \code{"month"}
+\item \code{"week"}, \code{"yweek"}, \code{"mweek"}
+\item \code{"day"}, \code{"yday"}, \code{"mday"}
+\item \code{"hour"}, \code{"minute"}, \code{"second"}, \code{"millisecond"}
+}}
 
 \item{every}{\verb{[positive integer(1)]}
 
@@ -95,6 +99,14 @@ time you hit the month-day value of the \code{origin}. \code{"yweek"} is built o
 of this internally as \verb{period = "yday", every = every * 7}. This ends up
 using an algorithm very similar to \code{lubridate::week()}, with the added
 benefit of being able to control the \code{origin} date.
+
+The \code{period} value of \code{"mday"} is computed as \code{every}-day periods within
+each month, with a forced reset of the \code{every}-day counter
+on the first day of each month. The most useful application of this is
+\code{"mweek"}, which is implemented as \verb{period = "mday", every = every * 7}. This
+allows you to group by the "week of the month". For \code{"mday"} and \code{"mweek"},
+only the year and month parts of the \code{origin} value are used. Because of
+this, the \code{origin} argument is not that interesting for these periods.
 }
 
 \section{Precision}{
@@ -181,4 +193,19 @@ data.frame(
   week = warp_distance(x, "week", origin = origin),
   yweek = warp_distance(x, "yweek", origin = origin)
 )
+
+# ---------------------------------------------------------------------------
+# `period = "mweek"`
+
+x <- as.Date("2019-12-23") + 0:16
+
+# `"mweek"` breaks `x` up into weeks of the month. Notice how days 1-7
+# of 2020-01 all have the same distance value. A forced reset of the 7 day
+# counter is done at the 1st of every month. This results in the 3 day
+# week of the month at the end of 2019-12, from 29-31.
+data.frame(
+  x = x,
+  mweek = warp_distance(x, "mweek")
+)
+
 }
