@@ -70,6 +70,10 @@
 #' only the year and month parts of the `origin` value are used. Because of
 #' this, the `origin` argument is not that interesting for these periods.
 #'
+#' The `"hour"` period (and more granular frequencies) can produce results
+#' that might be surprising, even if they are technically correct. See the
+#' vignette at `vignette("hour", package = "warp")` for more information.
+#'
 #' @section Precision:
 #'
 #' With `POSIXct`, the limit of precision is approximately the microsecond

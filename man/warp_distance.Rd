@@ -107,6 +107,10 @@ on the first day of each month. The most useful application of this is
 allows you to group by the "week of the month". For \code{"mday"} and \code{"mweek"},
 only the year and month parts of the \code{origin} value are used. Because of
 this, the \code{origin} argument is not that interesting for these periods.
+
+The \code{"hour"} period (and more granular frequencies) can produce results
+that might be surprising, even if they are technically correct. See the
+vignette at \code{vignette("hour", package = "warp")} for more information.
 }
 
 \section{Precision}{
