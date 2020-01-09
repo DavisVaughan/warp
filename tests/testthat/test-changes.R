@@ -17,13 +17,13 @@ test_that("duplicate non-contiguous values are allowed", {
 
 test_that("`NA` / `NaN` / `Inf` dates look equivalent", {
   x <- new_date(c(NA_real_, Inf, NaN))
-  expect_equal(warp_change(x), 3)
+  expect_equal(warp_change(x, period = "year"), 3)
 })
 
 test_that("size 0 input works", {
-  expect_equal(warp_change(new_date()), numeric())
+  expect_equal(warp_change(new_date(), period = "year"), numeric())
 })
 
 test_that("size 1 input works", {
-  expect_equal(warp_change(new_date(0)), 1)
+  expect_equal(warp_change(new_date(0), period = "year"), 1)
 })

@@ -4,7 +4,7 @@
 \alias{warp_change}
 \title{Detect changes in a date time vector}
 \usage{
-warp_change(x, period = "year", every = 1L, origin = NULL)
+warp_change(x, period, every = 1L, origin = NULL)
 }
 \arguments{
 \item{x}{\verb{[Date / POSIXct / POSIXlt]}

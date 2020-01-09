@@ -4,7 +4,7 @@
 \alias{warp_boundary}
 \title{Locate period boundaries for a date vector}
 \usage{
-warp_boundary(x, period = "year", every = 1L, origin = NULL)
+warp_boundary(x, period, every = 1L, origin = NULL)
 }
 \arguments{
 \item{x}{\verb{[Date / POSIXct / POSIXlt]}

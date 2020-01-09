@@ -4,7 +4,7 @@
 \alias{warp_distance}
 \title{Compute distances from a date time origin}
 \usage{
-warp_distance(x, period = "year", every = 1L, origin = NULL)
+warp_distance(x, period, every = 1L, origin = NULL)
 }
 \arguments{
 \item{x}{\verb{[Date / POSIXct / POSIXlt]}

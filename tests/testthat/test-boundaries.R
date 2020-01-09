@@ -10,7 +10,7 @@ test_that("warp_boundary() works", {
 })
 
 test_that("warp_boundary() only allows date like inputs", {
-  expect_error(warp_boundary(1), "must inherit from")
+  expect_error(warp_boundary(1, period = "year"), "must inherit from")
 })
 
 test_that("the first value is always included as the first `start`", {
@@ -27,10 +27,10 @@ test_that("duplicate non-contiguous values are allowed, and show up in different
 
 test_that("size 0 input works", {
   expect <- data.frame(start = numeric(), stop = numeric())
-  expect_equal(warp_boundary(new_date(numeric())), expect)
+  expect_equal(warp_boundary(new_date(numeric()), period = "year"), expect)
 })
 
 test_that("size 1 input works", {
   expect <- data.frame(start = 1, stop = 1)
-  expect_equal(warp_boundary(new_date(2)), expect)
+  expect_equal(warp_boundary(new_date(2), period = "year"), expect)
 })

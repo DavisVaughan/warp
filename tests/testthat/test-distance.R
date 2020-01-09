@@ -56,9 +56,9 @@ test_that("can handle `every` with default origin", {
     "1973-01-01"
   ))
 
-  expect_equal(warp_distance(x, every = 2L), c(-2, -1, -1, 0, 0, 1, 1))
-  expect_equal(warp_distance(x, every = 3L), c(-1, -1, -1, 0, 0, 0, 1))
-  expect_equal(warp_distance(x, every = 4L), c(-1, -1, -1, 0, 0, 0, 0))
+  expect_equal(warp_distance(x, period = "year", every = 2L), c(-2, -1, -1, 0, 0, 1, 1))
+  expect_equal(warp_distance(x, period = "year", every = 3L), c(-1, -1, -1, 0, 0, 0, 1))
+  expect_equal(warp_distance(x, period = "year", every = 4L), c(-1, -1, -1, 0, 0, 0, 0))
 })
 
 test_that("can handle `every` with altered origin", {
@@ -71,9 +71,9 @@ test_that("can handle `every` with altered origin", {
 
   origin <- as.Date("1971-01-01")
 
-  expect_equal(warp_distance(x, every = 2L, origin = origin), c(-2, -2, -1, -1, 0, 0, 1))
-  expect_equal(warp_distance(x, every = 3L, origin = origin), c(-2, -1, -1, -1, 0, 0, 0))
-  expect_equal(warp_distance(x, every = 4L, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, period = "year", every = 2L, origin = origin), c(-2, -2, -1, -1, 0, 0, 1))
+  expect_equal(warp_distance(x, period = "year", every = 3L, origin = origin), c(-2, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, period = "year", every = 4L, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
 })
 
 test_that("fractional Date pieces are ignored", {
@@ -82,7 +82,7 @@ test_that("fractional Date pieces are ignored", {
   y <- structure(-0.0001, class = "Date")
 
   # But we really treat this as `new_date(0)`
-  expect_equal(warp_distance(y), 0)
+  expect_equal(warp_distance(y, period = "year"), 0)
 })
 
 test_that("size 0 input works - integer Dates", {
@@ -188,9 +188,9 @@ test_that("can handle `every` with default origin", {
     "1973-01-01"
   ), tz = "UTC")
 
-  expect_equal(warp_distance(x, every = 2L), c(-2, -1, -1, 0, 0, 1, 1))
-  expect_equal(warp_distance(x, every = 3L), c(-1, -1, -1, 0, 0, 0, 1))
-  expect_equal(warp_distance(x, every = 4L), c(-1, -1, -1, 0, 0, 0, 0))
+  expect_equal(warp_distance(x, period = "year", every = 2L), c(-2, -1, -1, 0, 0, 1, 1))
+  expect_equal(warp_distance(x, period = "year", every = 3L), c(-1, -1, -1, 0, 0, 0, 1))
+  expect_equal(warp_distance(x, period = "year", every = 4L), c(-1, -1, -1, 0, 0, 0, 0))
 })
 
 test_that("can handle `every` with altered origin", {
@@ -203,9 +203,9 @@ test_that("can handle `every` with altered origin", {
 
   origin <- as.Date("1971-01-01")
 
-  expect_equal(warp_distance(x, every = 2L, origin = origin), c(-2, -2, -1, -1, 0, 0, 1))
-  expect_equal(warp_distance(x, every = 3L, origin = origin), c(-2, -1, -1, -1, 0, 0, 0))
-  expect_equal(warp_distance(x, every = 4L, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, period = "year", every = 2L, origin = origin), c(-2, -2, -1, -1, 0, 0, 1))
+  expect_equal(warp_distance(x, period = "year", every = 3L, origin = origin), c(-2, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, period = "year", every = 4L, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
 })
 
 test_that("can handle `every` with altered origin and altered timezone", {
@@ -218,9 +218,9 @@ test_that("can handle `every` with altered origin and altered timezone", {
 
   origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
 
-  expect_equal(warp_distance(x, every = 2L, origin = origin), c(-2, -2, -1, -1, 0, 0, 1))
-  expect_equal(warp_distance(x, every = 3L, origin = origin), c(-2, -1, -1, -1, 0, 0, 0))
-  expect_equal(warp_distance(x, every = 4L, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, period = "year", every = 2L, origin = origin), c(-2, -2, -1, -1, 0, 0, 1))
+  expect_equal(warp_distance(x, period = "year", every = 3L, origin = origin), c(-2, -1, -1, -1, 0, 0, 0))
+  expect_equal(warp_distance(x, period = "year", every = 4L, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
 })
 
 test_that("default `origin` results in epoch in the time zone of `x`", {
@@ -3327,25 +3327,25 @@ test_that("can warp_distance() by millisecond with POSIXlt", {
 # warp_distance() misc
 
 test_that("`x` is validated", {
-  expect_error(warp_distance(1), "must inherit from")
+  expect_error(warp_distance(1, period = "year"), "must inherit from")
 })
 
 test_that("`origin` is validated", {
-  expect_error(warp_distance(new_date(0), origin = 1), "must inherit from")
-  expect_error(warp_distance(new_date(0), origin = new_date(c(0, 1))), "size 1, not 2")
+  expect_error(warp_distance(new_date(0), period = "year", origin = 1), "must inherit from")
+  expect_error(warp_distance(new_date(0), period = "year", origin = new_date(c(0, 1))), "size 1, not 2")
 
   expect_error(warp_distance(new_date(0), period = "year", origin = new_date(NA_real_)), "cannot be `NA`")
   expect_error(warp_distance(new_date(0), period = "month", origin = new_date(NA_real_)), "cannot be `NA`")
 })
 
 test_that("`every` is validated", {
-  expect_error(warp_distance(new_date(0), every = 0), "greater than 0, not 0")
-  expect_error(warp_distance(new_date(0), every = -1), "greater than 0, not -1")
-  expect_error(warp_distance(new_date(0), every = structure(1, class = "foobar")), "bare integer-ish")
-  expect_error(warp_distance(new_date(0), every = "x"), "integer-ish, not character")
-  expect_error(warp_distance(new_date(0), every = c(1, 1)), "size 1, not 2")
-  expect_error(warp_distance(new_date(0), every = integer()), "size 1, not 0")
-  expect_error(warp_distance(new_date(0), every = NA_integer_), "`every` must not be `NA`")
+  expect_error(warp_distance(new_date(0), period = "year", every = 0), "greater than 0, not 0")
+  expect_error(warp_distance(new_date(0), period = "year", every = -1), "greater than 0, not -1")
+  expect_error(warp_distance(new_date(0), period = "year", every = structure(1, class = "foobar")), "bare integer-ish")
+  expect_error(warp_distance(new_date(0), period = "year", every = "x"), "integer-ish, not character")
+  expect_error(warp_distance(new_date(0), period = "year", every = c(1, 1)), "size 1, not 2")
+  expect_error(warp_distance(new_date(0), period = "year", every = integer()), "size 1, not 0")
+  expect_error(warp_distance(new_date(0), period = "year", every = NA_integer_), "`every` must not be `NA`")
 })
 
 test_that("`period` is validated", {

@@ -16,6 +16,6 @@
 #' warp_change(x, period = "day", every = 2)
 #'
 #' warp_change(x, period = "day", every = 2, origin = as.Date("2019-01-01"))
-warp_change <- function(x, period = "year", every = 1L, origin = NULL) {
+warp_change <- function(x, period, every = 1L, origin = NULL) {
   .Call(warp_warp_change, x, period, every, origin)
 }
