@@ -101,18 +101,18 @@
 #'
 #' @param every `[positive integer(1)]`
 #'
-#'   The number of `period`s to group together.
+#'   The number of periods to group together.
 #'
-#'   For example, if `period = "year"` and `every` is set to `2`, then the years
-#'   1970 and 1971 would be placed in the same group.
+#'   For example, if the period was set to `"year"` with an every value of `2`,
+#'   then the years 1970 and 1971 would be placed in the same group.
 #'
 #' @param origin `[Date(1) / POSIXct(1) / POSIXlt(1) / NULL]`
 #'
 #'   The reference date time value. The default when left as `NULL` is the
-#'   epoch time of `1970-01-01 00:00:00`, _in the time zone of `x`_.
+#'   epoch time of `1970-01-01 00:00:00`, _in the time zone of the index_.
 #'
 #'   This is generally used to define the anchor time to count from, which is
-#'   relevant when `every > 1`.
+#'   relevant when the every value is `> 1`.
 #'
 #' @return
 #' A double vector containing the distances.
