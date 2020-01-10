@@ -23,6 +23,12 @@ library(warp)
 
 ## Installation
 
+You can install the release version from CRAN with:
+
+``` r
+install.package("warp")
+```
+
 You can install the development version from
 [GitHub](https://github.com/) with:
 
