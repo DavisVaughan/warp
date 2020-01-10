@@ -67,7 +67,7 @@ SEXP get_origin_epoch_in_time_zone(SEXP x) {
 
   // gmtoff is optional, it may not be there. In those cases assume UTC.
   if (Rf_length(dummy) != 11) {
-    UNPROTECT(3);
+    UNPROTECT(2);
     return R_NilValue;
   }
 
@@ -76,7 +76,7 @@ SEXP get_origin_epoch_in_time_zone(SEXP x) {
 
   // Documented as "unknown", assume UTC.
   if (offset == NA_INTEGER || offset == 0) {
-    UNPROTECT(3);
+    UNPROTECT(2);
     return R_NilValue;
   }
 
