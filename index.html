@@ -36,7 +36,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">warp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
@@ -93,58 +93,60 @@
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
+<p>You can install the release version from CRAN with:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">install.package</span>(<span class="st">"warp"</span>)</a></code></pre></div>
 <p>You can install the development version from <a href="https://github.com/">GitHub</a> with:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="co"># install.packages("devtools")</span></a>
-<a class="sourceLine" id="cb2-2" data-line-number="2">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"DavisVaughan/warp"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="co"># install.packages("devtools")</span></a>
+<a class="sourceLine" id="cb3-2" data-line-number="2">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"DavisVaughan/warp"</span>)</a></code></pre></div>
 </div>
 <div id="example" class="section level2">
 <h2 class="hasAnchor">
 <a href="#example" class="anchor"></a>Example</h2>
 <p>One of the core functions in warp is <code><a href="reference/warp_distance.html">warp_distance()</a></code>, which allows you to provide a date time vector and compute the “distance” from an <code>origin</code>. For example, this computes the number of months from the unix epoch.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">x &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span>(<span class="st">"1970-01-01"</span>) <span class="op">+</span><span class="st"> </span><span class="dv">-2</span><span class="op">:</span><span class="dv">2</span></a>
-<a class="sourceLine" id="cb3-2" data-line-number="2">x</a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt; [1] "1969-12-30" "1969-12-31" "1970-01-01" "1970-01-02" "1970-01-03"</span></a>
-<a class="sourceLine" id="cb3-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="kw"><a href="reference/warp_distance.html">warp_distance</a></span>(x, <span class="dt">period =</span> <span class="st">"month"</span>)</a>
-<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">#&gt; [1] -1 -1  0  0  0</span></a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">x &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span>(<span class="st">"1970-01-01"</span>) <span class="op">+</span><span class="st"> </span><span class="dv">-2</span><span class="op">:</span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb4-2" data-line-number="2">x</a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt; [1] "1969-12-30" "1969-12-31" "1970-01-01" "1970-01-02" "1970-01-03"</span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="kw"><a href="reference/warp_distance.html">warp_distance</a></span>(x, <span class="dt">period =</span> <span class="st">"month"</span>)</a>
+<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; [1] -1 -1  0  0  0</span></a></code></pre></div>
 <p>The values that <code><a href="reference/warp_distance.html">warp_distance()</a></code> returns correspond to the distance from <code>x</code> to the <code>origin</code>, in units defined by the <code>period</code> and the width defined by <code>every</code>. The <code>origin</code> defaults to the unix epoch of <code>1970-01-01 00:00:00</code> in the time zone of <code>x</code>, but you can change that. In this case the distances are saying that, for example, <code>"1970-01-02"</code> is in the same month as the origin, and <code>"1969-12-31"</code> is 1 month group away.</p>
 <p>You can also compute daily distances. Rather than grouping by 1 day, let’s lump every 2 days together, starting from the default <code>origin</code>.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># Groups 1970-01-01 and 1970-01-02 together</span></a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw"><a href="reference/warp_distance.html">warp_distance</a></span>(x, <span class="dt">period =</span> <span class="st">"day"</span>, <span class="dt">every =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt; [1] -1 -1  0  0  1</span></a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="co"># Groups 1970-01-01 and 1970-01-02 together</span></a>
+<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="kw"><a href="reference/warp_distance.html">warp_distance</a></span>(x, <span class="dt">period =</span> <span class="st">"day"</span>, <span class="dt">every =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co">#&gt; [1] -1 -1  0  0  1</span></a></code></pre></div>
 <p>You will often want to set your own <code>origin</code> date. Let’s shift it forward 1 to <code>1970-01-02</code>.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">origin &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span>(<span class="st">"1970-01-02"</span>)</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2">origin</a>
-<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co">#&gt; [1] "1970-01-02"</span></a>
-<a class="sourceLine" id="cb5-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co"># Groups 1970-01-02 and 1970-01-03 together</span></a>
-<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="kw"><a href="reference/warp_distance.html">warp_distance</a></span>(x, <span class="dt">period =</span> <span class="st">"day"</span>, <span class="dt">every =</span> <span class="dv">2</span>, <span class="dt">origin =</span> origin)</a>
-<a class="sourceLine" id="cb5-7" data-line-number="7"><span class="co">#&gt; [1] -2 -1 -1  0  0</span></a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">origin &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span>(<span class="st">"1970-01-02"</span>)</a>
+<a class="sourceLine" id="cb6-2" data-line-number="2">origin</a>
+<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="co">#&gt; [1] "1970-01-02"</span></a>
+<a class="sourceLine" id="cb6-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="co"># Groups 1970-01-02 and 1970-01-03 together</span></a>
+<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="kw"><a href="reference/warp_distance.html">warp_distance</a></span>(x, <span class="dt">period =</span> <span class="st">"day"</span>, <span class="dt">every =</span> <span class="dv">2</span>, <span class="dt">origin =</span> origin)</a>
+<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="co">#&gt; [1] -2 -1 -1  0  0</span></a></code></pre></div>
 <p>Another interesting period to group by is the <code>"mweek"</code>, i.e. the week of the month. Notice that days 1-7 of January 1970 are grouped into the same bucket. Also note that days 29-31 of December 1969 fell at the end of their corresponding month. This irregular week of size 3 is treated as the 5th week of that month, but the offset value of <code>-1</code> is still the number of week buckets from the <code>origin</code> of <code>1970-01-01</code>.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">y &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span>(<span class="st">"1969-12-28"</span>) <span class="op">+</span><span class="st"> </span><span class="dv">0</span><span class="op">:</span><span class="dv">14</span></a>
-<a class="sourceLine" id="cb6-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb6-3" data-line-number="3">tibble<span class="op">::</span><span class="kw"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span>(</a>
-<a class="sourceLine" id="cb6-4" data-line-number="4">  <span class="dt">y =</span> y,</a>
-<a class="sourceLine" id="cb6-5" data-line-number="5">  <span class="dt">mweek =</span> <span class="kw"><a href="reference/warp_distance.html">warp_distance</a></span>(y, <span class="st">"mweek"</span>)</a>
-<a class="sourceLine" id="cb6-6" data-line-number="6">)</a>
-<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="co">#&gt; # A tibble: 15 x 2</span></a>
-<a class="sourceLine" id="cb6-8" data-line-number="8"><span class="co">#&gt;    y          mweek</span></a>
-<a class="sourceLine" id="cb6-9" data-line-number="9"><span class="co">#&gt;    &lt;date&gt;     &lt;dbl&gt;</span></a>
-<a class="sourceLine" id="cb6-10" data-line-number="10"><span class="co">#&gt;  1 1969-12-28    -2</span></a>
-<a class="sourceLine" id="cb6-11" data-line-number="11"><span class="co">#&gt;  2 1969-12-29    -1</span></a>
-<a class="sourceLine" id="cb6-12" data-line-number="12"><span class="co">#&gt;  3 1969-12-30    -1</span></a>
-<a class="sourceLine" id="cb6-13" data-line-number="13"><span class="co">#&gt;  4 1969-12-31    -1</span></a>
-<a class="sourceLine" id="cb6-14" data-line-number="14"><span class="co">#&gt;  5 1970-01-01     0</span></a>
-<a class="sourceLine" id="cb6-15" data-line-number="15"><span class="co">#&gt;  6 1970-01-02     0</span></a>
-<a class="sourceLine" id="cb6-16" data-line-number="16"><span class="co">#&gt;  7 1970-01-03     0</span></a>
-<a class="sourceLine" id="cb6-17" data-line-number="17"><span class="co">#&gt;  8 1970-01-04     0</span></a>
-<a class="sourceLine" id="cb6-18" data-line-number="18"><span class="co">#&gt;  9 1970-01-05     0</span></a>
-<a class="sourceLine" id="cb6-19" data-line-number="19"><span class="co">#&gt; 10 1970-01-06     0</span></a>
-<a class="sourceLine" id="cb6-20" data-line-number="20"><span class="co">#&gt; 11 1970-01-07     0</span></a>
-<a class="sourceLine" id="cb6-21" data-line-number="21"><span class="co">#&gt; 12 1970-01-08     1</span></a>
-<a class="sourceLine" id="cb6-22" data-line-number="22"><span class="co">#&gt; 13 1970-01-09     1</span></a>
-<a class="sourceLine" id="cb6-23" data-line-number="23"><span class="co">#&gt; 14 1970-01-10     1</span></a>
-<a class="sourceLine" id="cb6-24" data-line-number="24"><span class="co">#&gt; 15 1970-01-11     1</span></a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">y &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span>(<span class="st">"1969-12-28"</span>) <span class="op">+</span><span class="st"> </span><span class="dv">0</span><span class="op">:</span><span class="dv">14</span></a>
+<a class="sourceLine" id="cb7-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3">tibble<span class="op">::</span><span class="kw"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span>(</a>
+<a class="sourceLine" id="cb7-4" data-line-number="4">  <span class="dt">y =</span> y,</a>
+<a class="sourceLine" id="cb7-5" data-line-number="5">  <span class="dt">mweek =</span> <span class="kw"><a href="reference/warp_distance.html">warp_distance</a></span>(y, <span class="st">"mweek"</span>)</a>
+<a class="sourceLine" id="cb7-6" data-line-number="6">)</a>
+<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt; # A tibble: 15 x 2</span></a>
+<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="co">#&gt;    y          mweek</span></a>
+<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">#&gt;    &lt;date&gt;     &lt;dbl&gt;</span></a>
+<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">#&gt;  1 1969-12-28    -2</span></a>
+<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co">#&gt;  2 1969-12-29    -1</span></a>
+<a class="sourceLine" id="cb7-12" data-line-number="12"><span class="co">#&gt;  3 1969-12-30    -1</span></a>
+<a class="sourceLine" id="cb7-13" data-line-number="13"><span class="co">#&gt;  4 1969-12-31    -1</span></a>
+<a class="sourceLine" id="cb7-14" data-line-number="14"><span class="co">#&gt;  5 1970-01-01     0</span></a>
+<a class="sourceLine" id="cb7-15" data-line-number="15"><span class="co">#&gt;  6 1970-01-02     0</span></a>
+<a class="sourceLine" id="cb7-16" data-line-number="16"><span class="co">#&gt;  7 1970-01-03     0</span></a>
+<a class="sourceLine" id="cb7-17" data-line-number="17"><span class="co">#&gt;  8 1970-01-04     0</span></a>
+<a class="sourceLine" id="cb7-18" data-line-number="18"><span class="co">#&gt;  9 1970-01-05     0</span></a>
+<a class="sourceLine" id="cb7-19" data-line-number="19"><span class="co">#&gt; 10 1970-01-06     0</span></a>
+<a class="sourceLine" id="cb7-20" data-line-number="20"><span class="co">#&gt; 11 1970-01-07     0</span></a>
+<a class="sourceLine" id="cb7-21" data-line-number="21"><span class="co">#&gt; 12 1970-01-08     1</span></a>
+<a class="sourceLine" id="cb7-22" data-line-number="22"><span class="co">#&gt; 13 1970-01-09     1</span></a>
+<a class="sourceLine" id="cb7-23" data-line-number="23"><span class="co">#&gt; 14 1970-01-10     1</span></a>
+<a class="sourceLine" id="cb7-24" data-line-number="24"><span class="co">#&gt; 15 1970-01-11     1</span></a></code></pre></div>
 </div>
 <div id="inspiration" class="section level2">
 <h2 class="hasAnchor">
