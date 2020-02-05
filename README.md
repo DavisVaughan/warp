@@ -15,7 +15,6 @@ status](https://github.com/DavisVaughan/warp/workflows/R-CMD-check/badge.svg)](h
 
 ![](https://media.giphy.com/media/jjeK2Er3E5igw/giphy.gif)
 
-
 The goal of warp is to provide tooling to group dates by a variety of
 periods, such as: yearly, monthly, by second, by week of the month, and
 more.
