@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hour Distances and Daylight Savings • warp</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.1/css/all.min.css" integrity="sha256-PbSmjxuVAzJ6FPvNYsrXygfGhNJYyZ2GktDbkMBqQZg=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.1/css/v4-shims.min.css" integrity="sha256-A6jcAdwFD48VMjlI3GDxUd+eCQa7/KWy6G9oe/ovaPA=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="Hour Distances and Daylight Savings">
 <meta property="og:description" content="">
@@ -93,167 +93,167 @@
 
     
     
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(warp)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(warp)</span></code></pre></div>
 <p>If using <code>period = "hour"</code>, it should work as expected at all times when using a time zone that doesn’t have daylight savings, like UTC or EST. If using a time zone with DST, like America/New_York, some additional explanation is required, especially when <code>every &gt; 1</code>.</p>
 <div id="spring-forward-gap" class="section level2">
 <h2 class="hasAnchor">
 <a href="#spring-forward-gap" class="anchor"></a>Spring Forward Gap</h2>
 <p>In America/New_York’s time zone, as time was about to reach <code>1970-04-26 02:00:00</code>, daylight savings kicked in and time shifts forward 1 hour so that the next time is actually <code>1970-04-26 03:00:00</code>.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">before_dst &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXct</a></span>(<span class="st">"1970-04-26 01:59:59"</span>, <span class="dt">tz =</span> <span class="st">"America/New_York"</span>)</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2">before_dst</a>
-<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="co">#&gt; [1] "1970-04-26 01:59:59 EST"</span></a>
-<a class="sourceLine" id="cb2-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb2-5" data-line-number="5">before_dst <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="co">#&gt; [1] "1970-04-26 03:00:00 EDT"</span></a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>before_dst &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXct</a></span>(<span class="st">"1970-04-26 01:59:59"</span>, <span class="dt">tz =</span> <span class="st">"America/New_York"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2"></a>before_dst</span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt; [1] "1970-04-26 01:59:59 EST"</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a></span>
+<span id="cb2-5"><a href="#cb2-5"></a>before_dst <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="co">#&gt; [1] "1970-04-26 03:00:00 EDT"</span></span></code></pre></div>
 <p><code><a href="../reference/warp_distance.html">warp_distance()</a></code> treats hours 1 and 3 as being side by side, since no hour 2 ever existed. This means that hours (0, 1) and (3, 4) get grouped together in the below example.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">x &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXct</a></span>(<span class="st">"1970-04-26 00:00:00"</span>, <span class="dt">tz =</span> <span class="st">"America/New_York"</span>) <span class="op">+</span><span class="st"> </span><span class="dv">3600</span> <span class="op">*</span><span class="st"> </span><span class="dv">0</span><span class="op">:</span><span class="dv">7</span></a>
-<a class="sourceLine" id="cb3-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(</a>
-<a class="sourceLine" id="cb3-4" data-line-number="4">  <span class="dt">x =</span> x,</a>
-<a class="sourceLine" id="cb3-5" data-line-number="5">  <span class="dt">hour =</span> <span class="kw"><a href="../reference/warp_distance.html">warp_distance</a></span>(x, <span class="st">"hour"</span>, <span class="dt">every =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb3-6" data-line-number="6">)</a>
-<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="co">#&gt;                     x hour</span></a>
-<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="co">#&gt; 1 1970-04-26 00:00:00 1380</span></a>
-<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="co">#&gt; 2 1970-04-26 01:00:00 1380</span></a>
-<a class="sourceLine" id="cb3-10" data-line-number="10"><span class="co">#&gt; 3 1970-04-26 03:00:00 1381</span></a>
-<a class="sourceLine" id="cb3-11" data-line-number="11"><span class="co">#&gt; 4 1970-04-26 04:00:00 1381</span></a>
-<a class="sourceLine" id="cb3-12" data-line-number="12"><span class="co">#&gt; 5 1970-04-26 05:00:00 1382</span></a>
-<a class="sourceLine" id="cb3-13" data-line-number="13"><span class="co">#&gt; 6 1970-04-26 06:00:00 1382</span></a>
-<a class="sourceLine" id="cb3-14" data-line-number="14"><span class="co">#&gt; 7 1970-04-26 07:00:00 1383</span></a>
-<a class="sourceLine" id="cb3-15" data-line-number="15"><span class="co">#&gt; 8 1970-04-26 08:00:00 1383</span></a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>x &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXct</a></span>(<span class="st">"1970-04-26 00:00:00"</span>, <span class="dt">tz =</span> <span class="st">"America/New_York"</span>) <span class="op">+</span><span class="st"> </span><span class="dv">3600</span> <span class="op">*</span><span class="st"> </span><span class="dv">0</span><span class="op">:</span><span class="dv">7</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a></span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(</span>
+<span id="cb3-4"><a href="#cb3-4"></a>  <span class="dt">x =</span> x,</span>
+<span id="cb3-5"><a href="#cb3-5"></a>  <span class="dt">hour =</span> <span class="kw"><a href="../reference/warp_distance.html">warp_distance</a></span>(x, <span class="st">"hour"</span>, <span class="dt">every =</span> <span class="dv">2</span>)</span>
+<span id="cb3-6"><a href="#cb3-6"></a>)</span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="co">#&gt;                     x hour</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="co">#&gt; 1 1970-04-26 00:00:00 1380</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="co">#&gt; 2 1970-04-26 01:00:00 1380</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a><span class="co">#&gt; 3 1970-04-26 03:00:00 1381</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a><span class="co">#&gt; 4 1970-04-26 04:00:00 1381</span></span>
+<span id="cb3-12"><a href="#cb3-12"></a><span class="co">#&gt; 5 1970-04-26 05:00:00 1382</span></span>
+<span id="cb3-13"><a href="#cb3-13"></a><span class="co">#&gt; 6 1970-04-26 06:00:00 1382</span></span>
+<span id="cb3-14"><a href="#cb3-14"></a><span class="co">#&gt; 7 1970-04-26 07:00:00 1383</span></span>
+<span id="cb3-15"><a href="#cb3-15"></a><span class="co">#&gt; 8 1970-04-26 08:00:00 1383</span></span></code></pre></div>
 <p>Because <code>period = "hour"</code> just computes the running number of 2 hour periods from the <code>origin</code>, this pattern carries forward into the next day to have a contiguous stream of values. This can be somewhat confusing, since hours 0 and 1 don’t get grouped together on the 27th.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">y &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXct</a></span>(<span class="st">"1970-04-26 22:00:00"</span>, <span class="dt">tz =</span> <span class="st">"America/New_York"</span>) <span class="op">+</span><span class="st"> </span><span class="dv">3600</span> <span class="op">*</span><span class="st"> </span><span class="dv">0</span><span class="op">:</span><span class="dv">5</span></a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(</a>
-<a class="sourceLine" id="cb4-4" data-line-number="4">  <span class="dt">y =</span> y,</a>
-<a class="sourceLine" id="cb4-5" data-line-number="5">  <span class="dt">hour =</span> <span class="kw"><a href="../reference/warp_distance.html">warp_distance</a></span>(y, <span class="st">"hour"</span>, <span class="dt">every =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb4-6" data-line-number="6">)</a>
-<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt;                     y hour</span></a>
-<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt; 1 1970-04-26 22:00:00 1390</span></a>
-<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt; 2 1970-04-26 23:00:00 1391</span></a>
-<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt; 3 1970-04-27 00:00:00 1391</span></a>
-<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt; 4 1970-04-27 01:00:00 1392</span></a>
-<a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">#&gt; 5 1970-04-27 02:00:00 1392</span></a>
-<a class="sourceLine" id="cb4-13" data-line-number="13"><span class="co">#&gt; 6 1970-04-27 03:00:00 1393</span></a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>y &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXct</a></span>(<span class="st">"1970-04-26 22:00:00"</span>, <span class="dt">tz =</span> <span class="st">"America/New_York"</span>) <span class="op">+</span><span class="st"> </span><span class="dv">3600</span> <span class="op">*</span><span class="st"> </span><span class="dv">0</span><span class="op">:</span><span class="dv">5</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a></span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(</span>
+<span id="cb4-4"><a href="#cb4-4"></a>  <span class="dt">y =</span> y,</span>
+<span id="cb4-5"><a href="#cb4-5"></a>  <span class="dt">hour =</span> <span class="kw"><a href="../reference/warp_distance.html">warp_distance</a></span>(y, <span class="st">"hour"</span>, <span class="dt">every =</span> <span class="dv">2</span>)</span>
+<span id="cb4-6"><a href="#cb4-6"></a>)</span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="co">#&gt;                     y hour</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="co">#&gt; 1 1970-04-26 22:00:00 1390</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a><span class="co">#&gt; 2 1970-04-26 23:00:00 1391</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="co">#&gt; 3 1970-04-27 00:00:00 1391</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a><span class="co">#&gt; 4 1970-04-27 01:00:00 1392</span></span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="co">#&gt; 5 1970-04-27 02:00:00 1392</span></span>
+<span id="cb4-13"><a href="#cb4-13"></a><span class="co">#&gt; 6 1970-04-27 03:00:00 1393</span></span></code></pre></div>
 <p>One way that you can sort of get around this is by using lubridate’s <code>force_tz()</code> function to force a UTC time zone with the same clock time as your original date. I’ve mocked up a poor man’s version of that function below.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="co"># Or call `lubridate::force_tz(x, "UTC")`</span></a>
-<a class="sourceLine" id="cb5-2" data-line-number="2">force_utc &lt;-<span class="st"> </span><span class="cf">function</span>(x) {</a>
-<a class="sourceLine" id="cb5-3" data-line-number="3">  x_lt &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXlt</a></span>(x)</a>
-<a class="sourceLine" id="cb5-4" data-line-number="4">  x_lt &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/class.html">unclass</a></span>(x_lt)</a>
-<a class="sourceLine" id="cb5-5" data-line-number="5">  </a>
-<a class="sourceLine" id="cb5-6" data-line-number="6">  <span class="kw"><a href="https://rdrr.io/r/base/attributes.html">attributes</a></span>(x) &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb5-7" data-line-number="7">  </a>
-<a class="sourceLine" id="cb5-8" data-line-number="8">  out &lt;-<span class="st"> </span>x <span class="op">+</span><span class="st"> </span>x_lt<span class="op">$</span>gmtoff</a>
-<a class="sourceLine" id="cb5-9" data-line-number="9">  </a>
-<a class="sourceLine" id="cb5-10" data-line-number="10">  <span class="kw"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXct</a></span>(out, <span class="dt">tz =</span> <span class="st">"UTC"</span>, <span class="dt">origin =</span> <span class="st">"1970-01-01"</span>)</a>
-<a class="sourceLine" id="cb5-11" data-line-number="11">}</a>
-<a class="sourceLine" id="cb5-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb5-13" data-line-number="13">x_utc &lt;-<span class="st"> </span><span class="kw">force_utc</span>(x)</a>
-<a class="sourceLine" id="cb5-14" data-line-number="14">y_utc &lt;-<span class="st"> </span><span class="kw">force_utc</span>(y)</a>
-<a class="sourceLine" id="cb5-15" data-line-number="15"></a>
-<a class="sourceLine" id="cb5-16" data-line-number="16">x_utc</a>
-<a class="sourceLine" id="cb5-17" data-line-number="17"><span class="co">#&gt; [1] "1970-04-26 00:00:00 UTC" "1970-04-26 01:00:00 UTC"</span></a>
-<a class="sourceLine" id="cb5-18" data-line-number="18"><span class="co">#&gt; [3] "1970-04-26 03:00:00 UTC" "1970-04-26 04:00:00 UTC"</span></a>
-<a class="sourceLine" id="cb5-19" data-line-number="19"><span class="co">#&gt; [5] "1970-04-26 05:00:00 UTC" "1970-04-26 06:00:00 UTC"</span></a>
-<a class="sourceLine" id="cb5-20" data-line-number="20"><span class="co">#&gt; [7] "1970-04-26 07:00:00 UTC" "1970-04-26 08:00:00 UTC"</span></a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># Or call `lubridate::force_tz(x, "UTC")`</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>force_utc &lt;-<span class="st"> </span><span class="cf">function</span>(x) {</span>
+<span id="cb5-3"><a href="#cb5-3"></a>  x_lt &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXlt</a></span>(x)</span>
+<span id="cb5-4"><a href="#cb5-4"></a>  x_lt &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/class.html">unclass</a></span>(x_lt)</span>
+<span id="cb5-5"><a href="#cb5-5"></a>  </span>
+<span id="cb5-6"><a href="#cb5-6"></a>  <span class="kw"><a href="https://rdrr.io/r/base/attributes.html">attributes</a></span>(x) &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a>  </span>
+<span id="cb5-8"><a href="#cb5-8"></a>  out &lt;-<span class="st"> </span>x <span class="op">+</span><span class="st"> </span>x_lt<span class="op">$</span>gmtoff</span>
+<span id="cb5-9"><a href="#cb5-9"></a>  </span>
+<span id="cb5-10"><a href="#cb5-10"></a>  <span class="kw"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXct</a></span>(out, <span class="dt">tz =</span> <span class="st">"UTC"</span>, <span class="dt">origin =</span> <span class="st">"1970-01-01"</span>)</span>
+<span id="cb5-11"><a href="#cb5-11"></a>}</span>
+<span id="cb5-12"><a href="#cb5-12"></a></span>
+<span id="cb5-13"><a href="#cb5-13"></a>x_utc &lt;-<span class="st"> </span><span class="kw">force_utc</span>(x)</span>
+<span id="cb5-14"><a href="#cb5-14"></a>y_utc &lt;-<span class="st"> </span><span class="kw">force_utc</span>(y)</span>
+<span id="cb5-15"><a href="#cb5-15"></a></span>
+<span id="cb5-16"><a href="#cb5-16"></a>x_utc</span>
+<span id="cb5-17"><a href="#cb5-17"></a><span class="co">#&gt; [1] "1970-04-26 00:00:00 UTC" "1970-04-26 01:00:00 UTC"</span></span>
+<span id="cb5-18"><a href="#cb5-18"></a><span class="co">#&gt; [3] "1970-04-26 03:00:00 UTC" "1970-04-26 04:00:00 UTC"</span></span>
+<span id="cb5-19"><a href="#cb5-19"></a><span class="co">#&gt; [5] "1970-04-26 05:00:00 UTC" "1970-04-26 06:00:00 UTC"</span></span>
+<span id="cb5-20"><a href="#cb5-20"></a><span class="co">#&gt; [7] "1970-04-26 07:00:00 UTC" "1970-04-26 08:00:00 UTC"</span></span></code></pre></div>
 <p>In UTC, hour 2 exists so groups are created as (0, 1), (2, 3), and so on, even though hour 2 doesn’t actually exist in America/New_York because of the DST gap. This has the affect of limiting the (2, 3) group to a maximum size of 1, since only hour 3 is possible in the data.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2">  <span class="dt">x_utc =</span> x_utc,</a>
-<a class="sourceLine" id="cb6-3" data-line-number="3">  <span class="dt">hour =</span> <span class="kw"><a href="../reference/warp_distance.html">warp_distance</a></span>(x_utc, <span class="st">"hour"</span>, <span class="dt">every =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb6-4" data-line-number="4">)</a>
-<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="co">#&gt;                 x_utc hour</span></a>
-<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="co">#&gt; 1 1970-04-26 00:00:00 1380</span></a>
-<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="co">#&gt; 2 1970-04-26 01:00:00 1380</span></a>
-<a class="sourceLine" id="cb6-8" data-line-number="8"><span class="co">#&gt; 3 1970-04-26 03:00:00 1381</span></a>
-<a class="sourceLine" id="cb6-9" data-line-number="9"><span class="co">#&gt; 4 1970-04-26 04:00:00 1382</span></a>
-<a class="sourceLine" id="cb6-10" data-line-number="10"><span class="co">#&gt; 5 1970-04-26 05:00:00 1382</span></a>
-<a class="sourceLine" id="cb6-11" data-line-number="11"><span class="co">#&gt; 6 1970-04-26 06:00:00 1383</span></a>
-<a class="sourceLine" id="cb6-12" data-line-number="12"><span class="co">#&gt; 7 1970-04-26 07:00:00 1383</span></a>
-<a class="sourceLine" id="cb6-13" data-line-number="13"><span class="co">#&gt; 8 1970-04-26 08:00:00 1384</span></a>
-<a class="sourceLine" id="cb6-14" data-line-number="14"></a>
-<a class="sourceLine" id="cb6-15" data-line-number="15"><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(</a>
-<a class="sourceLine" id="cb6-16" data-line-number="16">  <span class="dt">y_utc =</span> y_utc,</a>
-<a class="sourceLine" id="cb6-17" data-line-number="17">  <span class="dt">hour =</span> <span class="kw"><a href="../reference/warp_distance.html">warp_distance</a></span>(y_utc, <span class="st">"hour"</span>, <span class="dt">every =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb6-18" data-line-number="18">)</a>
-<a class="sourceLine" id="cb6-19" data-line-number="19"><span class="co">#&gt;                 y_utc hour</span></a>
-<a class="sourceLine" id="cb6-20" data-line-number="20"><span class="co">#&gt; 1 1970-04-26 22:00:00 1391</span></a>
-<a class="sourceLine" id="cb6-21" data-line-number="21"><span class="co">#&gt; 2 1970-04-26 23:00:00 1391</span></a>
-<a class="sourceLine" id="cb6-22" data-line-number="22"><span class="co">#&gt; 3 1970-04-27 00:00:00 1392</span></a>
-<a class="sourceLine" id="cb6-23" data-line-number="23"><span class="co">#&gt; 4 1970-04-27 01:00:00 1392</span></a>
-<a class="sourceLine" id="cb6-24" data-line-number="24"><span class="co">#&gt; 5 1970-04-27 02:00:00 1393</span></a>
-<a class="sourceLine" id="cb6-25" data-line-number="25"><span class="co">#&gt; 6 1970-04-27 03:00:00 1393</span></a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(</span>
+<span id="cb6-2"><a href="#cb6-2"></a>  <span class="dt">x_utc =</span> x_utc,</span>
+<span id="cb6-3"><a href="#cb6-3"></a>  <span class="dt">hour =</span> <span class="kw"><a href="../reference/warp_distance.html">warp_distance</a></span>(x_utc, <span class="st">"hour"</span>, <span class="dt">every =</span> <span class="dv">2</span>)</span>
+<span id="cb6-4"><a href="#cb6-4"></a>)</span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="co">#&gt;                 x_utc hour</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a><span class="co">#&gt; 1 1970-04-26 00:00:00 1380</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="co">#&gt; 2 1970-04-26 01:00:00 1380</span></span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="co">#&gt; 3 1970-04-26 03:00:00 1381</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="co">#&gt; 4 1970-04-26 04:00:00 1382</span></span>
+<span id="cb6-10"><a href="#cb6-10"></a><span class="co">#&gt; 5 1970-04-26 05:00:00 1382</span></span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="co">#&gt; 6 1970-04-26 06:00:00 1383</span></span>
+<span id="cb6-12"><a href="#cb6-12"></a><span class="co">#&gt; 7 1970-04-26 07:00:00 1383</span></span>
+<span id="cb6-13"><a href="#cb6-13"></a><span class="co">#&gt; 8 1970-04-26 08:00:00 1384</span></span>
+<span id="cb6-14"><a href="#cb6-14"></a></span>
+<span id="cb6-15"><a href="#cb6-15"></a><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(</span>
+<span id="cb6-16"><a href="#cb6-16"></a>  <span class="dt">y_utc =</span> y_utc,</span>
+<span id="cb6-17"><a href="#cb6-17"></a>  <span class="dt">hour =</span> <span class="kw"><a href="../reference/warp_distance.html">warp_distance</a></span>(y_utc, <span class="st">"hour"</span>, <span class="dt">every =</span> <span class="dv">2</span>)</span>
+<span id="cb6-18"><a href="#cb6-18"></a>)</span>
+<span id="cb6-19"><a href="#cb6-19"></a><span class="co">#&gt;                 y_utc hour</span></span>
+<span id="cb6-20"><a href="#cb6-20"></a><span class="co">#&gt; 1 1970-04-26 22:00:00 1391</span></span>
+<span id="cb6-21"><a href="#cb6-21"></a><span class="co">#&gt; 2 1970-04-26 23:00:00 1391</span></span>
+<span id="cb6-22"><a href="#cb6-22"></a><span class="co">#&gt; 3 1970-04-27 00:00:00 1392</span></span>
+<span id="cb6-23"><a href="#cb6-23"></a><span class="co">#&gt; 4 1970-04-27 01:00:00 1392</span></span>
+<span id="cb6-24"><a href="#cb6-24"></a><span class="co">#&gt; 5 1970-04-27 02:00:00 1393</span></span>
+<span id="cb6-25"><a href="#cb6-25"></a><span class="co">#&gt; 6 1970-04-27 03:00:00 1393</span></span></code></pre></div>
 </div>
 <div id="fall-backwards-overlap" class="section level2">
 <h2 class="hasAnchor">
 <a href="#fall-backwards-overlap" class="anchor"></a>Fall Backwards Overlap</h2>
 <p>In America/New_York’s time zone, as time was about to reach <code>1970-10-25 02:00:00</code>, daylight savings kicked in and time shifts backwards 1 hour so that the next time is actually <code>1970-10-25 01:00:00</code>. This means there are 2 full hours with an hour value of 1 in that day.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">before_fallback &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXct</a></span>(<span class="st">"1970-10-25 01:00:00"</span>, <span class="dt">tz =</span> <span class="st">"America/New_York"</span>)</a>
-<a class="sourceLine" id="cb7-2" data-line-number="2">before_fallback</a>
-<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="co">#&gt; [1] "1970-10-25 01:00:00 EDT"</span></a>
-<a class="sourceLine" id="cb7-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co"># add 1 hour of seconds</span></a>
-<a class="sourceLine" id="cb7-6" data-line-number="6">before_fallback <span class="op">+</span><span class="st"> </span><span class="dv">3600</span></a>
-<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt; [1] "1970-10-25 01:00:00 EST"</span></a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>before_fallback &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXct</a></span>(<span class="st">"1970-10-25 01:00:00"</span>, <span class="dt">tz =</span> <span class="st">"America/New_York"</span>)</span>
+<span id="cb7-2"><a href="#cb7-2"></a>before_fallback</span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="co">#&gt; [1] "1970-10-25 01:00:00 EDT"</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a></span>
+<span id="cb7-5"><a href="#cb7-5"></a><span class="co"># add 1 hour of seconds</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a>before_fallback <span class="op">+</span><span class="st"> </span><span class="dv">3600</span></span>
+<span id="cb7-7"><a href="#cb7-7"></a><span class="co">#&gt; [1] "1970-10-25 01:00:00 EST"</span></span></code></pre></div>
 <p>Because these are two distinct hours, <code><a href="../reference/warp_distance.html">warp_distance()</a></code> treats them as such, so in the example below a group of (1 EDT, 1 EST) gets created. Since daylight savings is currently active, we also have the situation described above where hour 0 and hour 1 are not grouped together.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">x &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXct</a></span>(<span class="st">"1970-10-25 00:00:00"</span>, <span class="dt">tz =</span> <span class="st">"America/New_York"</span>) <span class="op">+</span><span class="st"> </span><span class="dv">3600</span> <span class="op">*</span><span class="st"> </span><span class="dv">0</span><span class="op">:</span><span class="dv">7</span></a>
-<a class="sourceLine" id="cb8-2" data-line-number="2">x</a>
-<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="co">#&gt; [1] "1970-10-25 00:00:00 EDT" "1970-10-25 01:00:00 EDT"</span></a>
-<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="co">#&gt; [3] "1970-10-25 01:00:00 EST" "1970-10-25 02:00:00 EST"</span></a>
-<a class="sourceLine" id="cb8-5" data-line-number="5"><span class="co">#&gt; [5] "1970-10-25 03:00:00 EST" "1970-10-25 04:00:00 EST"</span></a>
-<a class="sourceLine" id="cb8-6" data-line-number="6"><span class="co">#&gt; [7] "1970-10-25 05:00:00 EST" "1970-10-25 06:00:00 EST"</span></a>
-<a class="sourceLine" id="cb8-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb8-8" data-line-number="8"><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(</a>
-<a class="sourceLine" id="cb8-9" data-line-number="9">  <span class="dt">x =</span> x,</a>
-<a class="sourceLine" id="cb8-10" data-line-number="10">  <span class="dt">hour =</span> <span class="kw"><a href="../reference/warp_distance.html">warp_distance</a></span>(x, <span class="st">"hour"</span>, <span class="dt">every =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb8-11" data-line-number="11">)</a>
-<a class="sourceLine" id="cb8-12" data-line-number="12"><span class="co">#&gt;                     x hour</span></a>
-<a class="sourceLine" id="cb8-13" data-line-number="13"><span class="co">#&gt; 1 1970-10-25 00:00:00 3563</span></a>
-<a class="sourceLine" id="cb8-14" data-line-number="14"><span class="co">#&gt; 2 1970-10-25 01:00:00 3564</span></a>
-<a class="sourceLine" id="cb8-15" data-line-number="15"><span class="co">#&gt; 3 1970-10-25 01:00:00 3564</span></a>
-<a class="sourceLine" id="cb8-16" data-line-number="16"><span class="co">#&gt; 4 1970-10-25 02:00:00 3565</span></a>
-<a class="sourceLine" id="cb8-17" data-line-number="17"><span class="co">#&gt; 5 1970-10-25 03:00:00 3565</span></a>
-<a class="sourceLine" id="cb8-18" data-line-number="18"><span class="co">#&gt; 6 1970-10-25 04:00:00 3566</span></a>
-<a class="sourceLine" id="cb8-19" data-line-number="19"><span class="co">#&gt; 7 1970-10-25 05:00:00 3566</span></a>
-<a class="sourceLine" id="cb8-20" data-line-number="20"><span class="co">#&gt; 8 1970-10-25 06:00:00 3567</span></a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>x &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXct</a></span>(<span class="st">"1970-10-25 00:00:00"</span>, <span class="dt">tz =</span> <span class="st">"America/New_York"</span>) <span class="op">+</span><span class="st"> </span><span class="dv">3600</span> <span class="op">*</span><span class="st"> </span><span class="dv">0</span><span class="op">:</span><span class="dv">7</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a>x</span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="co">#&gt; [1] "1970-10-25 00:00:00 EDT" "1970-10-25 01:00:00 EDT"</span></span>
+<span id="cb8-4"><a href="#cb8-4"></a><span class="co">#&gt; [3] "1970-10-25 01:00:00 EST" "1970-10-25 02:00:00 EST"</span></span>
+<span id="cb8-5"><a href="#cb8-5"></a><span class="co">#&gt; [5] "1970-10-25 03:00:00 EST" "1970-10-25 04:00:00 EST"</span></span>
+<span id="cb8-6"><a href="#cb8-6"></a><span class="co">#&gt; [7] "1970-10-25 05:00:00 EST" "1970-10-25 06:00:00 EST"</span></span>
+<span id="cb8-7"><a href="#cb8-7"></a></span>
+<span id="cb8-8"><a href="#cb8-8"></a><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(</span>
+<span id="cb8-9"><a href="#cb8-9"></a>  <span class="dt">x =</span> x,</span>
+<span id="cb8-10"><a href="#cb8-10"></a>  <span class="dt">hour =</span> <span class="kw"><a href="../reference/warp_distance.html">warp_distance</a></span>(x, <span class="st">"hour"</span>, <span class="dt">every =</span> <span class="dv">2</span>)</span>
+<span id="cb8-11"><a href="#cb8-11"></a>)</span>
+<span id="cb8-12"><a href="#cb8-12"></a><span class="co">#&gt;                     x hour</span></span>
+<span id="cb8-13"><a href="#cb8-13"></a><span class="co">#&gt; 1 1970-10-25 00:00:00 3563</span></span>
+<span id="cb8-14"><a href="#cb8-14"></a><span class="co">#&gt; 2 1970-10-25 01:00:00 3564</span></span>
+<span id="cb8-15"><a href="#cb8-15"></a><span class="co">#&gt; 3 1970-10-25 01:00:00 3564</span></span>
+<span id="cb8-16"><a href="#cb8-16"></a><span class="co">#&gt; 4 1970-10-25 02:00:00 3565</span></span>
+<span id="cb8-17"><a href="#cb8-17"></a><span class="co">#&gt; 5 1970-10-25 03:00:00 3565</span></span>
+<span id="cb8-18"><a href="#cb8-18"></a><span class="co">#&gt; 6 1970-10-25 04:00:00 3566</span></span>
+<span id="cb8-19"><a href="#cb8-19"></a><span class="co">#&gt; 7 1970-10-25 05:00:00 3566</span></span>
+<span id="cb8-20"><a href="#cb8-20"></a><span class="co">#&gt; 8 1970-10-25 06:00:00 3567</span></span></code></pre></div>
 <p>This fallback adjustment actually realigns hours 0 and 1 in the next day, since the 25th has 25 hours.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">y &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXct</a></span>(<span class="st">"1970-10-25 22:00:00"</span>, <span class="dt">tz =</span> <span class="st">"America/New_York"</span>) <span class="op">+</span><span class="st"> </span><span class="dv">3600</span> <span class="op">*</span><span class="st"> </span><span class="dv">0</span><span class="op">:</span><span class="dv">5</span></a>
-<a class="sourceLine" id="cb9-2" data-line-number="2">y</a>
-<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="co">#&gt; [1] "1970-10-25 22:00:00 EST" "1970-10-25 23:00:00 EST"</span></a>
-<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="co">#&gt; [3] "1970-10-26 00:00:00 EST" "1970-10-26 01:00:00 EST"</span></a>
-<a class="sourceLine" id="cb9-5" data-line-number="5"><span class="co">#&gt; [5] "1970-10-26 02:00:00 EST" "1970-10-26 03:00:00 EST"</span></a>
-<a class="sourceLine" id="cb9-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb9-7" data-line-number="7"><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(</a>
-<a class="sourceLine" id="cb9-8" data-line-number="8">  <span class="dt">y =</span> y,</a>
-<a class="sourceLine" id="cb9-9" data-line-number="9">  <span class="dt">hour =</span> <span class="kw"><a href="../reference/warp_distance.html">warp_distance</a></span>(y, <span class="st">"hour"</span>, <span class="dt">every =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb9-10" data-line-number="10">)</a>
-<a class="sourceLine" id="cb9-11" data-line-number="11"><span class="co">#&gt;                     y hour</span></a>
-<a class="sourceLine" id="cb9-12" data-line-number="12"><span class="co">#&gt; 1 1970-10-25 22:00:00 3575</span></a>
-<a class="sourceLine" id="cb9-13" data-line-number="13"><span class="co">#&gt; 2 1970-10-25 23:00:00 3575</span></a>
-<a class="sourceLine" id="cb9-14" data-line-number="14"><span class="co">#&gt; 3 1970-10-26 00:00:00 3576</span></a>
-<a class="sourceLine" id="cb9-15" data-line-number="15"><span class="co">#&gt; 4 1970-10-26 01:00:00 3576</span></a>
-<a class="sourceLine" id="cb9-16" data-line-number="16"><span class="co">#&gt; 5 1970-10-26 02:00:00 3577</span></a>
-<a class="sourceLine" id="cb9-17" data-line-number="17"><span class="co">#&gt; 6 1970-10-26 03:00:00 3577</span></a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>y &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXct</a></span>(<span class="st">"1970-10-25 22:00:00"</span>, <span class="dt">tz =</span> <span class="st">"America/New_York"</span>) <span class="op">+</span><span class="st"> </span><span class="dv">3600</span> <span class="op">*</span><span class="st"> </span><span class="dv">0</span><span class="op">:</span><span class="dv">5</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a>y</span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="co">#&gt; [1] "1970-10-25 22:00:00 EST" "1970-10-25 23:00:00 EST"</span></span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="co">#&gt; [3] "1970-10-26 00:00:00 EST" "1970-10-26 01:00:00 EST"</span></span>
+<span id="cb9-5"><a href="#cb9-5"></a><span class="co">#&gt; [5] "1970-10-26 02:00:00 EST" "1970-10-26 03:00:00 EST"</span></span>
+<span id="cb9-6"><a href="#cb9-6"></a></span>
+<span id="cb9-7"><a href="#cb9-7"></a><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(</span>
+<span id="cb9-8"><a href="#cb9-8"></a>  <span class="dt">y =</span> y,</span>
+<span id="cb9-9"><a href="#cb9-9"></a>  <span class="dt">hour =</span> <span class="kw"><a href="../reference/warp_distance.html">warp_distance</a></span>(y, <span class="st">"hour"</span>, <span class="dt">every =</span> <span class="dv">2</span>)</span>
+<span id="cb9-10"><a href="#cb9-10"></a>)</span>
+<span id="cb9-11"><a href="#cb9-11"></a><span class="co">#&gt;                     y hour</span></span>
+<span id="cb9-12"><a href="#cb9-12"></a><span class="co">#&gt; 1 1970-10-25 22:00:00 3575</span></span>
+<span id="cb9-13"><a href="#cb9-13"></a><span class="co">#&gt; 2 1970-10-25 23:00:00 3575</span></span>
+<span id="cb9-14"><a href="#cb9-14"></a><span class="co">#&gt; 3 1970-10-26 00:00:00 3576</span></span>
+<span id="cb9-15"><a href="#cb9-15"></a><span class="co">#&gt; 4 1970-10-26 01:00:00 3576</span></span>
+<span id="cb9-16"><a href="#cb9-16"></a><span class="co">#&gt; 5 1970-10-26 02:00:00 3577</span></span>
+<span id="cb9-17"><a href="#cb9-17"></a><span class="co">#&gt; 6 1970-10-26 03:00:00 3577</span></span></code></pre></div>
 <p>As before, one way to sort of avoid this is to force a UTC time zone.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">x_utc &lt;-<span class="st"> </span><span class="kw">force_utc</span>(x)</a>
-<a class="sourceLine" id="cb10-2" data-line-number="2">x_utc</a>
-<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="co">#&gt; [1] "1970-10-25 00:00:00 UTC" "1970-10-25 01:00:00 UTC"</span></a>
-<a class="sourceLine" id="cb10-4" data-line-number="4"><span class="co">#&gt; [3] "1970-10-25 01:00:00 UTC" "1970-10-25 02:00:00 UTC"</span></a>
-<a class="sourceLine" id="cb10-5" data-line-number="5"><span class="co">#&gt; [5] "1970-10-25 03:00:00 UTC" "1970-10-25 04:00:00 UTC"</span></a>
-<a class="sourceLine" id="cb10-6" data-line-number="6"><span class="co">#&gt; [7] "1970-10-25 05:00:00 UTC" "1970-10-25 06:00:00 UTC"</span></a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>x_utc &lt;-<span class="st"> </span><span class="kw">force_utc</span>(x)</span>
+<span id="cb10-2"><a href="#cb10-2"></a>x_utc</span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="co">#&gt; [1] "1970-10-25 00:00:00 UTC" "1970-10-25 01:00:00 UTC"</span></span>
+<span id="cb10-4"><a href="#cb10-4"></a><span class="co">#&gt; [3] "1970-10-25 01:00:00 UTC" "1970-10-25 02:00:00 UTC"</span></span>
+<span id="cb10-5"><a href="#cb10-5"></a><span class="co">#&gt; [5] "1970-10-25 03:00:00 UTC" "1970-10-25 04:00:00 UTC"</span></span>
+<span id="cb10-6"><a href="#cb10-6"></a><span class="co">#&gt; [7] "1970-10-25 05:00:00 UTC" "1970-10-25 06:00:00 UTC"</span></span></code></pre></div>
 <p>The consequences of this are that you have two dates with an hour value of 1. When forced to UTC, these look identical. The groups are as you probably expect with buckets of hours (0, 1), (2, 3), and so on, but now the two dates with hour values of 1 are identical so they fall in the same hour group.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(</a>
-<a class="sourceLine" id="cb11-2" data-line-number="2">  <span class="dt">x_utc =</span> x_utc,</a>
-<a class="sourceLine" id="cb11-3" data-line-number="3">  <span class="dt">hour =</span> <span class="kw"><a href="../reference/warp_distance.html">warp_distance</a></span>(x_utc, <span class="st">"hour"</span>, <span class="dt">every =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb11-4" data-line-number="4">)</a>
-<a class="sourceLine" id="cb11-5" data-line-number="5"><span class="co">#&gt;                 x_utc hour</span></a>
-<a class="sourceLine" id="cb11-6" data-line-number="6"><span class="co">#&gt; 1 1970-10-25 00:00:00 3564</span></a>
-<a class="sourceLine" id="cb11-7" data-line-number="7"><span class="co">#&gt; 2 1970-10-25 01:00:00 3564</span></a>
-<a class="sourceLine" id="cb11-8" data-line-number="8"><span class="co">#&gt; 3 1970-10-25 01:00:00 3564</span></a>
-<a class="sourceLine" id="cb11-9" data-line-number="9"><span class="co">#&gt; 4 1970-10-25 02:00:00 3565</span></a>
-<a class="sourceLine" id="cb11-10" data-line-number="10"><span class="co">#&gt; 5 1970-10-25 03:00:00 3565</span></a>
-<a class="sourceLine" id="cb11-11" data-line-number="11"><span class="co">#&gt; 6 1970-10-25 04:00:00 3566</span></a>
-<a class="sourceLine" id="cb11-12" data-line-number="12"><span class="co">#&gt; 7 1970-10-25 05:00:00 3566</span></a>
-<a class="sourceLine" id="cb11-13" data-line-number="13"><span class="co">#&gt; 8 1970-10-25 06:00:00 3567</span></a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(</span>
+<span id="cb11-2"><a href="#cb11-2"></a>  <span class="dt">x_utc =</span> x_utc,</span>
+<span id="cb11-3"><a href="#cb11-3"></a>  <span class="dt">hour =</span> <span class="kw"><a href="../reference/warp_distance.html">warp_distance</a></span>(x_utc, <span class="st">"hour"</span>, <span class="dt">every =</span> <span class="dv">2</span>)</span>
+<span id="cb11-4"><a href="#cb11-4"></a>)</span>
+<span id="cb11-5"><a href="#cb11-5"></a><span class="co">#&gt;                 x_utc hour</span></span>
+<span id="cb11-6"><a href="#cb11-6"></a><span class="co">#&gt; 1 1970-10-25 00:00:00 3564</span></span>
+<span id="cb11-7"><a href="#cb11-7"></a><span class="co">#&gt; 2 1970-10-25 01:00:00 3564</span></span>
+<span id="cb11-8"><a href="#cb11-8"></a><span class="co">#&gt; 3 1970-10-25 01:00:00 3564</span></span>
+<span id="cb11-9"><a href="#cb11-9"></a><span class="co">#&gt; 4 1970-10-25 02:00:00 3565</span></span>
+<span id="cb11-10"><a href="#cb11-10"></a><span class="co">#&gt; 5 1970-10-25 03:00:00 3565</span></span>
+<span id="cb11-11"><a href="#cb11-11"></a><span class="co">#&gt; 6 1970-10-25 04:00:00 3566</span></span>
+<span id="cb11-12"><a href="#cb11-12"></a><span class="co">#&gt; 7 1970-10-25 05:00:00 3566</span></span>
+<span id="cb11-13"><a href="#cb11-13"></a><span class="co">#&gt; 8 1970-10-25 06:00:00 3567</span></span></code></pre></div>
 </div>
 <div id="conclusion" class="section level2">
 <h2 class="hasAnchor">
@@ -262,7 +262,7 @@
 </div>
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
         <div id="tocnav">
       <h2 class="hasAnchor">
@@ -284,7 +284,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.9000.</p>
 </div>
 
       </footer>
