@@ -924,7 +924,7 @@ static inline int compute_mday_distance(int day,
   bool is_leap = is_leap_year(year);
 
   int* units_per_month =
-    is_leap_year(year) ?
+    is_leap ?
     units_per_month_leap_year :
     units_per_month_non_leap_year;
 
