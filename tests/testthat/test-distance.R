@@ -2114,6 +2114,216 @@ test_that("can warp_distance() by hour with POSIXlt", {
 })
 
 # ------------------------------------------------------------------------------
+# warp_distance(<POSIXct>, period = "dhour")
+
+test_that("works when `every` doesn't divide 24 hours evenly", {
+  x <- as.POSIXct("1970-01-01 00:00:00", tz = "America/New_York")
+  x <- x + 3600L * (-36:36)
+
+  warp_distance_dhour(x, 5)
+})
+
+test_that("treats DST spring forward gap as continuous", {
+  x <- as.POSIXct(
+    x = c(
+      "2019-03-10 00:00:00", "2019-03-10 01:00:00",
+      "2019-03-10 03:00:00", "2019-03-10 04:00:00"
+    ),
+    tz = "America/New_York"
+  )
+
+  expect_identical(
+    warp_distance_dhour(x, every = 2),
+    c(215580, 215580, 215581, 215581)
+  )
+
+  # Negative differences from `origin` in the future
+  origin <- as.POSIXct("2020-01-01 00:00:00", tz = "America/New_York")
+
+  expect_identical(
+    warp_distance_dhour(x, every = 2, origin = origin),
+    c(-3564, -3564, -3563, -3563)
+  )
+})
+
+test_that("resets counter after DST spring forward gap", {
+  # DST spring forward at 2019-03-10 01:59:59 + 1 -> 03:00:00
+  x <- as.POSIXct(
+    x = c(
+      "2019-03-10 22:00:00", "2019-03-10 23:00:00",
+      "2019-03-11 00:00:00", "2019-03-11 01:00:00"
+    ),
+    tz = "America/New_York"
+  )
+
+  expect_identical(
+    warp_distance_dhour(x, every = 2),
+    c(215590, 215591, 215592, 215592)
+  )
+
+  # Negative differences from `origin` in the future
+  origin <- as.POSIXct("2020-01-01 00:00:00", tz = "America/New_York")
+
+  expect_identical(
+    warp_distance_dhour(x, every = 2, origin = origin),
+    c(-3554, -3553, -3552, -3552)
+  )
+})
+
+test_that("works with DST spring forward where midnight doesn't exist", {
+  # important to test that timechange::time_floor() floors to hour 1
+  # on the 29th. DST change was at 2020-03-28 23:59:59 + 1 -> forward to hour 1
+
+  x <- as.POSIXct(
+    x = c(
+      "2020-03-28 22:00:00", "2020-03-28 23:59:59",
+      "2020-03-29 01:00:00", "2020-03-29 02:00:00",
+      "2020-03-29 03:00:00", "2020-03-29 04:00:00",
+      "2020-03-29 22:00:00", "2020-03-29 23:00:00",
+      "2020-03-30 00:00:00", "2020-03-30 01:00:00"
+    ),
+    tz = "Asia/Beirut"
+  )
+
+  expect_identical(
+    warp_distance_dhour(x, every = 2),
+    c(
+      220199, 220199,
+      220200, 220200,
+      220201, 220201,
+      220210, 220211,
+      220212, 220212
+    )
+  )
+})
+
+test_that("works with an `origin` that can't be at midnight", {
+  # DST was at midnight, shifting forward to hour 1, so flooring to day
+  # just returns this value
+  origin <- as.POSIXct("2020-03-29 01:00:00", tz = "Asia/Beirut")
+
+  x <- as.POSIXct(
+    x = c(
+      "2020-03-28 22:00:00", "2020-03-28 23:59:59",
+      "2020-03-29 01:00:00", "2020-03-29 02:00:00",
+      "2020-03-29 03:00:00", "2020-03-29 04:00:00",
+      "2020-03-29 22:00:00", "2020-03-29 23:00:00",
+      "2020-03-30 00:00:00", "2020-03-30 01:00:00"
+    ),
+    tz = "Asia/Beirut"
+  )
+
+  expect_identical(
+    warp_distance_dhour(x, 2, origin),
+    c(-1, -1, 0, 0, 1, 1, 10, 11, 12, 12)
+  )
+})
+
+test_that("works with an `origin` that can't be at midnight AND is a fractional hour", {
+  # DST was at midnight, shifting forward a whopping 20 minutes, so flooring
+  # this by "day" just returns this time
+  origin <- as.POSIXct("1920-09-01 00:20:00", tz = "Africa/Accra")
+
+  x <- as.POSIXct(
+    x = c(
+      "1920-08-31 19:59:59",
+      "1920-08-31 20:00:00",
+      "1920-08-31 21:59:59", # uses normal 2 hour gap starting from 0
+      "1920-08-31 22:00:00", # when not on 9/1
+      "1920-08-31 23:59:59",
+      "1920-09-01 00:20:00", # first time on 9/1
+      "1920-09-01 01:00:00",
+      "1920-09-01 02:19:00", # 2 hour chunks from the start of the day
+      "1920-09-01 02:20:00",
+      "1920-09-01 22:19:00",
+      "1920-09-01 22:20:00", # last 2 hour transition
+      "1920-09-01 23:59:59",
+      "1920-09-02 00:00:00", # on 9/2, resets to normal 2 hour gaps
+      "1920-09-02 01:59:59",
+      "1920-09-02 02:00:00"
+    ),
+    tz = "Africa/Accra"
+  )
+
+  expect_identical(
+    warp_distance_dhour(x, 2, origin),
+    c(
+      -3,
+      -2,
+      -2,
+      -1,
+      -1,
+      0,
+      0,
+      0,
+      1,
+      10,
+      11,
+      11,
+      12,
+      12,
+      13
+    )
+  )
+})
+
+test_that("can use the hour piece of `origin` - `every = 2`", {
+  origin1 <- as.POSIXct("1970-01-01 02:00:00", tz = "America/New_York")
+  origin2 <- as.POSIXct("1970-01-01 03:00:00", tz = "America/New_York")
+
+  x1 <- c(
+    "1969-12-31 21:59:59", "1969-12-31 22:00:00",
+    "1969-12-31 23:59:59", "1970-01-01 00:00:00",
+    "1970-01-01 01:59:59", "1970-01-01 02:00:00",
+    "1970-01-01 03:59:59", "1970-01-01 04:00:00",
+    "1970-01-01 23:59:59", "1970-01-02 00:00:00",
+    "1970-01-02 01:59:59", "1970-01-02 02:00:00",
+    "1970-01-02 03:59:59", "1970-01-02 04:00:00"
+  )
+
+  x2 <- c(
+    "1969-12-31 21:59:59", "1969-12-31 23:00:00",
+    "1969-12-31 23:59:59", "1970-01-01 00:00:00",
+    "1970-01-01 00:59:59", "1970-01-01 01:00:00",
+    "1970-01-01 02:59:59", "1970-01-01 03:00:00",
+    "1970-01-01 04:59:59", "1970-01-01 05:00:00",
+    "1970-01-01 22:59:59", "1970-01-01 23:00:00",
+    "1970-01-01 23:59:59", "1970-01-02 00:00:00",
+    "1970-01-02 00:59:59", "1970-01-02 01:00:00",
+    "1970-01-02 02:59:59", "1970-01-02 03:00:00"
+  )
+
+  x1 <- as.POSIXct(x1, tz = "America/New_York")
+  x2 <- as.POSIXct(x2, tz = "America/New_York")
+
+  expect_identical(
+    warp_distance_dhour(x1, every = 2, origin1),
+    c(
+      -3, -2,
+      -2, -1,
+      -1, 0,
+      0, 1,
+      10, 11,
+      11, 12,
+      12, 13
+    )
+  )
+
+  expect_identical(
+    warp_distance_dhour(x2, every = 2, origin2),
+    c(
+      -3, -2,
+      -2, -1,
+      -1, 0,
+      0, 1,
+      10, 11,
+      11, 12,
+      12, 13
+    )
+  )
+})
+
+# ------------------------------------------------------------------------------
 # warp_distance(<Date>, period = "minute")
 
 test_that("can warp_distance() by minute with Date", {
