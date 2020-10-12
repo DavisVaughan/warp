@@ -217,6 +217,7 @@ warp_distance_dhour <- function(x, every = 1L, origin = NULL) {
     origin <- as.POSIXct("1970-01-01", tz = tzone)
     origin <- vctrs:::unstructure(origin)
   } else {
+    origin <- timechange::time_floor(origin, "day")
     origin <- vctrs:::unstructure(origin)
   }
 
@@ -241,7 +242,7 @@ warp_distance_dhour <- function(x, every = 1L, origin = NULL) {
       next
     }
 
-    # this could both be negative!
+    # this could be negative!
     seconds_from_origin_to_x_floor <- as.integer(x_floor_elt - origin)
 
     # this should never be negative!
@@ -255,9 +256,7 @@ warp_distance_dhour <- function(x, every = 1L, origin = NULL) {
 
     # Always positive or zero, so just use integer division to find the hour
     # unit that we are currently in
-    div <- seconds_from_x_floor_to_x %/% seconds_in_unit
-
-    units_from_x_floor_to_x <- div
+    units_from_x_floor_to_x <- seconds_from_x_floor_to_x %/% seconds_in_unit
 
     out[[i]] <-
       units_from_origin_to_x_floor +
