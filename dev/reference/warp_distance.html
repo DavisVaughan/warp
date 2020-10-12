@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.1/css/all.min.css" integrity="sha256-PbSmjxuVAzJ6FPvNYsrXygfGhNJYyZ2GktDbkMBqQZg=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.1/css/v4-shims.min.css" integrity="sha256-A6jcAdwFD48VMjlI3GDxUd+eCQa7/KWy6G9oe/ovaPA=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -42,7 +46,6 @@ defined by the period.
 For example, period = &quot;year&quot; would return the number of years from
 the origin. Setting every = 2 would return the number of 2 year groups
 from the origin." />
-<meta name="twitter:card" content="summary" />
 
 
 <meta name="robots" content="noindex">
@@ -60,7 +63,7 @@ from the origin." />
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -81,12 +84,6 @@ from the origin." />
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
@@ -107,7 +104,7 @@ from the origin." />
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/DavisVaughan/warp">
+  <a href="https://github.com/DavisVaughan/warp/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -139,7 +136,7 @@ the <code>origin</code>. Setting <code>every = 2</code> would return the number 
 from the <code>origin</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>warp_distance</span>(<span class='no'>x</span>, <span class='no'>period</span>, <span class='kw'>every</span> <span class='kw'>=</span> <span class='fl'>1L</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>warp_distance</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>period</span>, every <span class='op'>=</span> <span class='fl'>1L</span>, origin <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -206,7 +203,7 @@ underlying numeric representation. <strong>It is highly advised to specify an
 
 <p>For <code>period</code> values of <code>"year"</code>, <code>"month"</code>, and <code>"day"</code>, the information
 provided in <code>origin</code> is truncated. Practically this means that if you
-specify:</p><pre>warp_distance(period = "month", origin = as.Date("1970-01-15"))
+specify:</p><pre><span class='fu'>warp_distance</span><span class='op'>(</span>period <span class='op'>=</span> <span class='st'>"month"</span>, origin <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span><span class='op'>(</span><span class='st'>"1970-01-15"</span><span class='op'>)</span><span class='op'>)</span>
 </pre>
 
 <p>then only <code>1970-01</code> will be used, and not the fact that the origin starts
@@ -252,16 +249,20 @@ zeroed out, so please do not attempt to rely on them. It should still be safe
 to work with microseconds, by, say, bucketing them by millisecond distances.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"1970-01-01"</span>) + -<span class='fl'>4</span>:<span class='fl'>4</span>
-<span class='no'>x</span></div><div class='output co'>#&gt; [1] "1969-12-28" "1969-12-29" "1969-12-30" "1969-12-31" "1970-01-01"
+    <pre class="examples"><div class='input'><span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span><span class='op'>(</span><span class='st'>"1970-01-01"</span><span class='op'>)</span> <span class='op'>+</span> <span class='op'>-</span><span class='fl'>4</span><span class='op'>:</span><span class='fl'>4</span>
+<span class='va'>x</span>
+</div><div class='output co'>#&gt; [1] "1969-12-28" "1969-12-29" "1969-12-30" "1969-12-31" "1970-01-01"
 #&gt; [6] "1970-01-02" "1970-01-03" "1970-01-04" "1970-01-05"</div><div class='input'>
 <span class='co'># Compute monthly distances (really, year + month)</span>
-<span class='fu'>warp_distance</span>(<span class='no'>x</span>, <span class='st'>"month"</span>)</div><div class='output co'>#&gt; [1] -1 -1 -1 -1  0  0  0  0  0</div><div class='input'>
+<span class='fu'>warp_distance</span><span class='op'>(</span><span class='va'>x</span>, <span class='st'>"month"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] -1 -1 -1 -1  0  0  0  0  0</div><div class='input'>
 <span class='co'># Compute distances every 2 days, relative to "1970-01-01"</span>
-<span class='fu'>warp_distance</span>(<span class='no'>x</span>, <span class='st'>"day"</span>, <span class='kw'>every</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; [1] -2 -2 -1 -1  0  0  1  1  2</div><div class='input'>
+<span class='fu'>warp_distance</span><span class='op'>(</span><span class='va'>x</span>, <span class='st'>"day"</span>, every <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] -2 -2 -1 -1  0  0  1  1  2</div><div class='input'>
 <span class='co'># Compute distances every 2 days, this time relative to "1970-01-02"</span>
-<span class='fu'>warp_distance</span>(<span class='no'>x</span>, <span class='st'>"day"</span>, <span class='kw'>every</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"1970-01-02"</span>))</div><div class='output co'>#&gt; [1] -3 -2 -2 -1 -1  0  0  1  1</div><div class='input'>
-<span class='no'>y</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.POSIXlt.html'>as.POSIXct</a></span>(<span class='st'>"1970-01-01 00:00:01"</span>, <span class='st'>"UTC"</span>) + <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>2</span>, <span class='fl'>3</span>, <span class='fl'>4</span>, <span class='fl'>5</span>, <span class='fl'>6</span>, <span class='fl'>10</span>)
+<span class='fu'>warp_distance</span><span class='op'>(</span><span class='va'>x</span>, <span class='st'>"day"</span>, every <span class='op'>=</span> <span class='fl'>2</span>, origin <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span><span class='op'>(</span><span class='st'>"1970-01-02"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] -3 -2 -2 -1 -1  0  0  1  1</div><div class='input'>
+<span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.POSIXlt.html'>as.POSIXct</a></span><span class='op'>(</span><span class='st'>"1970-01-01 00:00:01"</span>, <span class='st'>"UTC"</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>2</span>, <span class='fl'>3</span>, <span class='fl'>4</span>, <span class='fl'>5</span>, <span class='fl'>6</span>, <span class='fl'>10</span><span class='op'>)</span>
 
 <span class='co'># Compute distances every 5 seconds, starting from the unix epoch of</span>
 <span class='co'># 1970-01-01 00:00:00</span>
@@ -269,50 +270,57 @@ to work with microseconds, by, say, bucketing them by millisecond distances.</p>
 <span class='co'># [1970-01-01 00:00:00, 1970-01-01 00:00:05) = 0</span>
 <span class='co'># [1970-01-01 00:00:05, 1970-01-01 00:00:10) = 1</span>
 <span class='co'># [1970-01-01 00:00:10, 1970-01-01 00:00:15) = 2</span>
-<span class='fu'>warp_distance</span>(<span class='no'>y</span>, <span class='st'>"second"</span>, <span class='kw'>every</span> <span class='kw'>=</span> <span class='fl'>5</span>)</div><div class='output co'>#&gt; [1] 0 0 0 1 1 1 2</div><div class='input'>
+<span class='fu'>warp_distance</span><span class='op'>(</span><span class='va'>y</span>, <span class='st'>"second"</span>, every <span class='op'>=</span> <span class='fl'>5</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 0 0 0 1 1 1 2</div><div class='input'>
 <span class='co'># Compute distances every 5 seconds, starting from the minimum of `x`</span>
 <span class='co'># 1970-01-01 00:00:01</span>
 <span class='co'># So this buckets:</span>
 <span class='co'># [1970-01-01 00:00:01, 1970-01-01 00:00:06) = 0</span>
 <span class='co'># [1970-01-01 00:00:06, 1970-01-01 00:00:11) = 1</span>
 <span class='co'># [1970-01-01 00:00:11, 1970-01-01 00:00:16) = 2</span>
-<span class='no'>origin</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.POSIXlt.html'>as.POSIXct</a></span>(<span class='st'>"1970-01-01 00:00:01"</span>, <span class='st'>"UTC"</span>)
-<span class='fu'>warp_distance</span>(<span class='no'>y</span>, <span class='st'>"second"</span>, <span class='kw'>every</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='no'>origin</span>)</div><div class='output co'>#&gt; [1] 0 0 0 0 1 1 2</div><div class='input'>
+<span class='va'>origin</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.POSIXlt.html'>as.POSIXct</a></span><span class='op'>(</span><span class='st'>"1970-01-01 00:00:01"</span>, <span class='st'>"UTC"</span><span class='op'>)</span>
+<span class='fu'>warp_distance</span><span class='op'>(</span><span class='va'>y</span>, <span class='st'>"second"</span>, every <span class='op'>=</span> <span class='fl'>5</span>, origin <span class='op'>=</span> <span class='va'>origin</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 0 0 0 0 1 1 2</div><div class='input'>
 <span class='co'># ---------------------------------------------------------------------------</span>
 <span class='co'># Time zones</span>
 
 <span class='co'># When `x` is not UTC and `origin` is left as `NULL`, the origin is set as</span>
 <span class='co'># 1970-01-01 00:00:00 in the time zone of `x`. This seems to be the most</span>
 <span class='co'># practically useful default.</span>
-<span class='no'>z</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.POSIXlt.html'>as.POSIXct</a></span>(<span class='st'>"1969-12-31 23:00:00"</span>, <span class='st'>"UTC"</span>)
-<span class='no'>z_in_nyc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.POSIXlt.html'>as.POSIXct</a></span>(<span class='st'>"1969-12-31 23:00:00"</span>, <span class='st'>"America/New_York"</span>)
+<span class='va'>z</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.POSIXlt.html'>as.POSIXct</a></span><span class='op'>(</span><span class='st'>"1969-12-31 23:00:00"</span>, <span class='st'>"UTC"</span><span class='op'>)</span>
+<span class='va'>z_in_nyc</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.POSIXlt.html'>as.POSIXct</a></span><span class='op'>(</span><span class='st'>"1969-12-31 23:00:00"</span>, <span class='st'>"America/New_York"</span><span class='op'>)</span>
 
 <span class='co'># Practically this means that these give the same result, because their</span>
 <span class='co'># `origin` values are defined in their respective time zones.</span>
-<span class='fu'>warp_distance</span>(<span class='no'>z</span>, <span class='st'>"year"</span>)</div><div class='output co'>#&gt; [1] -1</div><div class='input'><span class='fu'>warp_distance</span>(<span class='no'>z_in_nyc</span>, <span class='st'>"year"</span>)</div><div class='output co'>#&gt; [1] -1</div><div class='input'>
+<span class='fu'>warp_distance</span><span class='op'>(</span><span class='va'>z</span>, <span class='st'>"year"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] -1</div><div class='input'><span class='fu'>warp_distance</span><span class='op'>(</span><span class='va'>z_in_nyc</span>, <span class='st'>"year"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] -1</div><div class='input'>
 <span class='co'># Compare that to what would happen if we used a static `origin` of</span>
 <span class='co'># 1970-01-01 00:00:00 UTC.</span>
 <span class='co'># America/New_York is 5 hours behind UTC, so when `z_in_nyc` is converted to</span>
 <span class='co'># UTC the value becomes `1970-01-01 04:00:00 UTC`, a different year. Because</span>
 <span class='co'># this is generally surprising, a warning is thrown.</span>
-<span class='no'>origin</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.POSIXlt.html'>as.POSIXct</a></span>(<span class='st'>"1970-01-01 00:00:00"</span>, <span class='kw'>tz</span> <span class='kw'>=</span> <span class='st'>"UTC"</span>)
-<span class='fu'>warp_distance</span>(<span class='no'>z</span>, <span class='st'>"year"</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='no'>origin</span>)</div><div class='output co'>#&gt; [1] -1</div><div class='input'><span class='fu'>warp_distance</span>(<span class='no'>z_in_nyc</span>, <span class='st'>"year"</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='no'>origin</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: `x` (America/New_York) and `origin` (UTC) do not have the same time zone. Converting `x` to the time zone of `origin`. It is highly advised to provide `x` and `origin` with the same time zone.</span></div><div class='output co'>#&gt; [1] 0</div><div class='input'>
+<span class='va'>origin</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.POSIXlt.html'>as.POSIXct</a></span><span class='op'>(</span><span class='st'>"1970-01-01 00:00:00"</span>, tz <span class='op'>=</span> <span class='st'>"UTC"</span><span class='op'>)</span>
+<span class='fu'>warp_distance</span><span class='op'>(</span><span class='va'>z</span>, <span class='st'>"year"</span>, origin <span class='op'>=</span> <span class='va'>origin</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] -1</div><div class='input'><span class='fu'>warp_distance</span><span class='op'>(</span><span class='va'>z_in_nyc</span>, <span class='st'>"year"</span>, origin <span class='op'>=</span> <span class='va'>origin</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: `x` (America/New_York) and `origin` (UTC) do not have the same time zone. Converting `x` to the time zone of `origin`. It is highly advised to provide `x` and `origin` with the same time zone.</span></div><div class='output co'>#&gt; [1] 0</div><div class='input'>
 <span class='co'># ---------------------------------------------------------------------------</span>
 <span class='co'># `period = "yweek"`</span>
 
-<span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"2019-12-23"</span>) + <span class='fl'>0</span>:<span class='fl'>16</span>
-<span class='no'>origin</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"1970-01-01"</span>)
+<span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span><span class='op'>(</span><span class='st'>"2019-12-23"</span><span class='op'>)</span> <span class='op'>+</span> <span class='fl'>0</span><span class='op'>:</span><span class='fl'>16</span>
+<span class='va'>origin</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span><span class='op'>(</span><span class='st'>"1970-01-01"</span><span class='op'>)</span>
 
 <span class='co'># `"week"` counts the number of 7 day periods from the `origin`</span>
 <span class='co'># `"yweek"` restarts the 7 day counter every time you hit the month-day</span>
 <span class='co'># value of the `origin`. Notice how, for the `yweek` column, only 1 day was</span>
 <span class='co'># in the week starting with `2019-12-31`. This is because the next day is</span>
 <span class='co'># `2020-01-01`, which aligns with the month-day value of the `origin`.</span>
-<span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(
-  <span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>x</span>,
-  <span class='kw'>week</span> <span class='kw'>=</span> <span class='fu'>warp_distance</span>(<span class='no'>x</span>, <span class='st'>"week"</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='no'>origin</span>),
-  <span class='kw'>yweek</span> <span class='kw'>=</span> <span class='fu'>warp_distance</span>(<span class='no'>x</span>, <span class='st'>"yweek"</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='no'>origin</span>)
-)</div><div class='output co'>#&gt;             x week yweek
+<span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>
+  x <span class='op'>=</span> <span class='va'>x</span>,
+  week <span class='op'>=</span> <span class='fu'>warp_distance</span><span class='op'>(</span><span class='va'>x</span>, <span class='st'>"week"</span>, origin <span class='op'>=</span> <span class='va'>origin</span><span class='op'>)</span>,
+  yweek <span class='op'>=</span> <span class='fu'>warp_distance</span><span class='op'>(</span><span class='va'>x</span>, <span class='st'>"yweek"</span>, origin <span class='op'>=</span> <span class='va'>origin</span><span class='op'>)</span>
+<span class='op'>)</span>
+</div><div class='output co'>#&gt;             x week yweek
 #&gt; 1  2019-12-23 2607  2647
 #&gt; 2  2019-12-24 2607  2648
 #&gt; 3  2019-12-25 2607  2648
@@ -333,16 +341,17 @@ to work with microseconds, by, say, bucketing them by millisecond distances.</p>
 <span class='co'># ---------------------------------------------------------------------------</span>
 <span class='co'># `period = "mweek"`</span>
 
-<span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"2019-12-23"</span>) + <span class='fl'>0</span>:<span class='fl'>16</span>
+<span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span><span class='op'>(</span><span class='st'>"2019-12-23"</span><span class='op'>)</span> <span class='op'>+</span> <span class='fl'>0</span><span class='op'>:</span><span class='fl'>16</span>
 
 <span class='co'># `"mweek"` breaks `x` up into weeks of the month. Notice how days 1-7</span>
 <span class='co'># of 2020-01 all have the same distance value. A forced reset of the 7 day</span>
 <span class='co'># counter is done at the 1st of every month. This results in the 3 day</span>
 <span class='co'># week of the month at the end of 2019-12, from 29-31.</span>
-<span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(
-  <span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>x</span>,
-  <span class='kw'>mweek</span> <span class='kw'>=</span> <span class='fu'>warp_distance</span>(<span class='no'>x</span>, <span class='st'>"mweek"</span>)
-)</div><div class='output co'>#&gt;             x mweek
+<span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>
+  x <span class='op'>=</span> <span class='va'>x</span>,
+  mweek <span class='op'>=</span> <span class='fu'>warp_distance</span><span class='op'>(</span><span class='va'>x</span>, <span class='st'>"mweek"</span><span class='op'>)</span>
+<span class='op'>)</span>
+</div><div class='output co'>#&gt;             x mweek
 #&gt; 1  2019-12-23  2960
 #&gt; 2  2019-12-24  2960
 #&gt; 3  2019-12-25  2960
@@ -363,16 +372,9 @@ to work with microseconds, by, say, bucketing them by millisecond distances.</p>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#details">Details</a></li>
-      <li><a href="#period">Period</a></li>
-      <li><a href="#precision">Precision</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -383,7 +385,7 @@ to work with microseconds, by, say, bucketing them by millisecond distances.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>
