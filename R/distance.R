@@ -207,3 +207,76 @@
 warp_distance <- function(x, period, every = 1L, origin = NULL) {
   .Call(warp_warp_distance, x, period, every, origin)
 }
+
+warp_distance_dhour <- function(x, every = 1L, origin = NULL) {
+  tzone <- get_time_zone(x)
+
+  every <- vctrs::vec_cast(every, integer())
+
+  if (is.null(origin)) {
+    origin <- as.POSIXct("1970-01-01", tz = tzone)
+    origin <- vctrs:::unstructure(origin)
+  } else {
+    origin <- vctrs:::unstructure(origin)
+  }
+
+  x_floor <- timechange::time_floor(x, unit = "day")
+  x_floor <- vctrs:::unstructure(x_floor)
+
+  x <- vctrs:::unstructure(x)
+
+  seconds_in_hour <- 3600L
+  seconds_in_unit <- seconds_in_hour * every
+
+  size <- length(x)
+
+  out <- vector("double", size)
+
+  for (i in seq_len(size)) {
+    x_elt <- x[[i]]
+    x_floor_elt <- x_floor[[i]]
+
+    if (is.na(x_elt)) {
+      out[[i]] <- NA_integer_
+      next
+    }
+
+    # this could both be negative!
+    seconds_from_origin_to_x_floor <- as.integer(x_floor_elt - origin)
+
+    # this should never be negative!
+    seconds_from_x_floor_to_x <- as.integer(x_elt - x_floor_elt)
+
+    res <- divmod(seconds_from_origin_to_x_floor, seconds_in_unit)
+    div <- res[[1]]
+    rem <- res[[2]]
+
+    units_from_origin_to_x_floor <- div + (rem != 0L)
+
+    # Always positive or zero, so just use integer division to find the hour
+    # unit that we are currently in
+    div <- seconds_from_x_floor_to_x %/% seconds_in_unit
+
+    units_from_x_floor_to_x <- div
+
+    out[[i]] <-
+      units_from_origin_to_x_floor +
+      units_from_x_floor_to_x
+  }
+
+  out
+}
+
+get_time_zone <- function(x) {
+  if (inherits(x, "Date")) {
+    return("UTC")
+  }
+
+  out <- attr(x, "tzone")
+
+  if (is.null(out)) {
+    return("")
+  } else {
+    return(out[[1]])
+  }
+}
