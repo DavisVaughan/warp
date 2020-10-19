@@ -82,6 +82,8 @@ struct warp_mday_components date_get_origin_mday_components(SEXP origin);
 // -----------------------------------------------------------------------------
 
 int pull_every(SEXP every);
+bool pull_last(SEXP last);
+bool pull_endpoint(SEXP endpoint);
 
 void __attribute__((noreturn)) never_reached(const char* fn);
 void __attribute__((noreturn)) r_error(const char* where, const char* why, ...);

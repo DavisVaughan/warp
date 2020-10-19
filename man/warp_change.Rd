@@ -4,7 +4,14 @@
 \alias{warp_change}
 \title{Detect changes in a date time vector}
 \usage{
-warp_change(x, period, every = 1L, origin = NULL)
+warp_change(
+  x,
+  period,
+  every = 1L,
+  origin = NULL,
+  last = TRUE,
+  endpoint = FALSE
+)
 }
 \arguments{
 \item{x}{\verb{[Date / POSIXct / POSIXlt]}
@@ -36,19 +43,52 @@ epoch time of \verb{1970-01-01 00:00:00}, \emph{in the time zone of the index}.
 
 This is generally used to define the anchor time to count from, which is
 relevant when the every value is \verb{> 1}.}
+
+\item{last}{\verb{[logical(1)]}
+
+If \code{TRUE}, the \emph{last} location \emph{before} a change is returned.
+The last location of the input is always returned.
+
+If \code{FALSE}, the \emph{first} location \emph{after} a change is returned.
+The first location of the input is always returned.}
+
+\item{endpoint}{\verb{[logical(1)]}
+
+If \code{TRUE} and \code{last = TRUE}, will additionally return the first location
+of the input.
+
+If \code{TRUE} and \code{last = FALSE}, will additionally return the last location
+of the input.
+
+If \code{FALSE}, does nothing.}
 }
 \value{
-A double vector of locations right before a change.
+A double vector of locations.
 }
 \description{
-\code{warp_change()} detects changes at the \code{period} level. It returns the
-locations of the value just before a change. The location of the last
-value in \code{x} is always returned at the end.
+\code{warp_change()} detects changes at the \code{period} level.
+
+If \code{last = TRUE}, it returns locations of the last value before a change,
+and the last location in \code{x} is always included. Additionally, if
+\code{endpoint = TRUE}, the first location in \code{x} will be included.
+
+If \code{last = FALSE}, it returns locations of the first value after a change,
+and the first location in \code{x} is always included. Additionally, if
+\code{endpoint = TRUE}, the last location in \code{x} will be included.
 }
 \examples{
 x <- as.Date("2019-01-01") + 0:5
+x
 
-warp_change(x, period = "day", every = 2)
+# Last location before a change, last location of `x` is always included
+warp_change(x, period = "yday", every = 2, last = TRUE)
 
-warp_change(x, period = "day", every = 2, origin = as.Date("2019-01-01"))
+# Also include first location
+warp_change(x, period = "yday", every = 2, last = TRUE, endpoint = TRUE)
+
+# First location after a change, first location of `x` is always included
+warp_change(x, period = "yday", every = 2, last = FALSE)
+
+# Also include last location
+warp_change(x, period = "yday", every = 2, last = FALSE, endpoint = TRUE)
 }

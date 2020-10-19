@@ -13,7 +13,14 @@
 // Functionality ------------------------------------------------
 
 SEXP warp_distance(SEXP x, enum warp_period_type type, int every, SEXP origin);
-SEXP warp_change(SEXP x, enum warp_period_type type, int every, SEXP origin);
+
+SEXP warp_change(SEXP x,
+                 enum warp_period_type period,
+                 int every,
+                 SEXP origin,
+                 bool last,
+                 bool endpoint);
+
 SEXP warp_boundary(SEXP x, enum warp_period_type type, int every, SEXP origin);
 
 // Compatibility ------------------------------------------------
