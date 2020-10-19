@@ -27,3 +27,29 @@ test_that("size 0 input works", {
 test_that("size 1 input works", {
   expect_equal(warp_change(new_date(0), period = "year"), 1)
 })
+
+test_that("`last = TRUE` returns last location before a change", {
+  x <- as.Date("2019-01-01") + 0:5
+
+  expect_identical(
+    warp_change(x, period = "yday", every = 2L, last = TRUE),
+    c(2, 4, 6)
+  )
+  expect_identical(
+    warp_change(x, period = "yday", every = 2L, last = TRUE, endpoint = TRUE),
+    c(1, 2, 4, 6)
+  )
+})
+
+test_that("`last = FALSE` returns first location after a change", {
+  x <- as.Date("2019-01-01") + 0:5
+
+  expect_identical(
+    warp_change(x, period = "yday", every = 2L, last = FALSE),
+    c(1, 3, 5)
+  )
+  expect_identical(
+    warp_change(x, period = "yday", every = 2L, last = FALSE, endpoint = TRUE),
+    c(1, 3, 5, 6)
+  )
+})

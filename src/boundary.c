@@ -7,8 +7,12 @@ static SEXP warp_boundary_impl(SEXP stops);
 
 // [[ include("warp.h") ]]
 SEXP warp_boundary(SEXP x, enum warp_period_type type, int every, SEXP origin) {
-  SEXP stops = PROTECT(warp_change(x, type, every, origin));
+  static const bool last = true;
+  static const bool endpoint = false;
+
+  SEXP stops = PROTECT(warp_change(x, type, every, origin, last, endpoint));
   SEXP out = warp_boundary_impl(stops);
+
   UNPROTECT(1);
   return out;
 }

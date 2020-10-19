@@ -105,6 +105,42 @@ int pull_every(SEXP every) {
 
 // -----------------------------------------------------------------------------
 
+// [[ include("utils.h") ]]
+bool pull_endpoint(SEXP endpoint) {
+  if (Rf_length(endpoint) != 1) {
+    r_error("pull_endpoint", "`endpoint` must have size 1, not %i", Rf_length(endpoint));
+  }
+
+  if (OBJECT(endpoint) != 0) {
+    r_error("pull_endpoint", "`endpoint` must be a bare logical value.");
+  }
+
+  switch (TYPEOF(endpoint)) {
+  case LGLSXP: return LOGICAL(endpoint)[0];
+  default: r_error("pull_endpoint", "`endpoint` must be logical, not %s", Rf_type2char(TYPEOF(endpoint)));
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+// [[ include("utils.h") ]]
+bool pull_last(SEXP last) {
+  if (Rf_length(last) != 1) {
+    r_error("pull_last", "`last` must have size 1, not %i", Rf_length(last));
+  }
+
+  if (OBJECT(last) != 0) {
+    r_error("pull_last", "`last` must be a bare logical value.");
+  }
+
+  switch (TYPEOF(last)) {
+  case LGLSXP: return LOGICAL(last)[0];
+  default: r_error("pull_last", "`last` must be logical, not %s", Rf_type2char(TYPEOF(last)));
+  }
+}
+
+// -----------------------------------------------------------------------------
+
 #define YEARS_FROM_0001_01_01_TO_EPOCH 1969
 #define LEAP_YEARS_FROM_0001_01_01_TO_EPOCH 477
 
