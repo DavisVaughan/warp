@@ -40,9 +40,13 @@
 
 
 <meta property="og:title" content="Detect changes in a date time vector — warp_change" />
-<meta property="og:description" content="warp_change() detects changes at the period level. It returns the
-locations of the value just before a change. The location of the last
-value in x is always returned at the end." />
+<meta property="og:description" content="warp_change() detects changes at the period level.
+If last = TRUE, it returns locations of the last value before a change,
+and the last location in x is always included. Additionally, if
+endpoint = TRUE, the first location in x will be included.
+If last = FALSE, it returns locations of the first value after a change,
+and the first location in x is always included. Additionally, if
+endpoint = TRUE, the last location in x will be included." />
 
 
 <meta name="robots" content="noindex">
@@ -125,12 +129,23 @@ value in x is always returned at the end." />
     </div>
 
     <div class="ref-description">
-    <p><code>warp_change()</code> detects changes at the <code>period</code> level. It returns the
-locations of the value just before a change. The location of the last
-value in <code>x</code> is always returned at the end.</p>
+    <p><code>warp_change()</code> detects changes at the <code>period</code> level.</p>
+<p>If <code>last = TRUE</code>, it returns locations of the last value before a change,
+and the last location in <code>x</code> is always included. Additionally, if
+<code>endpoint = TRUE</code>, the first location in <code>x</code> will be included.</p>
+<p>If <code>last = FALSE</code>, it returns locations of the first value after a change,
+and the first location in <code>x</code> is always included. Additionally, if
+<code>endpoint = TRUE</code>, the last location in <code>x</code> will be included.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>warp_change</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>period</span>, every <span class='op'>=</span> <span class='fl'>1L</span>, origin <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>warp_change</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  <span class='va'>period</span>,
+  every <span class='op'>=</span> <span class='fl'>1L</span>,
+  origin <span class='op'>=</span> <span class='cn'>NULL</span>,
+  last <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  endpoint <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -166,19 +181,46 @@ epoch time of <code>1970-01-01 00:00:00</code>, <em>in the time zone of the inde
 <p>This is generally used to define the anchor time to count from, which is
 relevant when the every value is <code>&gt; 1</code>.</p></td>
     </tr>
+    <tr>
+      <th>last</th>
+      <td><p><code>[logical(1)]</code></p>
+<p>If <code>TRUE</code>, the <em>last</em> location <em>before</em> a change is returned.
+The last location of the input is always returned.</p>
+<p>If <code>FALSE</code>, the <em>first</em> location <em>after</em> a change is returned.
+The first location of the input is always returned.</p></td>
+    </tr>
+    <tr>
+      <th>endpoint</th>
+      <td><p><code>[logical(1)]</code></p>
+<p>If <code>TRUE</code> and <code>last = TRUE</code>, will additionally return the first location
+of the input.</p>
+<p>If <code>TRUE</code> and <code>last = FALSE</code>, will additionally return the last location
+of the input.</p>
+<p>If <code>FALSE</code>, does nothing.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A double vector of locations right before a change.</p>
+    <p>A double vector of locations.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span><span class='op'>(</span><span class='st'>"2019-01-01"</span><span class='op'>)</span> <span class='op'>+</span> <span class='fl'>0</span><span class='op'>:</span><span class='fl'>5</span>
-
-<span class='fu'>warp_change</span><span class='op'>(</span><span class='va'>x</span>, period <span class='op'>=</span> <span class='st'>"day"</span>, every <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 1 3 5 6</div><div class='input'>
-<span class='fu'>warp_change</span><span class='op'>(</span><span class='va'>x</span>, period <span class='op'>=</span> <span class='st'>"day"</span>, every <span class='op'>=</span> <span class='fl'>2</span>, origin <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span><span class='op'>(</span><span class='st'>"2019-01-01"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 2 4 6</div></pre>
+<span class='va'>x</span>
+</div><div class='output co'>#&gt; [1] "2019-01-01" "2019-01-02" "2019-01-03" "2019-01-04" "2019-01-05"
+#&gt; [6] "2019-01-06"</div><div class='input'>
+<span class='co'># Last location before a change, last location of `x` is always included</span>
+<span class='fu'>warp_change</span><span class='op'>(</span><span class='va'>x</span>, period <span class='op'>=</span> <span class='st'>"yday"</span>, every <span class='op'>=</span> <span class='fl'>2</span>, last <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 2 4 6</div><div class='input'>
+<span class='co'># Also include first location</span>
+<span class='fu'>warp_change</span><span class='op'>(</span><span class='va'>x</span>, period <span class='op'>=</span> <span class='st'>"yday"</span>, every <span class='op'>=</span> <span class='fl'>2</span>, last <span class='op'>=</span> <span class='cn'>TRUE</span>, endpoint <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 1 2 4 6</div><div class='input'>
+<span class='co'># First location after a change, first location of `x` is always included</span>
+<span class='fu'>warp_change</span><span class='op'>(</span><span class='va'>x</span>, period <span class='op'>=</span> <span class='st'>"yday"</span>, every <span class='op'>=</span> <span class='fl'>2</span>, last <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 1 3 5</div><div class='input'>
+<span class='co'># Also include last location</span>
+<span class='fu'>warp_change</span><span class='op'>(</span><span class='va'>x</span>, period <span class='op'>=</span> <span class='st'>"yday"</span>, every <span class='op'>=</span> <span class='fl'>2</span>, last <span class='op'>=</span> <span class='cn'>FALSE</span>, endpoint <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 1 3 5 6</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
