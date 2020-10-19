@@ -4,7 +4,7 @@
 \alias{warp_boundary}
 \title{Locate period boundaries for a date vector}
 \usage{
-warp_boundary(x, period, every = 1L, origin = NULL)
+warp_boundary(x, period, ..., every = 1L, origin = NULL)
 }
 \arguments{
 \item{x}{\verb{[Date / POSIXct / POSIXlt]}
@@ -21,6 +21,10 @@ broken into:
 \item \code{"yweek"}, \code{"mweek"}
 \item \code{"yday"}, \code{"mday"}
 }}
+
+\item{...}{\verb{[dots]}
+
+These dots are for future extensions and must be empty.}
 
 \item{every}{\verb{[positive integer(1)]}
 

@@ -38,6 +38,11 @@
 #' # [1969-12-28, 1970-01-02)
 #' # [1970-01-02, 1970-01-07)
 #' warp_boundary(x, "day", every = 5, origin = origin)
-warp_boundary <- function(x, period, every = 1L, origin = NULL) {
+warp_boundary <- function(x,
+                          period,
+                          ...,
+                          every = 1L,
+                          origin = NULL) {
+  check_dots_empty("warp_boundary", ...)
   .Call(warp_warp_boundary, x, period, every, origin)
 }

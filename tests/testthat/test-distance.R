@@ -3354,3 +3354,9 @@ test_that("`period` is validated", {
   expect_error(warp_distance(new_date(0), period = "yr"), "Unknown `period` value 'yr'")
 })
 
+test_that("optional arguments must be specified by name", {
+  expect_error(
+    warp_distance(new_date(0), "year", 1),
+    "`...` is not empty in `warp_distance[(][)]`."
+  )
+})

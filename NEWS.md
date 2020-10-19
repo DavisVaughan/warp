@@ -1,5 +1,7 @@
 # warp (development version)
 
+* All optional arguments must now be specified by name.
+
 * `warp_change()` has two new arguments, `last` and `endpoint`, for controlling
   exactly what type of change points are returned.
 

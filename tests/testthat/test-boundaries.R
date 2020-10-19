@@ -34,3 +34,10 @@ test_that("size 1 input works", {
   expect <- data.frame(start = 1, stop = 1)
   expect_equal(warp_boundary(new_date(2), period = "year"), expect)
 })
+
+test_that("optional arguments must be specified by name", {
+  expect_error(
+    warp_boundary(new_date(0), "year", 1),
+    "`...` is not empty in `warp_boundary[(][)]`."
+  )
+})

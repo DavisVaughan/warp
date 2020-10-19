@@ -114,6 +114,10 @@
 #'   This is generally used to define the anchor time to count from, which is
 #'   relevant when the every value is `> 1`.
 #'
+#' @param ... `[dots]`
+#'
+#'   These dots are for future extensions and must be empty.
+#'
 #' @return
 #' A double vector containing the distances.
 #'
@@ -204,6 +208,11 @@
 #'   mweek = warp_distance(x, "mweek")
 #' )
 #'
-warp_distance <- function(x, period, every = 1L, origin = NULL) {
+warp_distance <- function(x,
+                          period,
+                          ...,
+                          every = 1L,
+                          origin = NULL) {
+  check_dots_empty("warp_distance", ...)
   .Call(warp_warp_distance, x, period, every, origin)
 }

@@ -7,6 +7,7 @@
 warp_change(
   x,
   period,
+  ...,
   every = 1L,
   origin = NULL,
   last = TRUE,
@@ -28,6 +29,10 @@ broken into:
 \item \code{"yweek"}, \code{"mweek"}
 \item \code{"yday"}, \code{"mday"}
 }}
+
+\item{...}{\verb{[dots]}
+
+These dots are for future extensions and must be empty.}
 
 \item{every}{\verb{[positive integer(1)]}
 
