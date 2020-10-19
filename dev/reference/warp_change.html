@@ -141,6 +141,7 @@ and the first location in <code>x</code> is always included. Additionally, if
     <pre class="usage"><span class='fu'>warp_change</span><span class='op'>(</span>
   <span class='va'>x</span>,
   <span class='va'>period</span>,
+  <span class='va'>...</span>,
   every <span class='op'>=</span> <span class='fl'>1L</span>,
   origin <span class='op'>=</span> <span class='cn'>NULL</span>,
   last <span class='op'>=</span> <span class='cn'>TRUE</span>,
@@ -165,6 +166,11 @@ broken into:</p><ul>
 <li><p><code>"yweek"</code>, <code>"mweek"</code></p></li>
 <li><p><code>"yday"</code>, <code>"mday"</code></p></li>
 </ul></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p><code>[dots]</code></p>
+<p>These dots are for future extensions and must be empty.</p></td>
     </tr>
     <tr>
       <th>every</th>

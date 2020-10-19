@@ -130,7 +130,7 @@ rolling from one month to the next. It returns the start and stop positions
 for each contiguous period chunk in <code>x</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>warp_boundary</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>period</span>, every <span class='op'>=</span> <span class='fl'>1L</span>, origin <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>warp_boundary</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>period</span>, <span class='va'>...</span>, every <span class='op'>=</span> <span class='fl'>1L</span>, origin <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -150,6 +150,11 @@ broken into:</p><ul>
 <li><p><code>"yweek"</code>, <code>"mweek"</code></p></li>
 <li><p><code>"yday"</code>, <code>"mday"</code></p></li>
 </ul></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p><code>[dots]</code></p>
+<p>These dots are for future extensions and must be empty.</p></td>
     </tr>
     <tr>
       <th>every</th>
