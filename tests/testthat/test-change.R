@@ -53,3 +53,10 @@ test_that("`last = FALSE` returns first location after a change", {
     c(1, 3, 5, 6)
   )
 })
+
+test_that("optional arguments must be specified by name", {
+  expect_error(
+    warp_change(new_date(0), "year", 1),
+    "`...` is not empty in `warp_change[(][)]`."
+  )
+})

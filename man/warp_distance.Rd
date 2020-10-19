@@ -4,7 +4,7 @@
 \alias{warp_distance}
 \title{Compute distances from a date time origin}
 \usage{
-warp_distance(x, period, every = 1L, origin = NULL)
+warp_distance(x, period, ..., every = 1L, origin = NULL)
 }
 \arguments{
 \item{x}{\verb{[Date / POSIXct / POSIXlt]}
@@ -21,6 +21,10 @@ broken into:
 \item \code{"yweek"}, \code{"mweek"}
 \item \code{"yday"}, \code{"mday"}
 }}
+
+\item{...}{\verb{[dots]}
+
+These dots are for future extensions and must be empty.}
 
 \item{every}{\verb{[positive integer(1)]}
 
