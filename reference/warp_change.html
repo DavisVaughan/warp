@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -36,10 +40,13 @@
 
 
 <meta property="og:title" content="Detect changes in a date time vector — warp_change" />
-<meta property="og:description" content="warp_change() detects changes at the period level. It returns the
-locations of the value just before a change. The location of the last
-value in x is always returned at the end." />
-<meta name="twitter:card" content="summary" />
+<meta property="og:description" content="warp_change() detects changes at the period level.
+If last = TRUE, it returns locations of the last value before a change,
+and the last location in x is always included. Additionally, if
+endpoint = TRUE, the first location in x will be included.
+If last = FALSE, it returns locations of the first value after a change,
+and the first location in x is always included. Additionally, if
+endpoint = TRUE, the last location in x will be included." />
 
 
 
@@ -57,7 +64,7 @@ value in x is always returned at the end." />
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -71,19 +78,13 @@ value in x is always returned at the end." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">warp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
@@ -104,7 +105,7 @@ value in x is always returned at the end." />
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/DavisVaughan/warp">
+  <a href="https://github.com/DavisVaughan/warp/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -128,12 +129,24 @@ value in x is always returned at the end." />
     </div>
 
     <div class="ref-description">
-    <p><code>warp_change()</code> detects changes at the <code>period</code> level. It returns the
-locations of the value just before a change. The location of the last
-value in <code>x</code> is always returned at the end.</p>
+    <p><code>warp_change()</code> detects changes at the <code>period</code> level.</p>
+<p>If <code>last = TRUE</code>, it returns locations of the last value before a change,
+and the last location in <code>x</code> is always included. Additionally, if
+<code>endpoint = TRUE</code>, the first location in <code>x</code> will be included.</p>
+<p>If <code>last = FALSE</code>, it returns locations of the first value after a change,
+and the first location in <code>x</code> is always included. Additionally, if
+<code>endpoint = TRUE</code>, the last location in <code>x</code> will be included.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>warp_change</span>(<span class='no'>x</span>, <span class='no'>period</span>, <span class='kw'>every</span> <span class='kw'>=</span> <span class='fl'>1L</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>warp_change</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  <span class='va'>period</span>,
+  <span class='va'>...</span>,
+  every <span class='op'>=</span> <span class='fl'>1L</span>,
+  origin <span class='op'>=</span> <span class='cn'>NULL</span>,
+  last <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  endpoint <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -155,6 +168,11 @@ broken into:</p><ul>
 </ul></td>
     </tr>
     <tr>
+      <th>...</th>
+      <td><p><code>[dots]</code></p>
+<p>These dots are for future extensions and must be empty.</p></td>
+    </tr>
+    <tr>
       <th>every</th>
       <td><p><code>[positive integer(1)]</code></p>
 <p>The number of periods to group together.</p>
@@ -169,26 +187,51 @@ epoch time of <code>1970-01-01 00:00:00</code>, <em>in the time zone of the inde
 <p>This is generally used to define the anchor time to count from, which is
 relevant when the every value is <code>&gt; 1</code>.</p></td>
     </tr>
+    <tr>
+      <th>last</th>
+      <td><p><code>[logical(1)]</code></p>
+<p>If <code>TRUE</code>, the <em>last</em> location <em>before</em> a change is returned.
+The last location of the input is always returned.</p>
+<p>If <code>FALSE</code>, the <em>first</em> location <em>after</em> a change is returned.
+The first location of the input is always returned.</p></td>
+    </tr>
+    <tr>
+      <th>endpoint</th>
+      <td><p><code>[logical(1)]</code></p>
+<p>If <code>TRUE</code> and <code>last = TRUE</code>, will additionally return the first location
+of the input.</p>
+<p>If <code>TRUE</code> and <code>last = FALSE</code>, will additionally return the last location
+of the input.</p>
+<p>If <code>FALSE</code>, does nothing.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A double vector of locations right before a change.</p>
+    <p>A double vector of locations.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"2019-01-01"</span>) + <span class='fl'>0</span>:<span class='fl'>5</span>
-
-<span class='fu'>warp_change</span>(<span class='no'>x</span>, <span class='kw'>period</span> <span class='kw'>=</span> <span class='st'>"day"</span>, <span class='kw'>every</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; [1] 1 3 5 6</div><div class='input'>
-<span class='fu'>warp_change</span>(<span class='no'>x</span>, <span class='kw'>period</span> <span class='kw'>=</span> <span class='st'>"day"</span>, <span class='kw'>every</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"2019-01-01"</span>))</div><div class='output co'>#&gt; [1] 2 4 6</div></pre>
+    <pre class="examples"><div class='input'><span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span><span class='op'>(</span><span class='st'>"2019-01-01"</span><span class='op'>)</span> <span class='op'>+</span> <span class='fl'>0</span><span class='op'>:</span><span class='fl'>5</span>
+<span class='va'>x</span>
+</div><div class='output co'>#&gt; [1] "2019-01-01" "2019-01-02" "2019-01-03" "2019-01-04" "2019-01-05"
+#&gt; [6] "2019-01-06"</div><div class='input'>
+<span class='co'># Last location before a change, last location of `x` is always included</span>
+<span class='fu'>warp_change</span><span class='op'>(</span><span class='va'>x</span>, period <span class='op'>=</span> <span class='st'>"yday"</span>, every <span class='op'>=</span> <span class='fl'>2</span>, last <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 2 4 6</div><div class='input'>
+<span class='co'># Also include first location</span>
+<span class='fu'>warp_change</span><span class='op'>(</span><span class='va'>x</span>, period <span class='op'>=</span> <span class='st'>"yday"</span>, every <span class='op'>=</span> <span class='fl'>2</span>, last <span class='op'>=</span> <span class='cn'>TRUE</span>, endpoint <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 1 2 4 6</div><div class='input'>
+<span class='co'># First location after a change, first location of `x` is always included</span>
+<span class='fu'>warp_change</span><span class='op'>(</span><span class='va'>x</span>, period <span class='op'>=</span> <span class='st'>"yday"</span>, every <span class='op'>=</span> <span class='fl'>2</span>, last <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 1 3 5</div><div class='input'>
+<span class='co'># Also include last location</span>
+<span class='fu'>warp_change</span><span class='op'>(</span><span class='va'>x</span>, period <span class='op'>=</span> <span class='st'>"yday"</span>, every <span class='op'>=</span> <span class='fl'>2</span>, last <span class='op'>=</span> <span class='cn'>FALSE</span>, endpoint <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 1 3 5 6</div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -199,7 +242,7 @@ relevant when the every value is <code>&gt; 1</code>.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

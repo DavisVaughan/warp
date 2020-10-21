@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -39,7 +43,6 @@
 <meta property="og:description" content="warp_boundary() detects a change in time period along x, for example,
 rolling from one month to the next. It returns the start and stop positions
 for each contiguous period chunk in x." />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -57,7 +60,7 @@ for each contiguous period chunk in x." />
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -71,19 +74,13 @@ for each contiguous period chunk in x." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">warp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
@@ -104,7 +101,7 @@ for each contiguous period chunk in x." />
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/DavisVaughan/warp">
+  <a href="https://github.com/DavisVaughan/warp/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -133,7 +130,7 @@ rolling from one month to the next. It returns the start and stop positions
 for each contiguous period chunk in <code>x</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>warp_boundary</span>(<span class='no'>x</span>, <span class='no'>period</span>, <span class='kw'>every</span> <span class='kw'>=</span> <span class='fl'>1L</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>warp_boundary</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>period</span>, <span class='va'>...</span>, every <span class='op'>=</span> <span class='fl'>1L</span>, origin <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -153,6 +150,11 @@ broken into:</p><ul>
 <li><p><code>"yweek"</code>, <code>"mweek"</code></p></li>
 <li><p><code>"yday"</code>, <code>"mday"</code></p></li>
 </ul></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p><code>[dots]</code></p>
+<p>These dots are for future extensions and must be empty.</p></td>
     </tr>
     <tr>
       <th>every</th>
@@ -181,11 +183,13 @@ double vectors representing boundaries of the date time groups.</p>
 positions are computed from these.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span>(<span class='st'>"1970-01-01"</span>) + -<span class='fl'>4</span>:<span class='fl'>5</span>
-<span class='no'>x</span></div><div class='output co'>#&gt;  [1] "1969-12-28" "1969-12-29" "1969-12-30" "1969-12-31" "1970-01-01"
+    <pre class="examples"><div class='input'><span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span><span class='op'>(</span><span class='st'>"1970-01-01"</span><span class='op'>)</span> <span class='op'>+</span> <span class='op'>-</span><span class='fl'>4</span><span class='op'>:</span><span class='fl'>5</span>
+<span class='va'>x</span>
+</div><div class='output co'>#&gt;  [1] "1969-12-28" "1969-12-29" "1969-12-30" "1969-12-31" "1970-01-01"
 #&gt;  [6] "1970-01-02" "1970-01-03" "1970-01-04" "1970-01-05" "1970-01-06"</div><div class='input'>
 <span class='co'># Boundaries by month</span>
-<span class='fu'>warp_boundary</span>(<span class='no'>x</span>, <span class='st'>"month"</span>)</div><div class='output co'>#&gt;   start stop
+<span class='fu'>warp_boundary</span><span class='op'>(</span><span class='va'>x</span>, <span class='st'>"month"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;   start stop
 #&gt; 1     1    4
 #&gt; 2     5   10</div><div class='input'>
 <span class='co'># Bound by every 5 days, relative to "1970-01-01"</span>
@@ -193,29 +197,27 @@ positions are computed from these.</p>
 <span class='co'># [1969-12-27, 1970-01-01)</span>
 <span class='co'># [1970-01-01, 1970-01-06)</span>
 <span class='co'># [1970-01-06, 1970-01-11)</span>
-<span class='fu'>warp_boundary</span>(<span class='no'>x</span>, <span class='st'>"day"</span>, <span class='kw'>every</span> <span class='kw'>=</span> <span class='fl'>5</span>)</div><div class='output co'>#&gt;   start stop
+<span class='fu'>warp_boundary</span><span class='op'>(</span><span class='va'>x</span>, <span class='st'>"day"</span>, every <span class='op'>=</span> <span class='fl'>5</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;   start stop
 #&gt; 1     1    4
 #&gt; 2     5    9
 #&gt; 3    10   10</div><div class='input'>
 <span class='co'># Bound by every 5 days, relative to the smallest value in our vector</span>
-<span class='no'>origin</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>min</a></span>(<span class='no'>x</span>)
-<span class='no'>origin</span></div><div class='output co'>#&gt; [1] "1969-12-28"</div><div class='input'>
+<span class='va'>origin</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>min</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
+<span class='va'>origin</span>
+</div><div class='output co'>#&gt; [1] "1969-12-28"</div><div class='input'>
 <span class='co'># Creates boundaries of:</span>
 <span class='co'># [1969-12-28, 1970-01-02)</span>
 <span class='co'># [1970-01-02, 1970-01-07)</span>
-<span class='fu'>warp_boundary</span>(<span class='no'>x</span>, <span class='st'>"day"</span>, <span class='kw'>every</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>origin</span> <span class='kw'>=</span> <span class='no'>origin</span>)</div><div class='output co'>#&gt;   start stop
+<span class='fu'>warp_boundary</span><span class='op'>(</span><span class='va'>x</span>, <span class='st'>"day"</span>, every <span class='op'>=</span> <span class='fl'>5</span>, origin <span class='op'>=</span> <span class='va'>origin</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;   start stop
 #&gt; 1     1    5
 #&gt; 2     6   10</div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#details">Details</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -226,7 +228,7 @@ positions are computed from these.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

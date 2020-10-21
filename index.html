@@ -6,10 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Group Dates • warp</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
+<script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="Group Dates">
 <meta property="og:description" content="Tooling to group dates by a variety of periods
     including: yearly, monthly, by second, by week of the month, and more.
@@ -17,13 +18,12 @@
     distance between dates in terms of the period. This extracts valuable
     information that can be used in further calculations that rely on a
     specific temporal spacing between observations.">
-<meta name="twitter:card" content="summary">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
-<body>
+<body data-spy="scroll" data-target="#toc">
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -36,18 +36,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">warp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
@@ -69,7 +63,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/DavisVaughan/warp">
+  <a href="https://github.com/DavisVaughan/warp/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -91,65 +85,73 @@
 <a href="#warp" class="anchor"></a>warp</h1></div>
 <!-- badges: start -->
 
+<p><img src="https://media.giphy.com/media/jjeK2Er3E5igw/giphy.gif"></p>
 <p>The goal of warp is to provide tooling to group dates by a variety of periods, such as: yearly, monthly, by second, by week of the month, and more.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(warp)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit">
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/DavisVaughan/warp">warp</a></span><span class="op">)</span></pre></div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>You can install the release version from CRAN with:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">install.package</span>(<span class="st">"warp"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit">
+<span class="fu">install.package</span><span class="op">(</span><span class="st">"warp"</span><span class="op">)</span></pre></div>
 <p>You can install the development version from <a href="https://github.com/">GitHub</a> with:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="co"># install.packages("devtools")</span></a>
-<a class="sourceLine" id="cb3-2" data-line-number="2">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"DavisVaughan/warp"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit">
+<span class="co"># install.packages("devtools")</span>
+<span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"DavisVaughan/warp"</span><span class="op">)</span></pre></div>
 </div>
 <div id="example" class="section level2">
 <h2 class="hasAnchor">
 <a href="#example" class="anchor"></a>Example</h2>
 <p>One of the core functions in warp is <code><a href="reference/warp_distance.html">warp_distance()</a></code>, which allows you to provide a date time vector and compute the “distance” from an <code>origin</code>. For example, this computes the number of months from the unix epoch.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">x &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span>(<span class="st">"1970-01-01"</span>) <span class="op">+</span><span class="st"> </span><span class="dv">-2</span><span class="op">:</span><span class="dv">2</span></a>
-<a class="sourceLine" id="cb4-2" data-line-number="2">x</a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt; [1] "1969-12-30" "1969-12-31" "1970-01-01" "1970-01-02" "1970-01-03"</span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="kw"><a href="reference/warp_distance.html">warp_distance</a></span>(x, <span class="dt">period =</span> <span class="st">"month"</span>)</a>
-<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; [1] -1 -1  0  0  0</span></a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit">
+<span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span><span class="op">(</span><span class="st">"1970-01-01"</span><span class="op">)</span> <span class="op">+</span> <span class="op">-</span><span class="fl">2</span><span class="op">:</span><span class="fl">2</span>
+<span class="va">x</span>
+<span class="co">#&gt; [1] "1969-12-30" "1969-12-31" "1970-01-01" "1970-01-02" "1970-01-03"</span>
+
+<span class="fu"><a href="reference/warp_distance.html">warp_distance</a></span><span class="op">(</span><span class="va">x</span>, period <span class="op">=</span> <span class="st">"month"</span><span class="op">)</span>
+<span class="co">#&gt; [1] -1 -1  0  0  0</span></pre></div>
 <p>The values that <code><a href="reference/warp_distance.html">warp_distance()</a></code> returns correspond to the distance from <code>x</code> to the <code>origin</code>, in units defined by the <code>period</code> and the width defined by <code>every</code>. The <code>origin</code> defaults to the unix epoch of <code>1970-01-01 00:00:00</code> in the time zone of <code>x</code>, but you can change that. In this case the distances are saying that, for example, <code>"1970-01-02"</code> is in the same month as the origin, and <code>"1969-12-31"</code> is 1 month group away.</p>
 <p>You can also compute daily distances. Rather than grouping by 1 day, let’s lump every 2 days together, starting from the default <code>origin</code>.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="co"># Groups 1970-01-01 and 1970-01-02 together</span></a>
-<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="kw"><a href="reference/warp_distance.html">warp_distance</a></span>(x, <span class="dt">period =</span> <span class="st">"day"</span>, <span class="dt">every =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co">#&gt; [1] -1 -1  0  0  1</span></a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit">
+<span class="co"># Groups 1970-01-01 and 1970-01-02 together</span>
+<span class="fu"><a href="reference/warp_distance.html">warp_distance</a></span><span class="op">(</span><span class="va">x</span>, period <span class="op">=</span> <span class="st">"day"</span>, every <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
+<span class="co">#&gt; [1] -1 -1  0  0  1</span></pre></div>
 <p>You will often want to set your own <code>origin</code> date. Let’s shift it forward 1 to <code>1970-01-02</code>.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">origin &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span>(<span class="st">"1970-01-02"</span>)</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2">origin</a>
-<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="co">#&gt; [1] "1970-01-02"</span></a>
-<a class="sourceLine" id="cb6-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="co"># Groups 1970-01-02 and 1970-01-03 together</span></a>
-<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="kw"><a href="reference/warp_distance.html">warp_distance</a></span>(x, <span class="dt">period =</span> <span class="st">"day"</span>, <span class="dt">every =</span> <span class="dv">2</span>, <span class="dt">origin =</span> origin)</a>
-<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="co">#&gt; [1] -2 -1 -1  0  0</span></a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit">
+<span class="va">origin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span><span class="op">(</span><span class="st">"1970-01-02"</span><span class="op">)</span>
+<span class="va">origin</span>
+<span class="co">#&gt; [1] "1970-01-02"</span>
+
+<span class="co"># Groups 1970-01-02 and 1970-01-03 together</span>
+<span class="fu"><a href="reference/warp_distance.html">warp_distance</a></span><span class="op">(</span><span class="va">x</span>, period <span class="op">=</span> <span class="st">"day"</span>, every <span class="op">=</span> <span class="fl">2</span>, origin <span class="op">=</span> <span class="va">origin</span><span class="op">)</span>
+<span class="co">#&gt; [1] -2 -1 -1  0  0</span></pre></div>
 <p>Another interesting period to group by is the <code>"mweek"</code>, i.e. the week of the month. Notice that days 1-7 of January 1970 are grouped into the same bucket. Also note that days 29-31 of December 1969 fell at the end of their corresponding month. This irregular week of size 3 is treated as the 5th week of that month, but the offset value of <code>-1</code> is still the number of week buckets from the <code>origin</code> of <code>1970-01-01</code>.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">y &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span>(<span class="st">"1969-12-28"</span>) <span class="op">+</span><span class="st"> </span><span class="dv">0</span><span class="op">:</span><span class="dv">14</span></a>
-<a class="sourceLine" id="cb7-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb7-3" data-line-number="3">tibble<span class="op">::</span><span class="kw"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span>(</a>
-<a class="sourceLine" id="cb7-4" data-line-number="4">  <span class="dt">y =</span> y,</a>
-<a class="sourceLine" id="cb7-5" data-line-number="5">  <span class="dt">mweek =</span> <span class="kw"><a href="reference/warp_distance.html">warp_distance</a></span>(y, <span class="st">"mweek"</span>)</a>
-<a class="sourceLine" id="cb7-6" data-line-number="6">)</a>
-<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt; # A tibble: 15 x 2</span></a>
-<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="co">#&gt;    y          mweek</span></a>
-<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">#&gt;    &lt;date&gt;     &lt;dbl&gt;</span></a>
-<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">#&gt;  1 1969-12-28    -2</span></a>
-<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co">#&gt;  2 1969-12-29    -1</span></a>
-<a class="sourceLine" id="cb7-12" data-line-number="12"><span class="co">#&gt;  3 1969-12-30    -1</span></a>
-<a class="sourceLine" id="cb7-13" data-line-number="13"><span class="co">#&gt;  4 1969-12-31    -1</span></a>
-<a class="sourceLine" id="cb7-14" data-line-number="14"><span class="co">#&gt;  5 1970-01-01     0</span></a>
-<a class="sourceLine" id="cb7-15" data-line-number="15"><span class="co">#&gt;  6 1970-01-02     0</span></a>
-<a class="sourceLine" id="cb7-16" data-line-number="16"><span class="co">#&gt;  7 1970-01-03     0</span></a>
-<a class="sourceLine" id="cb7-17" data-line-number="17"><span class="co">#&gt;  8 1970-01-04     0</span></a>
-<a class="sourceLine" id="cb7-18" data-line-number="18"><span class="co">#&gt;  9 1970-01-05     0</span></a>
-<a class="sourceLine" id="cb7-19" data-line-number="19"><span class="co">#&gt; 10 1970-01-06     0</span></a>
-<a class="sourceLine" id="cb7-20" data-line-number="20"><span class="co">#&gt; 11 1970-01-07     0</span></a>
-<a class="sourceLine" id="cb7-21" data-line-number="21"><span class="co">#&gt; 12 1970-01-08     1</span></a>
-<a class="sourceLine" id="cb7-22" data-line-number="22"><span class="co">#&gt; 13 1970-01-09     1</span></a>
-<a class="sourceLine" id="cb7-23" data-line-number="23"><span class="co">#&gt; 14 1970-01-10     1</span></a>
-<a class="sourceLine" id="cb7-24" data-line-number="24"><span class="co">#&gt; 15 1970-01-11     1</span></a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit">
+<span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span><span class="op">(</span><span class="st">"1969-12-28"</span><span class="op">)</span> <span class="op">+</span> <span class="fl">0</span><span class="op">:</span><span class="fl">14</span>
+
+<span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>
+  y <span class="op">=</span> <span class="va">y</span>,
+  mweek <span class="op">=</span> <span class="fu"><a href="reference/warp_distance.html">warp_distance</a></span><span class="op">(</span><span class="va">y</span>, <span class="st">"mweek"</span><span class="op">)</span>
+<span class="op">)</span>
+<span class="co">#&gt; # A tibble: 15 x 2</span>
+<span class="co">#&gt;    y          mweek</span>
+<span class="co">#&gt;    &lt;date&gt;     &lt;dbl&gt;</span>
+<span class="co">#&gt;  1 1969-12-28    -2</span>
+<span class="co">#&gt;  2 1969-12-29    -1</span>
+<span class="co">#&gt;  3 1969-12-30    -1</span>
+<span class="co">#&gt;  4 1969-12-31    -1</span>
+<span class="co">#&gt;  5 1970-01-01     0</span>
+<span class="co">#&gt;  6 1970-01-02     0</span>
+<span class="co">#&gt;  7 1970-01-03     0</span>
+<span class="co">#&gt;  8 1970-01-04     0</span>
+<span class="co">#&gt;  9 1970-01-05     0</span>
+<span class="co">#&gt; 10 1970-01-06     0</span>
+<span class="co">#&gt; 11 1970-01-07     0</span>
+<span class="co">#&gt; 12 1970-01-08     1</span>
+<span class="co">#&gt; 13 1970-01-09     1</span>
+<span class="co">#&gt; 14 1970-01-10     1</span>
+<span class="co">#&gt; 15 1970-01-11     1</span></pre></div>
 </div>
 <div id="inspiration" class="section level2">
 <h2 class="hasAnchor">
@@ -159,11 +161,13 @@
 </div>
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
 <h2>Links</h2>
 <ul class="list-unstyled">
-<li>Browse source code at <br><a href="https://github.com/DavisVaughan/warp">https://​github.com/​DavisVaughan/​warp</a>
+<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=warp">https://​cloud.r-project.org/​package=warp</a>
+</li>
+<li>Browse source code at <br><a href="https://github.com/DavisVaughan/warp/">https://​github.com/​DavisVaughan/​warp/​</a>
 </li>
 <li>Report a bug at <br><a href="https://github.com/DavisVaughan/warp/issues">https://​github.com/​DavisVaughan/​warp/​issues</a>
 </li>
@@ -201,7 +205,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>
