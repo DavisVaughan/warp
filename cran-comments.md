@@ -8,3 +8,7 @@
 0 errors | 0 warnings | 1 note
 
 * This is a new release.
+
+## 0.2.0 Submission
+
+This is a small update that adds `last` and `endpoint` arguments to `warp_change()`.
