@@ -1,32 +1,31 @@
 Package: warp
 Title: Group Dates
 Version: 0.2.0.9000
-Authors@R: 
-    c(person(given = "Davis",
-             family = "Vaughan",
-             role = c("aut", "cre"),
-             email = "davis@rstudio.com"),
-      person(given = "RStudio",
-             role = "cph"))
-Description: Tooling to group dates by a variety of periods
-    including: yearly, monthly, by second, by week of the month, and more.
-    The groups are defined in such a way that they also represent the
-    distance between dates in terms of the period. This extracts valuable
+Authors@R: c(
+    person("Davis", "Vaughan", , "davis@rstudio.com", role = c("aut", "cre")),
+    person("RStudio", role = "cph")
+  )
+Description: Tooling to group dates by a variety of periods including:
+    yearly, monthly, by second, by week of the month, and more.  The
+    groups are defined in such a way that they also represent the distance
+    between dates in terms of the period. This extracts valuable
     information that can be used in further calculations that rely on a
     specific temporal spacing between observations.
 License: MIT + file LICENSE
-URL: https://github.com/DavisVaughan/warp, https://davisvaughan.github.io/warp/
+URL: https://github.com/DavisVaughan/warp,
+    https://davisvaughan.github.io/warp/
 BugReports: https://github.com/DavisVaughan/warp/issues
 Depends: 
     R (>= 3.2)
 Suggests: 
     covr,
-    testthat (>= 2.1.0),
     knitr,
-    rmarkdown
+    rmarkdown,
+    testthat (>= 2.1.0)
+VignetteBuilder: 
+    knitr
+Config/Needs/website: tidyverse/tidytemplate
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
-VignetteBuilder: knitr
-Config/Needs/website: tidyverse/tidytemplate
