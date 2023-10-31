@@ -1,4 +1,6 @@
-destination: docs
+url: https://davisvaughan.github.io/warp/
+template:
+  bootstrap: 5
 
 development:
   mode: auto

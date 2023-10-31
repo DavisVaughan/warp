@@ -79,8 +79,10 @@ underlying numeric representation. \strong{It is highly advised to specify an
 
 For \code{period} values of \code{"year"}, \code{"month"}, and \code{"day"}, the information
 provided in \code{origin} is truncated. Practically this means that if you
-specify:\preformatted{warp_distance(period = "month", origin = as.Date("1970-01-15"))
-}
+specify:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{warp_distance(period = "month", origin = as.Date("1970-01-15"))
+}\if{html}{\out{</div>}}
 
 then only \code{1970-01} will be used, and not the fact that the origin starts
 on the 15th of the month.
