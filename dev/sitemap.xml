@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>/LICENSE-text.html</loc>
+    <loc>https://davisvaughan.github.io/warp/dev/LICENSE-text.html</loc>
   </url>
   <url>
-    <loc>/LICENSE.html</loc>
+    <loc>https://davisvaughan.github.io/warp/dev/LICENSE.html</loc>
   </url>
   <url>
-    <loc>/articles/hour.html</loc>
+    <loc>https://davisvaughan.github.io/warp/dev/articles/hour.html</loc>
   </url>
   <url>
-    <loc>/articles/index.html</loc>
+    <loc>https://davisvaughan.github.io/warp/dev/articles/index.html</loc>
   </url>
   <url>
-    <loc>/authors.html</loc>
+    <loc>https://davisvaughan.github.io/warp/dev/authors.html</loc>
   </url>
   <url>
-    <loc>/index.html</loc>
+    <loc>https://davisvaughan.github.io/warp/dev/index.html</loc>
   </url>
   <url>
-    <loc>/news/index.html</loc>
+    <loc>https://davisvaughan.github.io/warp/dev/news/index.html</loc>
   </url>
   <url>
-    <loc>/reference/index.html</loc>
+    <loc>https://davisvaughan.github.io/warp/dev/reference/index.html</loc>
   </url>
   <url>
-    <loc>/reference/warp-package.html</loc>
+    <loc>https://davisvaughan.github.io/warp/dev/reference/warp-package.html</loc>
   </url>
   <url>
-    <loc>/reference/warp_boundary.html</loc>
+    <loc>https://davisvaughan.github.io/warp/dev/reference/warp_boundary.html</loc>
   </url>
   <url>
-    <loc>/reference/warp_change.html</loc>
+    <loc>https://davisvaughan.github.io/warp/dev/reference/warp_change.html</loc>
   </url>
   <url>
-    <loc>/reference/warp_distance.html</loc>
+    <loc>https://davisvaughan.github.io/warp/dev/reference/warp_distance.html</loc>
   </url>
 </urlset>

@@ -3,5 +3,8 @@ pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   hour: hour.html
-last_built: 2023-10-31T20:30Z
+last_built: 2023-10-31T20:48Z
+urls:
+  reference: https://davisvaughan.github.io/warp/reference
+  article: https://davisvaughan.github.io/warp/articles
 
