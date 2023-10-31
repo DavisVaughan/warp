@@ -5,10 +5,9 @@
 
 <!-- badges: start -->
 
+[![R-CMD-check](https://github.com/DavisVaughan/warp/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/DavisVaughan/warp/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
-coverage](https://codecov.io/gh/DavisVaughan/warp/branch/master/graph/badge.svg)](https://codecov.io/gh/DavisVaughan/warp?branch=master)
-[![R build
-status](https://github.com/DavisVaughan/warp/workflows/R-CMD-check/badge.svg)](https://github.com/DavisVaughan/warp)
+coverage](https://codecov.io/gh/DavisVaughan/warp/branch/main/graph/badge.svg)](https://app.codecov.io/gh/DavisVaughan/warp?branch=main)
 <!-- badges: end -->
 
 ![](https://media.giphy.com/media/jjeK2Er3E5igw/giphy.gif)
