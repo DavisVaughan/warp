@@ -15,17 +15,16 @@ License: MIT + file LICENSE
 URL: https://github.com/DavisVaughan/warp,
     https://davisvaughan.github.io/warp/
 BugReports: https://github.com/DavisVaughan/warp/issues
-Depends: 
+Depends:
     R (>= 3.2)
-Suggests: 
+Suggests:
     covr,
     knitr,
     rmarkdown,
     testthat (>= 2.1.0)
-VignetteBuilder: 
+VignetteBuilder:
     knitr
 Config/Needs/website: tidyverse/tidytemplate
 Encoding: UTF-8
-LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
