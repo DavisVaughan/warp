@@ -5,8 +5,6 @@
 
 <!-- badges: start -->
 
-[![Travis build
-status](https://travis-ci.org/DavisVaughan/warp.svg?branch=master)](https://travis-ci.org/DavisVaughan/warp)
 [![Codecov test
 coverage](https://codecov.io/gh/DavisVaughan/warp/branch/master/graph/badge.svg)](https://codecov.io/gh/DavisVaughan/warp?branch=master)
 [![R build
@@ -35,8 +33,8 @@ You can install the development version from
 [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("DavisVaughan/warp")
+# install.packages("pak")
+pak::pak("DavisVaughan/warp")
 ```
 
 ## Example
@@ -99,7 +97,7 @@ tibble::tibble(
   y = y,
   mweek = warp_distance(y, "mweek")
 )
-#> # A tibble: 15 x 2
+#> # A tibble: 15 × 2
 #>    y          mweek
 #>    <date>     <dbl>
 #>  1 1969-12-28    -2

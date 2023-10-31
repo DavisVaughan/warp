@@ -1,6 +1,6 @@
 ---
 output: github_document
-editor_options: 
+editor_options:
   chunk_output_type: console
 ---
 
@@ -18,7 +18,6 @@ knitr::opts_chunk$set(
 # warp
 
 <!-- badges: start -->
-[![Travis build status](https://travis-ci.org/DavisVaughan/warp.svg?branch=master)](https://travis-ci.org/DavisVaughan/warp)
 [![Codecov test coverage](https://codecov.io/gh/DavisVaughan/warp/branch/master/graph/badge.svg)](https://codecov.io/gh/DavisVaughan/warp?branch=master)
 [![R build status](https://github.com/DavisVaughan/warp/workflows/R-CMD-check/badge.svg)](https://github.com/DavisVaughan/warp)
 <!-- badges: end -->
@@ -42,8 +41,8 @@ install.package("warp")
 You can install the development version from [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("DavisVaughan/warp")
+# install.packages("pak")
+pak::pak("DavisVaughan/warp")
 ```
 
 ## Example
