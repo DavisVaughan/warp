@@ -20,6 +20,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -42,7 +44,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -59,8 +61,8 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/DavisVaughan/warp/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/DavisVaughan/warp/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -74,197 +76,236 @@
 
       
 
-      </header><script src="hour_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="hour_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
-<script src="hour_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Hour Distances and Daylight Savings</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/DavisVaughan/warp/blob/master/vignettes/hour.Rmd"><code>vignettes/hour.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/DavisVaughan/warp/blob/HEAD/vignettes/hour.Rmd" class="external-link"><code>vignettes/hour.Rmd</code></a></small>
       <div class="hidden name"><code>hour.Rmd</code></div>
 
     </div>
 
     
     
-<div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/DavisVaughan/warp">warp</a></span><span class="op">)</span></pre></div>
-<p>If using <code>period = "hour"</code>, it should work as expected at all times when using a time zone that doesn’t have daylight savings, like UTC or EST. If using a time zone with DST, like America/New_York, some additional explanation is required, especially when <code>every &gt; 1</code>.</p>
-<div id="spring-forward-gap" class="section level2">
-<h2 class="hasAnchor">
-<a href="#spring-forward-gap" class="anchor"></a>Spring Forward Gap</h2>
-<p>In America/New_York’s time zone, as time was about to reach <code>1970-04-26 02:00:00</code>, daylight savings kicked in and time shifts forward 1 hour so that the next time is actually <code>1970-04-26 03:00:00</code>.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="va">before_dst</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXct</a></span><span class="op">(</span><span class="st">"1970-04-26 01:59:59"</span>, tz <span class="op">=</span> <span class="st">"America/New_York"</span><span class="op">)</span>
-<span class="va">before_dst</span>
-<span class="co">#&gt; [1] "1970-04-26 01:59:59 EST"</span>
-
-<span class="va">before_dst</span> <span class="op">+</span> <span class="fl">1</span>
-<span class="co">#&gt; [1] "1970-04-26 03:00:00 EDT"</span></pre></div>
-<p><code><a href="../reference/warp_distance.html">warp_distance()</a></code> treats hours 1 and 3 as being side by side, since no hour 2 ever existed. This means that hours (0, 1) and (3, 4) get grouped together in the below example.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit">
-<span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXct</a></span><span class="op">(</span><span class="st">"1970-04-26 00:00:00"</span>, tz <span class="op">=</span> <span class="st">"America/New_York"</span><span class="op">)</span> <span class="op">+</span> <span class="fl">3600</span> <span class="op">*</span> <span class="fl">0</span><span class="op">:</span><span class="fl">7</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>
-  x <span class="op">=</span> <span class="va">x</span>,
-  hour <span class="op">=</span> <span class="fu"><a href="../reference/warp_distance.html">warp_distance</a></span><span class="op">(</span><span class="va">x</span>, <span class="st">"hour"</span>, every <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
-<span class="op">)</span>
-<span class="co">#&gt;                     x hour</span>
-<span class="co">#&gt; 1 1970-04-26 00:00:00 1380</span>
-<span class="co">#&gt; 2 1970-04-26 01:00:00 1380</span>
-<span class="co">#&gt; 3 1970-04-26 03:00:00 1381</span>
-<span class="co">#&gt; 4 1970-04-26 04:00:00 1381</span>
-<span class="co">#&gt; 5 1970-04-26 05:00:00 1382</span>
-<span class="co">#&gt; 6 1970-04-26 06:00:00 1382</span>
-<span class="co">#&gt; 7 1970-04-26 07:00:00 1383</span>
-<span class="co">#&gt; 8 1970-04-26 08:00:00 1383</span></pre></div>
-<p>Because <code>period = "hour"</code> just computes the running number of 2 hour periods from the <code>origin</code>, this pattern carries forward into the next day to have a contiguous stream of values. This can be somewhat confusing, since hours 0 and 1 don’t get grouped together on the 27th.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit">
-<span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXct</a></span><span class="op">(</span><span class="st">"1970-04-26 22:00:00"</span>, tz <span class="op">=</span> <span class="st">"America/New_York"</span><span class="op">)</span> <span class="op">+</span> <span class="fl">3600</span> <span class="op">*</span> <span class="fl">0</span><span class="op">:</span><span class="fl">5</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>
-  y <span class="op">=</span> <span class="va">y</span>,
-  hour <span class="op">=</span> <span class="fu"><a href="../reference/warp_distance.html">warp_distance</a></span><span class="op">(</span><span class="va">y</span>, <span class="st">"hour"</span>, every <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
-<span class="op">)</span>
-<span class="co">#&gt;                     y hour</span>
-<span class="co">#&gt; 1 1970-04-26 22:00:00 1390</span>
-<span class="co">#&gt; 2 1970-04-26 23:00:00 1391</span>
-<span class="co">#&gt; 3 1970-04-27 00:00:00 1391</span>
-<span class="co">#&gt; 4 1970-04-27 01:00:00 1392</span>
-<span class="co">#&gt; 5 1970-04-27 02:00:00 1392</span>
-<span class="co">#&gt; 6 1970-04-27 03:00:00 1393</span></pre></div>
-<p>One way that you can sort of get around this is by using lubridate’s <code>force_tz()</code> function to force a UTC time zone with the same clock time as your original date. I’ve mocked up a poor man’s version of that function below.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit">
-<span class="co"># Or call `lubridate::force_tz(x, "UTC")`</span>
-<span class="va">force_utc</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">x_lt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXlt</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
-  <span class="va">x_lt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/class.html">unclass</a></span><span class="op">(</span><span class="va">x_lt</span><span class="op">)</span>
-  
-  <span class="fu"><a href="https://rdrr.io/r/base/attributes.html">attributes</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">NULL</span>
-  
-  <span class="va">out</span> <span class="op">&lt;-</span> <span class="va">x</span> <span class="op">+</span> <span class="va">x_lt</span><span class="op">$</span><span class="va">gmtoff</span>
-  
-  <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXct</a></span><span class="op">(</span><span class="va">out</span>, tz <span class="op">=</span> <span class="st">"UTC"</span>, origin <span class="op">=</span> <span class="st">"1970-01-01"</span><span class="op">)</span>
-<span class="op">}</span>
-
-<span class="va">x_utc</span> <span class="op">&lt;-</span> <span class="fu">force_utc</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
-<span class="va">y_utc</span> <span class="op">&lt;-</span> <span class="fu">force_utc</span><span class="op">(</span><span class="va">y</span><span class="op">)</span>
-
-<span class="va">x_utc</span>
-<span class="co">#&gt; [1] "1970-04-26 00:00:00 UTC" "1970-04-26 01:00:00 UTC"</span>
-<span class="co">#&gt; [3] "1970-04-26 03:00:00 UTC" "1970-04-26 04:00:00 UTC"</span>
-<span class="co">#&gt; [5] "1970-04-26 05:00:00 UTC" "1970-04-26 06:00:00 UTC"</span>
-<span class="co">#&gt; [7] "1970-04-26 07:00:00 UTC" "1970-04-26 08:00:00 UTC"</span></pre></div>
-<p>In UTC, hour 2 exists so groups are created as (0, 1), (2, 3), and so on, even though hour 2 doesn’t actually exist in America/New_York because of the DST gap. This has the affect of limiting the (2, 3) group to a maximum size of 1, since only hour 3 is possible in the data.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>
-  x_utc <span class="op">=</span> <span class="va">x_utc</span>,
-  hour <span class="op">=</span> <span class="fu"><a href="../reference/warp_distance.html">warp_distance</a></span><span class="op">(</span><span class="va">x_utc</span>, <span class="st">"hour"</span>, every <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
-<span class="op">)</span>
-<span class="co">#&gt;                 x_utc hour</span>
-<span class="co">#&gt; 1 1970-04-26 00:00:00 1380</span>
-<span class="co">#&gt; 2 1970-04-26 01:00:00 1380</span>
-<span class="co">#&gt; 3 1970-04-26 03:00:00 1381</span>
-<span class="co">#&gt; 4 1970-04-26 04:00:00 1382</span>
-<span class="co">#&gt; 5 1970-04-26 05:00:00 1382</span>
-<span class="co">#&gt; 6 1970-04-26 06:00:00 1383</span>
-<span class="co">#&gt; 7 1970-04-26 07:00:00 1383</span>
-<span class="co">#&gt; 8 1970-04-26 08:00:00 1384</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>
-  y_utc <span class="op">=</span> <span class="va">y_utc</span>,
-  hour <span class="op">=</span> <span class="fu"><a href="../reference/warp_distance.html">warp_distance</a></span><span class="op">(</span><span class="va">y_utc</span>, <span class="st">"hour"</span>, every <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
-<span class="op">)</span>
-<span class="co">#&gt;                 y_utc hour</span>
-<span class="co">#&gt; 1 1970-04-26 22:00:00 1391</span>
-<span class="co">#&gt; 2 1970-04-26 23:00:00 1391</span>
-<span class="co">#&gt; 3 1970-04-27 00:00:00 1392</span>
-<span class="co">#&gt; 4 1970-04-27 01:00:00 1392</span>
-<span class="co">#&gt; 5 1970-04-27 02:00:00 1393</span>
-<span class="co">#&gt; 6 1970-04-27 03:00:00 1393</span></pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/DavisVaughan/warp" class="external-link">warp</a></span><span class="op">)</span></span></code></pre></div>
+<p>If using <code>period = "hour"</code>, it should work as expected at
+all times when using a time zone that doesn’t have daylight savings,
+like UTC or EST. If using a time zone with DST, like America/New_York,
+some additional explanation is required, especially when
+<code>every &gt; 1</code>.</p>
+<div class="section level2">
+<h2 id="spring-forward-gap">Spring Forward Gap<a class="anchor" aria-label="anchor" href="#spring-forward-gap"></a>
+</h2>
+<p>In America/New_York’s time zone, as time was about to reach
+<code>1970-04-26 02:00:00</code>, daylight savings kicked in and time
+shifts forward 1 hour so that the next time is actually
+<code>1970-04-26 03:00:00</code>.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">before_dst</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"1970-04-26 01:59:59"</span>, tz <span class="op">=</span> <span class="st">"America/New_York"</span><span class="op">)</span></span>
+<span><span class="va">before_dst</span></span>
+<span><span class="co">#&gt; [1] "1970-04-26 01:59:59 EST"</span></span>
+<span></span>
+<span><span class="va">before_dst</span> <span class="op">+</span> <span class="fl">1</span></span>
+<span><span class="co">#&gt; [1] "1970-04-26 03:00:00 EDT"</span></span></code></pre></div>
+<p><code><a href="../reference/warp_distance.html">warp_distance()</a></code> treats hours 1 and 3 as being side by
+side, since no hour 2 ever existed. This means that hours (0, 1) and (3,
+4) get grouped together in the below example.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"1970-04-26 00:00:00"</span>, tz <span class="op">=</span> <span class="st">"America/New_York"</span><span class="op">)</span> <span class="op">+</span> <span class="fl">3600</span> <span class="op">*</span> <span class="fl">0</span><span class="op">:</span><span class="fl">7</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">x</span>,</span>
+<span>  hour <span class="op">=</span> <span class="fu"><a href="../reference/warp_distance.html">warp_distance</a></span><span class="op">(</span><span class="va">x</span>, <span class="st">"hour"</span>, every <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt;                     x hour</span></span>
+<span><span class="co">#&gt; 1 1970-04-26 00:00:00 1380</span></span>
+<span><span class="co">#&gt; 2 1970-04-26 01:00:00 1380</span></span>
+<span><span class="co">#&gt; 3 1970-04-26 03:00:00 1381</span></span>
+<span><span class="co">#&gt; 4 1970-04-26 04:00:00 1381</span></span>
+<span><span class="co">#&gt; 5 1970-04-26 05:00:00 1382</span></span>
+<span><span class="co">#&gt; 6 1970-04-26 06:00:00 1382</span></span>
+<span><span class="co">#&gt; 7 1970-04-26 07:00:00 1383</span></span>
+<span><span class="co">#&gt; 8 1970-04-26 08:00:00 1383</span></span></code></pre></div>
+<p>Because <code>period = "hour"</code> just computes the running number
+of 2 hour periods from the <code>origin</code>, this pattern carries
+forward into the next day to have a contiguous stream of values. This
+can be somewhat confusing, since hours 0 and 1 don’t get grouped
+together on the 27th.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"1970-04-26 22:00:00"</span>, tz <span class="op">=</span> <span class="st">"America/New_York"</span><span class="op">)</span> <span class="op">+</span> <span class="fl">3600</span> <span class="op">*</span> <span class="fl">0</span><span class="op">:</span><span class="fl">5</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  y <span class="op">=</span> <span class="va">y</span>,</span>
+<span>  hour <span class="op">=</span> <span class="fu"><a href="../reference/warp_distance.html">warp_distance</a></span><span class="op">(</span><span class="va">y</span>, <span class="st">"hour"</span>, every <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt;                     y hour</span></span>
+<span><span class="co">#&gt; 1 1970-04-26 22:00:00 1390</span></span>
+<span><span class="co">#&gt; 2 1970-04-26 23:00:00 1391</span></span>
+<span><span class="co">#&gt; 3 1970-04-27 00:00:00 1391</span></span>
+<span><span class="co">#&gt; 4 1970-04-27 01:00:00 1392</span></span>
+<span><span class="co">#&gt; 5 1970-04-27 02:00:00 1392</span></span>
+<span><span class="co">#&gt; 6 1970-04-27 03:00:00 1393</span></span></code></pre></div>
+<p>One way that you can sort of get around this is by using lubridate’s
+<code>force_tz()</code> function to force a UTC time zone with the same
+clock time as your original date. I’ve mocked up a poor man’s version of
+that function below.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Or call `lubridate::force_tz(x, "UTC")`</span></span>
+<span><span class="va">force_utc</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">x_lt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXlt</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">x_lt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">unclass</a></span><span class="op">(</span><span class="va">x_lt</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/attributes.html" class="external-link">attributes</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
+<span>  </span>
+<span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="va">x</span> <span class="op">+</span> <span class="va">x_lt</span><span class="op">$</span><span class="va">gmtoff</span></span>
+<span>  </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="va">out</span>, tz <span class="op">=</span> <span class="st">"UTC"</span>, origin <span class="op">=</span> <span class="st">"1970-01-01"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">x_utc</span> <span class="op">&lt;-</span> <span class="fu">force_utc</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="va">y_utc</span> <span class="op">&lt;-</span> <span class="fu">force_utc</span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">x_utc</span></span>
+<span><span class="co">#&gt; [1] "1970-04-26 00:00:00 UTC" "1970-04-26 01:00:00 UTC"</span></span>
+<span><span class="co">#&gt; [3] "1970-04-26 03:00:00 UTC" "1970-04-26 04:00:00 UTC"</span></span>
+<span><span class="co">#&gt; [5] "1970-04-26 05:00:00 UTC" "1970-04-26 06:00:00 UTC"</span></span>
+<span><span class="co">#&gt; [7] "1970-04-26 07:00:00 UTC" "1970-04-26 08:00:00 UTC"</span></span></code></pre></div>
+<p>In UTC, hour 2 exists so groups are created as (0, 1), (2, 3), and so
+on, even though hour 2 doesn’t actually exist in America/New_York
+because of the DST gap. This has the affect of limiting the (2, 3) group
+to a maximum size of 1, since only hour 3 is possible in the data.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  x_utc <span class="op">=</span> <span class="va">x_utc</span>,</span>
+<span>  hour <span class="op">=</span> <span class="fu"><a href="../reference/warp_distance.html">warp_distance</a></span><span class="op">(</span><span class="va">x_utc</span>, <span class="st">"hour"</span>, every <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt;                 x_utc hour</span></span>
+<span><span class="co">#&gt; 1 1970-04-26 00:00:00 1380</span></span>
+<span><span class="co">#&gt; 2 1970-04-26 01:00:00 1380</span></span>
+<span><span class="co">#&gt; 3 1970-04-26 03:00:00 1381</span></span>
+<span><span class="co">#&gt; 4 1970-04-26 04:00:00 1382</span></span>
+<span><span class="co">#&gt; 5 1970-04-26 05:00:00 1382</span></span>
+<span><span class="co">#&gt; 6 1970-04-26 06:00:00 1383</span></span>
+<span><span class="co">#&gt; 7 1970-04-26 07:00:00 1383</span></span>
+<span><span class="co">#&gt; 8 1970-04-26 08:00:00 1384</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  y_utc <span class="op">=</span> <span class="va">y_utc</span>,</span>
+<span>  hour <span class="op">=</span> <span class="fu"><a href="../reference/warp_distance.html">warp_distance</a></span><span class="op">(</span><span class="va">y_utc</span>, <span class="st">"hour"</span>, every <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt;                 y_utc hour</span></span>
+<span><span class="co">#&gt; 1 1970-04-26 22:00:00 1391</span></span>
+<span><span class="co">#&gt; 2 1970-04-26 23:00:00 1391</span></span>
+<span><span class="co">#&gt; 3 1970-04-27 00:00:00 1392</span></span>
+<span><span class="co">#&gt; 4 1970-04-27 01:00:00 1392</span></span>
+<span><span class="co">#&gt; 5 1970-04-27 02:00:00 1393</span></span>
+<span><span class="co">#&gt; 6 1970-04-27 03:00:00 1393</span></span></code></pre></div>
 </div>
-<div id="fall-backwards-overlap" class="section level2">
-<h2 class="hasAnchor">
-<a href="#fall-backwards-overlap" class="anchor"></a>Fall Backwards Overlap</h2>
-<p>In America/New_York’s time zone, as time was about to reach <code>1970-10-25 02:00:00</code>, daylight savings kicked in and time shifts backwards 1 hour so that the next time is actually <code>1970-10-25 01:00:00</code>. This means there are 2 full hours with an hour value of 1 in that day.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit">
-<span class="va">before_fallback</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXct</a></span><span class="op">(</span><span class="st">"1970-10-25 01:00:00"</span>, tz <span class="op">=</span> <span class="st">"America/New_York"</span><span class="op">)</span>
-<span class="va">before_fallback</span>
-<span class="co">#&gt; [1] "1970-10-25 01:00:00 EDT"</span>
-
-<span class="co"># add 1 hour of seconds</span>
-<span class="va">before_fallback</span> <span class="op">+</span> <span class="fl">3600</span>
-<span class="co">#&gt; [1] "1970-10-25 01:00:00 EST"</span></pre></div>
-<p>Because these are two distinct hours, <code><a href="../reference/warp_distance.html">warp_distance()</a></code> treats them as such, so in the example below a group of (1 EDT, 1 EST) gets created. Since daylight savings is currently active, we also have the situation described above where hour 0 and hour 1 are not grouped together.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit">
-<span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXct</a></span><span class="op">(</span><span class="st">"1970-10-25 00:00:00"</span>, tz <span class="op">=</span> <span class="st">"America/New_York"</span><span class="op">)</span> <span class="op">+</span> <span class="fl">3600</span> <span class="op">*</span> <span class="fl">0</span><span class="op">:</span><span class="fl">7</span>
-<span class="va">x</span>
-<span class="co">#&gt; [1] "1970-10-25 00:00:00 EDT" "1970-10-25 01:00:00 EDT"</span>
-<span class="co">#&gt; [3] "1970-10-25 01:00:00 EST" "1970-10-25 02:00:00 EST"</span>
-<span class="co">#&gt; [5] "1970-10-25 03:00:00 EST" "1970-10-25 04:00:00 EST"</span>
-<span class="co">#&gt; [7] "1970-10-25 05:00:00 EST" "1970-10-25 06:00:00 EST"</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>
-  x <span class="op">=</span> <span class="va">x</span>,
-  hour <span class="op">=</span> <span class="fu"><a href="../reference/warp_distance.html">warp_distance</a></span><span class="op">(</span><span class="va">x</span>, <span class="st">"hour"</span>, every <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
-<span class="op">)</span>
-<span class="co">#&gt;                     x hour</span>
-<span class="co">#&gt; 1 1970-10-25 00:00:00 3563</span>
-<span class="co">#&gt; 2 1970-10-25 01:00:00 3564</span>
-<span class="co">#&gt; 3 1970-10-25 01:00:00 3564</span>
-<span class="co">#&gt; 4 1970-10-25 02:00:00 3565</span>
-<span class="co">#&gt; 5 1970-10-25 03:00:00 3565</span>
-<span class="co">#&gt; 6 1970-10-25 04:00:00 3566</span>
-<span class="co">#&gt; 7 1970-10-25 05:00:00 3566</span>
-<span class="co">#&gt; 8 1970-10-25 06:00:00 3567</span></pre></div>
-<p>This fallback adjustment actually realigns hours 0 and 1 in the next day, since the 25th has 25 hours.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit">
-<span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXct</a></span><span class="op">(</span><span class="st">"1970-10-25 22:00:00"</span>, tz <span class="op">=</span> <span class="st">"America/New_York"</span><span class="op">)</span> <span class="op">+</span> <span class="fl">3600</span> <span class="op">*</span> <span class="fl">0</span><span class="op">:</span><span class="fl">5</span>
-<span class="va">y</span>
-<span class="co">#&gt; [1] "1970-10-25 22:00:00 EST" "1970-10-25 23:00:00 EST"</span>
-<span class="co">#&gt; [3] "1970-10-26 00:00:00 EST" "1970-10-26 01:00:00 EST"</span>
-<span class="co">#&gt; [5] "1970-10-26 02:00:00 EST" "1970-10-26 03:00:00 EST"</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>
-  y <span class="op">=</span> <span class="va">y</span>,
-  hour <span class="op">=</span> <span class="fu"><a href="../reference/warp_distance.html">warp_distance</a></span><span class="op">(</span><span class="va">y</span>, <span class="st">"hour"</span>, every <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
-<span class="op">)</span>
-<span class="co">#&gt;                     y hour</span>
-<span class="co">#&gt; 1 1970-10-25 22:00:00 3575</span>
-<span class="co">#&gt; 2 1970-10-25 23:00:00 3575</span>
-<span class="co">#&gt; 3 1970-10-26 00:00:00 3576</span>
-<span class="co">#&gt; 4 1970-10-26 01:00:00 3576</span>
-<span class="co">#&gt; 5 1970-10-26 02:00:00 3577</span>
-<span class="co">#&gt; 6 1970-10-26 03:00:00 3577</span></pre></div>
-<p>As before, one way to sort of avoid this is to force a UTC time zone.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit">
-<span class="va">x_utc</span> <span class="op">&lt;-</span> <span class="fu">force_utc</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
-<span class="va">x_utc</span>
-<span class="co">#&gt; [1] "1970-10-25 00:00:00 UTC" "1970-10-25 01:00:00 UTC"</span>
-<span class="co">#&gt; [3] "1970-10-25 01:00:00 UTC" "1970-10-25 02:00:00 UTC"</span>
-<span class="co">#&gt; [5] "1970-10-25 03:00:00 UTC" "1970-10-25 04:00:00 UTC"</span>
-<span class="co">#&gt; [7] "1970-10-25 05:00:00 UTC" "1970-10-25 06:00:00 UTC"</span></pre></div>
-<p>The consequences of this are that you have two dates with an hour value of 1. When forced to UTC, these look identical. The groups are as you probably expect with buckets of hours (0, 1), (2, 3), and so on, but now the two dates with hour values of 1 are identical so they fall in the same hour group.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>
-  x_utc <span class="op">=</span> <span class="va">x_utc</span>,
-  hour <span class="op">=</span> <span class="fu"><a href="../reference/warp_distance.html">warp_distance</a></span><span class="op">(</span><span class="va">x_utc</span>, <span class="st">"hour"</span>, every <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
-<span class="op">)</span>
-<span class="co">#&gt;                 x_utc hour</span>
-<span class="co">#&gt; 1 1970-10-25 00:00:00 3564</span>
-<span class="co">#&gt; 2 1970-10-25 01:00:00 3564</span>
-<span class="co">#&gt; 3 1970-10-25 01:00:00 3564</span>
-<span class="co">#&gt; 4 1970-10-25 02:00:00 3565</span>
-<span class="co">#&gt; 5 1970-10-25 03:00:00 3565</span>
-<span class="co">#&gt; 6 1970-10-25 04:00:00 3566</span>
-<span class="co">#&gt; 7 1970-10-25 05:00:00 3566</span>
-<span class="co">#&gt; 8 1970-10-25 06:00:00 3567</span></pre></div>
+<div class="section level2">
+<h2 id="fall-backwards-overlap">Fall Backwards Overlap<a class="anchor" aria-label="anchor" href="#fall-backwards-overlap"></a>
+</h2>
+<p>In America/New_York’s time zone, as time was about to reach
+<code>1970-10-25 02:00:00</code>, daylight savings kicked in and time
+shifts backwards 1 hour so that the next time is actually
+<code>1970-10-25 01:00:00</code>. This means there are 2 full hours with
+an hour value of 1 in that day.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">before_fallback</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"1970-10-25 01:00:00"</span>, tz <span class="op">=</span> <span class="st">"America/New_York"</span><span class="op">)</span></span>
+<span><span class="va">before_fallback</span></span>
+<span><span class="co">#&gt; [1] "1970-10-25 01:00:00 EDT"</span></span>
+<span></span>
+<span><span class="co"># add 1 hour of seconds</span></span>
+<span><span class="va">before_fallback</span> <span class="op">+</span> <span class="fl">3600</span></span>
+<span><span class="co">#&gt; [1] "1970-10-25 01:00:00 EST"</span></span></code></pre></div>
+<p>Because these are two distinct hours, <code><a href="../reference/warp_distance.html">warp_distance()</a></code>
+treats them as such, so in the example below a group of (1 EDT, 1 EST)
+gets created. Since daylight savings is currently active, we also have
+the situation described above where hour 0 and hour 1 are not grouped
+together.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"1970-10-25 00:00:00"</span>, tz <span class="op">=</span> <span class="st">"America/New_York"</span><span class="op">)</span> <span class="op">+</span> <span class="fl">3600</span> <span class="op">*</span> <span class="fl">0</span><span class="op">:</span><span class="fl">7</span></span>
+<span><span class="va">x</span></span>
+<span><span class="co">#&gt; [1] "1970-10-25 00:00:00 EDT" "1970-10-25 01:00:00 EDT"</span></span>
+<span><span class="co">#&gt; [3] "1970-10-25 01:00:00 EST" "1970-10-25 02:00:00 EST"</span></span>
+<span><span class="co">#&gt; [5] "1970-10-25 03:00:00 EST" "1970-10-25 04:00:00 EST"</span></span>
+<span><span class="co">#&gt; [7] "1970-10-25 05:00:00 EST" "1970-10-25 06:00:00 EST"</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">x</span>,</span>
+<span>  hour <span class="op">=</span> <span class="fu"><a href="../reference/warp_distance.html">warp_distance</a></span><span class="op">(</span><span class="va">x</span>, <span class="st">"hour"</span>, every <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt;                     x hour</span></span>
+<span><span class="co">#&gt; 1 1970-10-25 00:00:00 3563</span></span>
+<span><span class="co">#&gt; 2 1970-10-25 01:00:00 3564</span></span>
+<span><span class="co">#&gt; 3 1970-10-25 01:00:00 3564</span></span>
+<span><span class="co">#&gt; 4 1970-10-25 02:00:00 3565</span></span>
+<span><span class="co">#&gt; 5 1970-10-25 03:00:00 3565</span></span>
+<span><span class="co">#&gt; 6 1970-10-25 04:00:00 3566</span></span>
+<span><span class="co">#&gt; 7 1970-10-25 05:00:00 3566</span></span>
+<span><span class="co">#&gt; 8 1970-10-25 06:00:00 3567</span></span></code></pre></div>
+<p>This fallback adjustment actually realigns hours 0 and 1 in the next
+day, since the 25th has 25 hours.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"1970-10-25 22:00:00"</span>, tz <span class="op">=</span> <span class="st">"America/New_York"</span><span class="op">)</span> <span class="op">+</span> <span class="fl">3600</span> <span class="op">*</span> <span class="fl">0</span><span class="op">:</span><span class="fl">5</span></span>
+<span><span class="va">y</span></span>
+<span><span class="co">#&gt; [1] "1970-10-25 22:00:00 EST" "1970-10-25 23:00:00 EST"</span></span>
+<span><span class="co">#&gt; [3] "1970-10-26 00:00:00 EST" "1970-10-26 01:00:00 EST"</span></span>
+<span><span class="co">#&gt; [5] "1970-10-26 02:00:00 EST" "1970-10-26 03:00:00 EST"</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  y <span class="op">=</span> <span class="va">y</span>,</span>
+<span>  hour <span class="op">=</span> <span class="fu"><a href="../reference/warp_distance.html">warp_distance</a></span><span class="op">(</span><span class="va">y</span>, <span class="st">"hour"</span>, every <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt;                     y hour</span></span>
+<span><span class="co">#&gt; 1 1970-10-25 22:00:00 3575</span></span>
+<span><span class="co">#&gt; 2 1970-10-25 23:00:00 3575</span></span>
+<span><span class="co">#&gt; 3 1970-10-26 00:00:00 3576</span></span>
+<span><span class="co">#&gt; 4 1970-10-26 01:00:00 3576</span></span>
+<span><span class="co">#&gt; 5 1970-10-26 02:00:00 3577</span></span>
+<span><span class="co">#&gt; 6 1970-10-26 03:00:00 3577</span></span></code></pre></div>
+<p>As before, one way to sort of avoid this is to force a UTC time
+zone.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">x_utc</span> <span class="op">&lt;-</span> <span class="fu">force_utc</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="va">x_utc</span></span>
+<span><span class="co">#&gt; [1] "1970-10-25 00:00:00 UTC" "1970-10-25 01:00:00 UTC"</span></span>
+<span><span class="co">#&gt; [3] "1970-10-25 01:00:00 UTC" "1970-10-25 02:00:00 UTC"</span></span>
+<span><span class="co">#&gt; [5] "1970-10-25 03:00:00 UTC" "1970-10-25 04:00:00 UTC"</span></span>
+<span><span class="co">#&gt; [7] "1970-10-25 05:00:00 UTC" "1970-10-25 06:00:00 UTC"</span></span></code></pre></div>
+<p>The consequences of this are that you have two dates with an hour
+value of 1. When forced to UTC, these look identical. The groups are as
+you probably expect with buckets of hours (0, 1), (2, 3), and so on, but
+now the two dates with hour values of 1 are identical so they fall in
+the same hour group.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  x_utc <span class="op">=</span> <span class="va">x_utc</span>,</span>
+<span>  hour <span class="op">=</span> <span class="fu"><a href="../reference/warp_distance.html">warp_distance</a></span><span class="op">(</span><span class="va">x_utc</span>, <span class="st">"hour"</span>, every <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt;                 x_utc hour</span></span>
+<span><span class="co">#&gt; 1 1970-10-25 00:00:00 3564</span></span>
+<span><span class="co">#&gt; 2 1970-10-25 01:00:00 3564</span></span>
+<span><span class="co">#&gt; 3 1970-10-25 01:00:00 3564</span></span>
+<span><span class="co">#&gt; 4 1970-10-25 02:00:00 3565</span></span>
+<span><span class="co">#&gt; 5 1970-10-25 03:00:00 3565</span></span>
+<span><span class="co">#&gt; 6 1970-10-25 04:00:00 3566</span></span>
+<span><span class="co">#&gt; 7 1970-10-25 05:00:00 3566</span></span>
+<span><span class="co">#&gt; 8 1970-10-25 06:00:00 3567</span></span></code></pre></div>
 </div>
-<div id="conclusion" class="section level2">
-<h2 class="hasAnchor">
-<a href="#conclusion" class="anchor"></a>Conclusion</h2>
-<p>While the implementation of <code>period = "hour"</code> is <em>technically</em> correct, I recognize that it isn’t the most intuitive operation. More intuitive would be a period value of <code>"dhour"</code>, which would correspond to the “hour of the day”. This would count the number of hour groups from the origin, like <code>"hour"</code> does, but it would reset the <code>every</code>-hour counter every time you enter a new day. However, this has proved to be challenging to code up, but I hope to incorporate this eventually.</p>
+<div class="section level2">
+<h2 id="conclusion">Conclusion<a class="anchor" aria-label="anchor" href="#conclusion"></a>
+</h2>
+<p>While the implementation of <code>period = "hour"</code> is
+<em>technically</em> correct, I recognize that it isn’t the most
+intuitive operation. More intuitive would be a period value of
+<code>"dhour"</code>, which would correspond to the “hour of the day”.
+This would count the number of hour groups from the origin, like
+<code>"hour"</code> does, but it would reset the <code>every</code>-hour
+counter every time you enter a new day. However, this has proved to be
+challenging to code up, but I hope to incorporate this eventually.</p>
 </div>
   </div>
 
@@ -279,11 +320,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Davis Vaughan.</p>
+  <p></p>
+<p>Developed by Davis Vaughan.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
@@ -291,6 +334,8 @@
 
   
 
+
+  
 
   </body>
 </html>
