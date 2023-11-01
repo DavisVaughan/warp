@@ -2,8 +2,8 @@ Package: warp
 Title: Group Dates
 Version: 0.2.0.9000
 Authors@R: c(
-    person("Davis", "Vaughan", , "davis@rstudio.com", role = c("aut", "cre")),
-    person("RStudio", role = "cph")
+    person("Davis", "Vaughan", , "davis@posit.co", role = c("aut", "cre")),
+    person("Posit Software, PBC", role = c("cph", "fnd"))
   )
 Description: Tooling to group dates by a variety of periods including:
     yearly, monthly, by second, by week of the month, and more.  The
