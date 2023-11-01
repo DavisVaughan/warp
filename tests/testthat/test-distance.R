@@ -1597,13 +1597,16 @@ test_that("can handle `every` with altered origin - numeric POSIXct", {
   expect_equal(warp_distance(x, period = "day", every = 4L, origin = origin), c(-1, -1, -1, -1, 0, 0, 0))
 })
 
-test_that("`as.POSIXlt()` keeps us from handling fractional negative seconds correctly on linux", {
-  skip_on_os(c("linux", "solaris")) # maybe solaris? being safe
+test_that("fractional negative seconds are handled correctly", {
+  # Since we don't test all R-devel versions in CI, lets be extra safe here and
+  # just not run this on CRAN
+  skip_on_cran()
+  skip_if(getRversion() < "4.4.0", "Used to be broken on everything except Linux")
 
-  # Base R printing is wrong, because as.POSIXlt() is wrong
+  # `as.POSIXlt()` was wrong on (except on Linux, I think) until this was fixed:
   # https://bugs.r-project.org/bugzilla/show_bug.cgi?id=17667
 
-  # I don't care what base R prints this as, this is supposed to be:
+  # If working correctly, this should print as:
   # "1969-12-31T23:59:59.5"
   x <- .POSIXct(-0.5, "UTC")
 
@@ -1611,15 +1614,10 @@ test_that("`as.POSIXlt()` keeps us from handling fractional negative seconds cor
   # "1969-12-30T23:59:59.5"
   y <- .POSIXct(-86400.5, "UTC")
 
-  # But `as.POSIXlt()` gives the wrong result by ignoring the negative
+  # `as.POSIXlt()` used to give the wrong result by ignoring the negative
   # fractional part
-  expect_failure(
-    expect_identical(warp_distance(x, "day"), -1)
-  )
-
-  expect_failure(
-    expect_identical(warp_distance(y, "day"), -2)
-  )
+  expect_identical(warp_distance(x, "day"), -1)
+  expect_identical(warp_distance(y, "day"), -2)
 })
 
 test_that("DST is respected", {
