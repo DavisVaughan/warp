@@ -1,4 +1,4 @@
-# warp (development version)
+# warp 0.2.1
 
 * Fixed a test related to an R-devel bugfix in `as.POSIXlt()` (#36).
 
