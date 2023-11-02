@@ -1,22 +1,23 @@
 # Platform
 
-|field    |value                        |
-|:--------|:----------------------------|
-|version  |R version 4.0.0 (2020-04-24) |
-|os       |macOS Mojave 10.14.6         |
-|system   |x86_64, darwin17.0           |
-|ui       |RStudio                      |
-|language |(EN)                         |
-|collate  |en_US.UTF-8                  |
-|ctype    |en_US.UTF-8                  |
-|tz       |America/New_York             |
-|date     |2020-10-21                   |
+|field    |value                                      |
+|:--------|:------------------------------------------|
+|version  |R version 4.3.1 (2023-06-16)               |
+|os       |macOS Ventura 13.6                         |
+|system   |aarch64, darwin20                          |
+|ui       |X11                                        |
+|language |(EN)                                       |
+|collate  |en_US.UTF-8                                |
+|ctype    |en_US.UTF-8                                |
+|tz       |America/New_York                           |
+|date     |2023-11-02                                 |
+|pandoc   |3.1.6 @ /opt/homebrew/bin/ (via rmarkdown) |
 
 # Dependencies
 
 |package |old   |new        |Δ  |
 |:-------|:-----|:----------|:--|
-|warp    |0.1.0 |0.1.0.9000 |*  |
+|warp    |0.2.0 |0.2.0.9000 |*  |
 
 # Revdeps
 
