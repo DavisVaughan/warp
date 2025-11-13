@@ -7,7 +7,7 @@
 
 [![R-CMD-check](https://github.com/DavisVaughan/warp/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/DavisVaughan/warp/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
-coverage](https://codecov.io/gh/DavisVaughan/warp/branch/main/graph/badge.svg)](https://app.codecov.io/gh/DavisVaughan/warp?branch=main)
+coverage](https://codecov.io/gh/DavisVaughan/warp/graph/badge.svg)](https://app.codecov.io/gh/DavisVaughan/warp)
 <!-- badges: end -->
 
 ![](https://media.giphy.com/media/jjeK2Er3E5igw/giphy.gif)
