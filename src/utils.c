@@ -259,17 +259,25 @@ void __attribute__((noreturn)) never_reached(const char* fn) {
 
 // -----------------------------------------------------------------------------
 
+#if R_VERSION < R_Version(4, 5, 0)
 static SEXP r_env_get(SEXP env, SEXP sym) {
-  SEXP obj = PROTECT(Rf_findVarInFrame3(env, sym, FALSE));
+  SEXP out = Rf_findVarInFrame3(env, sym, FALSE);
 
-  // Force lazy loaded bindings
-  if (TYPEOF(obj) == PROMSXP) {
-    obj = Rf_eval(obj, R_BaseEnv);
+  if (out == R_UnboundValue) {
+    Rf_errorcall(R_NilValue, "object not found");
   }
 
-  UNPROTECT(1);
-  return obj;
+  if (TYPEOF(out) == PROMSXP) {
+    return Rf_eval(out, R_BaseEnv);
+  }
+
+  return out;
 }
+#else
+static SEXP r_env_get(SEXP env, SEXP sym) {
+  return R_getVar(sym, env, FALSE);
+}
+#endif
 
 // [[ include("utils.h") ]]
 SEXP r_maybe_duplicate(SEXP x) {
