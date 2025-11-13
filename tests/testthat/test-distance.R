@@ -30,13 +30,10 @@ test_that("Date + non-UTC origin converts with a warning", {
   )
   origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
 
-  expect_identical(
-    expect_warning(
-      warp_distance(x, "year", origin = origin),
-      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
-    ),
-    warp_distance(x_with_tz, "year", origin = origin)
-  )
+  expect_snapshot({
+    out <- warp_distance(x, "year", origin = origin)
+  })
+  expect_identical(out, warp_distance(x_with_tz, "year", origin = origin))
 })
 
 test_that("can use integer Dates", {
@@ -174,13 +171,10 @@ test_that("UTC POSIXct + non-UTC origin converts with a warning", {
   x_with_tz <- structure(x, tzone = "America/New_York")
   origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
 
-  expect_identical(
-    expect_warning(
-      warp_distance(x, "year", origin = origin),
-      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
-    ),
-    warp_distance(x_with_tz, "year", origin = origin)
-  )
+  expect_snapshot({
+    out <- warp_distance(x, "year", origin = origin)
+  })
+  expect_identical(out, warp_distance(x_with_tz, "year", origin = origin))
 })
 
 test_that("local time POSIXct + UTC origin converts with a warning", {
@@ -188,10 +182,10 @@ test_that("local time POSIXct + UTC origin converts with a warning", {
     x <- as.POSIXct("1970-12-31 23:00:00") # in UTC this is in 1971
     origin <- as.POSIXct("1971-01-01", tz = "UTC")
 
-    expect_identical(
-      expect_warning(warp_distance(x, "year", origin = origin)),
-      0
-    )
+    expect_snapshot({
+      out <- warp_distance(x, "year", origin = origin)
+    })
+    expect_identical(out, 0)
   })
 })
 
@@ -387,13 +381,10 @@ test_that("Date + non-UTC origin converts with a warning", {
   )
   origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
 
-  expect_identical(
-    expect_warning(
-      warp_distance(x, "month", origin = origin),
-      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
-    ),
-    warp_distance(x_with_tz, "month", origin = origin)
-  )
+  expect_snapshot({
+    out <- warp_distance(x, "month", origin = origin)
+  })
+  expect_identical(out, warp_distance(x_with_tz, "month", origin = origin))
 })
 
 test_that("can use integer Dates", {
@@ -526,13 +517,10 @@ test_that("UTC POSIXct + non-UTC origin converts with a warning", {
   x_with_tz <- structure(x, tzone = "America/New_York")
   origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
 
-  expect_identical(
-    expect_warning(
-      warp_distance(x, "month", origin = origin),
-      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
-    ),
-    warp_distance(x_with_tz, "month", origin = origin)
-  )
+  expect_snapshot({
+    out <- warp_distance(x, "month", origin = origin)
+  })
+  expect_identical(out, warp_distance(x_with_tz, "month", origin = origin))
 })
 
 test_that("local time POSIXct + UTC origin converts with a warning", {
@@ -540,10 +528,10 @@ test_that("local time POSIXct + UTC origin converts with a warning", {
     x <- as.POSIXct("1970-12-31 23:00:00") # in UTC this is in 1971-01
     origin <- as.POSIXct("1971-01-01", tz = "UTC")
 
-    expect_identical(
-      expect_warning(warp_distance(x, "month", origin = origin)),
-      0
-    )
+    expect_snapshot({
+      out <- warp_distance(x, "month", origin = origin)
+    })
+    expect_identical(out, 0)
   })
 })
 
@@ -701,13 +689,10 @@ test_that("Date + non-UTC origin converts with a warning", {
   )
   origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
 
-  expect_identical(
-    expect_warning(
-      warp_distance(x, "yweek", origin = origin),
-      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
-    ),
-    warp_distance(x_with_tz, "yweek", origin = origin)
-  )
+  expect_snapshot({
+    out <- warp_distance(x, "yweek", origin = origin)
+  })
+  expect_identical(out, warp_distance(x_with_tz, "yweek", origin = origin))
 })
 
 test_that("can use integer Dates", {
@@ -1039,13 +1024,10 @@ test_that("UTC POSIXct + non-UTC origin converts with a warning", {
   x_with_tz <- structure(x, tzone = "America/New_York")
   origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
 
-  expect_identical(
-    expect_warning(
-      warp_distance(x, "yweek", origin = origin),
-      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
-    ),
-    warp_distance(x_with_tz, "yweek", origin = origin)
-  )
+  expect_snapshot({
+    out <- warp_distance(x, "yweek", origin = origin)
+  })
+  expect_identical(out, warp_distance(x_with_tz, "yweek", origin = origin))
 })
 
 test_that("local time POSIXct + UTC origin converts with a warning", {
@@ -1053,10 +1035,10 @@ test_that("local time POSIXct + UTC origin converts with a warning", {
     x <- as.POSIXct("1970-12-31 23:00:00") # in UTC this is in 1971-01
     origin <- as.POSIXct("1971-01-01", tz = "UTC")
 
-    expect_identical(
-      expect_warning(warp_distance(x, "yweek", origin = origin)),
-      0
-    )
+    expect_snapshot({
+      out <- warp_distance(x, "yweek", origin = origin)
+    })
+    expect_identical(out, 0)
   })
 })
 
@@ -1386,13 +1368,10 @@ test_that("Date + non-UTC origin converts with a warning", {
   )
   origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
 
-  expect_identical(
-    expect_warning(
-      warp_distance(x, "mday", origin = origin),
-      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
-    ),
-    warp_distance(x_with_tz, "mday", origin = origin)
-  )
+  expect_snapshot({
+    out <- warp_distance(x, "mday", origin = origin)
+  })
+  expect_identical(out, warp_distance(x_with_tz, "mday", origin = origin))
 })
 
 test_that("can use integer Dates", {
@@ -1578,13 +1557,10 @@ test_that("UTC POSIXct + non-UTC origin converts with a warning", {
   x_with_tz <- structure(x, tzone = "America/New_York")
   origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
 
-  expect_identical(
-    expect_warning(
-      warp_distance(x, "mday", origin = origin),
-      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
-    ),
-    warp_distance(x_with_tz, "mday", origin = origin)
-  )
+  expect_snapshot({
+    out <- warp_distance(x, "mday", origin = origin)
+  })
+  expect_identical(out, warp_distance(x_with_tz, "mday", origin = origin))
 })
 
 test_that("local time POSIXct + UTC origin converts with a warning", {
@@ -1592,10 +1568,10 @@ test_that("local time POSIXct + UTC origin converts with a warning", {
     x <- as.POSIXct("1970-12-31 23:00:00") # in UTC this is in 1971-01
     origin <- as.POSIXct("1971-01-01", tz = "UTC")
 
-    expect_identical(
-      expect_warning(warp_distance(x, "mday", origin = origin)),
-      0
-    )
+    expect_snapshot({
+      out <- warp_distance(x, "mday", origin = origin)
+    })
+    expect_identical(out, 0)
   })
 })
 
@@ -1782,13 +1758,10 @@ test_that("Date + non-UTC origin converts with a warning", {
   )
   origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
 
-  expect_identical(
-    expect_warning(
-      warp_distance(x, "day", origin = origin),
-      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
-    ),
-    warp_distance(x_with_tz, "day", origin = origin)
-  )
+  expect_snapshot({
+    out <- warp_distance(x, "day", origin = origin)
+  })
+  expect_identical(out, warp_distance(x_with_tz, "day", origin = origin))
 })
 
 test_that("can use integer Dates", {
@@ -2019,13 +1992,10 @@ test_that("UTC POSIXct + non-UTC origin converts with a warning", {
   x_with_tz <- structure(x, tzone = "America/New_York")
   origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
 
-  expect_identical(
-    expect_warning(
-      warp_distance(x, "day", origin = origin),
-      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
-    ),
-    warp_distance(x_with_tz, "day", origin = origin)
-  )
+  expect_snapshot({
+    out <- warp_distance(x, "day", origin = origin)
+  })
+  expect_identical(out, warp_distance(x_with_tz, "day", origin = origin))
 })
 
 test_that("local time POSIXct + UTC origin converts with a warning", {
@@ -2033,10 +2003,10 @@ test_that("local time POSIXct + UTC origin converts with a warning", {
     x <- as.POSIXct("1970-12-31 23:00:00") # in UTC this is in 1971-01-01
     origin <- as.POSIXct("1971-01-01", tz = "UTC")
 
-    expect_identical(
-      expect_warning(warp_distance(x, "day", origin = origin)),
-      0
-    )
+    expect_snapshot({
+      out <- warp_distance(x, "day", origin = origin)
+    })
+    expect_identical(out, 0)
   })
 })
 
@@ -2274,13 +2244,10 @@ test_that("Date + non-UTC origin converts with a warning", {
   )
   origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
 
-  expect_identical(
-    expect_warning(
-      warp_distance(x, "hour", origin = origin),
-      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
-    ),
-    warp_distance(x_with_tz, "hour", origin = origin)
-  )
+  expect_snapshot({
+    out <- warp_distance(x, "hour", origin = origin)
+  })
+  expect_identical(out, warp_distance(x_with_tz, "hour", origin = origin))
 })
 
 test_that("can use integer Dates", {
@@ -2521,13 +2488,10 @@ test_that("UTC POSIXct + non-UTC origin converts with a warning", {
   x_with_tz <- structure(x, tzone = "America/New_York")
   origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
 
-  expect_identical(
-    expect_warning(
-      warp_distance(x, "hour", origin = origin),
-      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
-    ),
-    warp_distance(x_with_tz, "hour", origin = origin)
-  )
+  expect_snapshot({
+    out <- warp_distance(x, "hour", origin = origin)
+  })
+  expect_identical(out, warp_distance(x_with_tz, "hour", origin = origin))
 })
 
 test_that("local time POSIXct + UTC origin converts with a warning", {
@@ -2535,10 +2499,10 @@ test_that("local time POSIXct + UTC origin converts with a warning", {
     x <- as.POSIXct("1970-12-31 23:00:00") # in UTC this is in 1971-01-01 04:00:00
     origin <- as.POSIXct("1971-01-01", tz = "UTC")
 
-    expect_identical(
-      expect_warning(warp_distance(x, "hour", origin = origin)),
-      4
-    )
+    expect_snapshot({
+      out <- warp_distance(x, "hour", origin = origin)
+    })
+    expect_identical(out, 4)
   })
 })
 
@@ -2857,13 +2821,10 @@ test_that("Date + non-UTC origin converts with a warning", {
   )
   origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
 
-  expect_identical(
-    expect_warning(
-      warp_distance(x, "minute", origin = origin),
-      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
-    ),
-    warp_distance(x_with_tz, "minute", origin = origin)
-  )
+  expect_snapshot({
+    out <- warp_distance(x, "minute", origin = origin)
+  })
+  expect_identical(out, warp_distance(x_with_tz, "minute", origin = origin))
 })
 
 test_that("can use integer Dates", {
@@ -3099,13 +3060,10 @@ test_that("UTC POSIXct + non-UTC origin converts with a warning", {
   x_with_tz <- structure(x, tzone = "America/New_York")
   origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
 
-  expect_identical(
-    expect_warning(
-      warp_distance(x, "minute", origin = origin),
-      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
-    ),
-    warp_distance(x_with_tz, "minute", origin = origin)
-  )
+  expect_snapshot({
+    out <- warp_distance(x, "minute", origin = origin)
+  })
+  expect_identical(out, warp_distance(x_with_tz, "minute", origin = origin))
 })
 
 test_that("local time POSIXct + UTC origin converts with a warning", {
@@ -3113,10 +3071,10 @@ test_that("local time POSIXct + UTC origin converts with a warning", {
     x <- as.POSIXct("1970-12-31 23:00:00") # in UTC this is in 1971-01-01 04:00:00
     origin <- as.POSIXct("1971-01-01", tz = "UTC")
 
-    expect_identical(
-      expect_warning(warp_distance(x, "minute", origin = origin)),
-      240 # 4 hr * 60 min
-    )
+    expect_snapshot({
+      out <- warp_distance(x, "minute", origin = origin)
+    })
+    expect_identical(out, 240) # 4 hr * 60 min
   })
 })
 
@@ -3353,13 +3311,10 @@ test_that("Date + non-UTC origin converts with a warning", {
   )
   origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
 
-  expect_identical(
-    expect_warning(
-      warp_distance(x, "second", origin = origin),
-      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
-    ),
-    warp_distance(x_with_tz, "second", origin = origin)
-  )
+  expect_snapshot({
+    out <- warp_distance(x, "second", origin = origin)
+  })
+  expect_identical(out, warp_distance(x_with_tz, "second", origin = origin))
 })
 
 test_that("can use integer Dates", {
@@ -3600,13 +3555,10 @@ test_that("UTC POSIXct + non-UTC origin converts with a warning", {
   x_with_tz <- structure(x, tzone = "America/New_York")
   origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
 
-  expect_identical(
-    expect_warning(
-      warp_distance(x, "second", origin = origin),
-      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
-    ),
-    warp_distance(x_with_tz, "second", origin = origin)
-  )
+  expect_snapshot({
+    out <- warp_distance(x, "second", origin = origin)
+  })
+  expect_identical(out, warp_distance(x_with_tz, "second", origin = origin))
 })
 
 test_that("local time POSIXct + UTC origin converts with a warning", {
@@ -3614,10 +3566,10 @@ test_that("local time POSIXct + UTC origin converts with a warning", {
     x <- as.POSIXct("1970-12-31 23:00:00") # in UTC this is in 1971-01-01 04:00:00
     origin <- as.POSIXct("1971-01-01", tz = "UTC")
 
-    expect_identical(
-      expect_warning(warp_distance(x, "second", origin = origin)),
-      14400 # 4 hr * 60 min * 60 sec
-    )
+    expect_snapshot({
+      out <- warp_distance(x, "second", origin = origin)
+    })
+    expect_identical(out, 14400) # 4 hr * 60 min * 60 sec
   })
 })
 
@@ -3856,11 +3808,11 @@ test_that("Date + non-UTC origin converts with a warning", {
   )
   origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
 
+  expect_snapshot({
+    out <- warp_distance(x, "millisecond", origin = origin)
+  })
   expect_identical(
-    expect_warning(
-      warp_distance(x, "millisecond", origin = origin),
-      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
-    ),
+    out,
     warp_distance(x_with_tz, "millisecond", origin = origin)
   )
 })
@@ -4133,11 +4085,11 @@ test_that("UTC POSIXct + non-UTC origin converts with a warning", {
   x_with_tz <- structure(x, tzone = "America/New_York")
   origin <- as.POSIXct("1971-01-01", tz = "America/New_York")
 
+  expect_snapshot({
+    out <- warp_distance(x, "millisecond", origin = origin)
+  })
   expect_identical(
-    expect_warning(
-      warp_distance(x, "millisecond", origin = origin),
-      "`x` [(]UTC[)] and `origin` [(]America/New_York[)]"
-    ),
+    out,
     warp_distance(x_with_tz, "millisecond", origin = origin)
   )
 })
@@ -4147,10 +4099,10 @@ test_that("local time POSIXct + UTC origin converts with a warning", {
     x <- as.POSIXct("1970-12-31 23:00:00") # in UTC this is in 1971-01-01 04:00:00
     origin <- as.POSIXct("1971-01-01", tz = "UTC")
 
-    expect_identical(
-      expect_warning(warp_distance(x, "millisecond", origin = origin)),
-      14400 * 1000 # 4 hr * 60 min * 60 sec * 1000 milliseconds
-    )
+    expect_snapshot({
+      out <- warp_distance(x, "millisecond", origin = origin)
+    })
+    expect_identical(out, 14400 * 1000) # 4 hr * 60 min * 60 sec * 1000 milliseconds
   })
 })
 

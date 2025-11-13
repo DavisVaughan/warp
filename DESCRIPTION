@@ -3,7 +3,8 @@ Title: Group Dates
 Version: 0.2.1.9000
 Authors@R: c(
     person("Davis", "Vaughan", , "davis@posit.co", role = c("aut", "cre")),
-    person("Posit Software, PBC", role = c("cph", "fnd"))
+    person("Posit Software, PBC", role = c("cph", "fnd"),
+           comment = c(ROR = "03wc8by49"))
   )
 Description: Tooling to group dates by a variety of periods including:
     yearly, monthly, by second, by week of the month, and more.  The
@@ -26,6 +27,8 @@ VignetteBuilder:
     knitr
 Config/build/compilation-database: true
 Config/Needs/website: tidyverse/tidytemplate
+Config/testthat/edition: 3
+Config/usethis/last-upkeep: 2025-11-13
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.3
