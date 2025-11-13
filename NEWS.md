@@ -1,5 +1,7 @@
 # warp (development version)
 
+* R >=4.0.0 is now required.
+
 # warp 0.2.1
 
 * Fixed a test related to an R-devel bugfix in `as.POSIXlt()` (#36).
