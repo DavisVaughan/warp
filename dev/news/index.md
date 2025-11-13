@@ -2,6 +2,9 @@
 
 ## warp (development version)
 
+- warp is now compliant with R’s C API
+  ([\#39](https://github.com/DavisVaughan/warp/issues/39)).
+
 - R \>=4.0.0 is now required.
 
 ## warp 0.2.1
