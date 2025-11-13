@@ -50,13 +50,15 @@
 #'
 #' # Also include last location
 #' warp_change(x, period = "yday", every = 2, last = FALSE, endpoint = TRUE)
-warp_change <- function(x,
-                        period,
-                        ...,
-                        every = 1L,
-                        origin = NULL,
-                        last = TRUE,
-                        endpoint = FALSE) {
+warp_change <- function(
+  x,
+  period,
+  ...,
+  every = 1L,
+  origin = NULL,
+  last = TRUE,
+  endpoint = FALSE
+) {
   check_dots_empty("warp_change", ...)
   .Call(warp_warp_change, x, period, every, origin, last, endpoint)
 }

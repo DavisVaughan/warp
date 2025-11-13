@@ -208,11 +208,7 @@
 #'   mweek = warp_distance(x, "mweek")
 #' )
 #'
-warp_distance <- function(x,
-                          period,
-                          ...,
-                          every = 1L,
-                          origin = NULL) {
+warp_distance <- function(x, period, ..., every = 1L, origin = NULL) {
   check_dots_empty("warp_distance", ...)
   .Call(warp_warp_distance, x, period, every, origin)
 }

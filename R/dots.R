@@ -11,7 +11,9 @@ check_dots_empty <- function(fn, ...) {
   }
 
   msg <- paste0(
-    "`...` is not empty in `", fn, "()`.\n",
+    "`...` is not empty in `",
+    fn,
+    "()`.\n",
     "These dots only exist to allow for future extensions and should be empty.\n",
     "Did you misspecify an argument?"
   )

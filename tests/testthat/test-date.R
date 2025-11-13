@@ -70,7 +70,9 @@ test_that("can get the year offset of a value close to the minimum integer value
 })
 
 test_that("going below the minimum allowed date is an error", {
-  minimum_allowed_date_minus_one <- -.Machine$integer.max + unclass(as.Date("2001-01-01")) - 1L
+  minimum_allowed_date_minus_one <- -.Machine$integer.max +
+    unclass(as.Date("2001-01-01")) -
+    1L
 
   x <- structure(minimum_allowed_date_minus_one, class = "Date")
 
