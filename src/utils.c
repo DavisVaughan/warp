@@ -40,7 +40,7 @@ SEXP warp_class_type(SEXP x) {
 }
 
 enum warp_class_type time_class_type(SEXP x) {
-  if (!OBJECT(x)) {
+  if (!Rf_isObject(x)) {
     return warp_class_unknown;
   }
 
@@ -92,7 +92,7 @@ int pull_every(SEXP every) {
     r_error("pull_every", "`every` must have size 1, not %i", Rf_length(every));
   }
 
-  if (OBJECT(every) != 0) {
+  if (Rf_isObject(every) != 0) {
     r_error("pull_every", "`every` must be a bare integer-ish value.");
   }
 
@@ -111,7 +111,7 @@ bool pull_endpoint(SEXP endpoint) {
     r_error("pull_endpoint", "`endpoint` must have size 1, not %i", Rf_length(endpoint));
   }
 
-  if (OBJECT(endpoint) != 0) {
+  if (Rf_isObject(endpoint) != 0) {
     r_error("pull_endpoint", "`endpoint` must be a bare logical value.");
   }
 
@@ -129,7 +129,7 @@ bool pull_last(SEXP last) {
     r_error("pull_last", "`last` must have size 1, not %i", Rf_length(last));
   }
 
-  if (OBJECT(last) != 0) {
+  if (Rf_isObject(last) != 0) {
     r_error("pull_last", "`last` must be a bare logical value.");
   }
 
