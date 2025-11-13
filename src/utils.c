@@ -53,7 +53,7 @@ enum warp_class_type time_class_type(SEXP x) {
 
 static enum warp_class_type time_class_type_impl(SEXP klass) {
   int n = Rf_length(klass);
-  SEXP const* p_klass = STRING_PTR(klass);
+  SEXP const* p_klass = STRING_PTR_RO(klass);
 
   p_klass += n - 2;
   SEXP butlast = *p_klass++;
