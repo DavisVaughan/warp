@@ -40,7 +40,7 @@ SEXP warp_class_type(SEXP x) {
 }
 
 enum warp_class_type time_class_type(SEXP x) {
-  if (!OBJECT(x)) {
+  if (!Rf_isObject(x)) {
     return warp_class_unknown;
   }
 
@@ -53,7 +53,7 @@ enum warp_class_type time_class_type(SEXP x) {
 
 static enum warp_class_type time_class_type_impl(SEXP klass) {
   int n = Rf_length(klass);
-  SEXP const* p_klass = STRING_PTR(klass);
+  SEXP const* p_klass = STRING_PTR_RO(klass);
 
   p_klass += n - 2;
   SEXP butlast = *p_klass++;
@@ -92,7 +92,7 @@ int pull_every(SEXP every) {
     r_error("pull_every", "`every` must have size 1, not %i", Rf_length(every));
   }
 
-  if (OBJECT(every) != 0) {
+  if (Rf_isObject(every) != 0) {
     r_error("pull_every", "`every` must be a bare integer-ish value.");
   }
 
@@ -111,7 +111,7 @@ bool pull_endpoint(SEXP endpoint) {
     r_error("pull_endpoint", "`endpoint` must have size 1, not %i", Rf_length(endpoint));
   }
 
-  if (OBJECT(endpoint) != 0) {
+  if (Rf_isObject(endpoint) != 0) {
     r_error("pull_endpoint", "`endpoint` must be a bare logical value.");
   }
 
@@ -129,7 +129,7 @@ bool pull_last(SEXP last) {
     r_error("pull_last", "`last` must have size 1, not %i", Rf_length(last));
   }
 
-  if (OBJECT(last) != 0) {
+  if (Rf_isObject(last) != 0) {
     r_error("pull_last", "`last` must be a bare logical value.");
   }
 
@@ -259,17 +259,25 @@ void __attribute__((noreturn)) never_reached(const char* fn) {
 
 // -----------------------------------------------------------------------------
 
+#if R_VERSION < R_Version(4, 5, 0)
 static SEXP r_env_get(SEXP env, SEXP sym) {
-  SEXP obj = PROTECT(Rf_findVarInFrame3(env, sym, FALSE));
+  SEXP out = Rf_findVarInFrame3(env, sym, FALSE);
 
-  // Force lazy loaded bindings
-  if (TYPEOF(obj) == PROMSXP) {
-    obj = Rf_eval(obj, R_BaseEnv);
+  if (out == R_UnboundValue) {
+    Rf_errorcall(R_NilValue, "object not found");
   }
 
-  UNPROTECT(1);
-  return obj;
+  if (TYPEOF(out) == PROMSXP) {
+    return Rf_eval(out, R_BaseEnv);
+  }
+
+  return out;
 }
+#else
+static SEXP r_env_get(SEXP env, SEXP sym) {
+  return R_getVar(sym, env, FALSE);
+}
+#endif
 
 // [[ include("utils.h") ]]
 SEXP r_maybe_duplicate(SEXP x) {
