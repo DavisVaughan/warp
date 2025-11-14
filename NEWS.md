@@ -1,4 +1,4 @@
-# warp (development version)
+# warp 0.2.2
 
 * warp is now compliant with R's C API (#39).
 
