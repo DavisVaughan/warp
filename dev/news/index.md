@@ -2,6 +2,10 @@
 
 ## warp (development version)
 
+## warp 0.2.2
+
+CRAN release: 2025-11-14
+
 - warp is now compliant with R’s C API
   ([\#39](https://github.com/DavisVaughan/warp/issues/39)).
 
