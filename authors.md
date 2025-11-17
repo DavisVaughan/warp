@@ -1,0 +1,24 @@
+# Authors and Citation
+
+## Authors
+
+- **Davis Vaughan**. Author, maintainer.
+
+- **Posit Software, PBC**. Copyright holder, funder.
+  [![ROR](https://raw.githubusercontent.com/ror-community/ror-logos/main/ror-icon-rgb.svg)](https://ror.org/03wc8by49)
+
+## Citation
+
+Source:
+[`DESCRIPTION`](https://github.com/DavisVaughan/warp/blob/main/DESCRIPTION)
+
+Vaughan D (2025). *warp: Group Dates*. R package version 0.2.2,
+<https://github.com/DavisVaughan/warp>.
+
+    @Manual{,
+      title = {warp: Group Dates},
+      author = {Davis Vaughan},
+      year = {2025},
+      note = {R package version 0.2.2},
+      url = {https://github.com/DavisVaughan/warp},
+    }
