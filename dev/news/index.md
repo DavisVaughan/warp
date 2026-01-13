@@ -2,6 +2,8 @@
 
 ## warp (development version)
 
+- Removed usage of `ATTRIB()` and `SET_ATTRIB()`.
+
 ## warp 0.2.2
 
 CRAN release: 2025-11-14
