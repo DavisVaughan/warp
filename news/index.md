@@ -1,5 +1,11 @@
 # Changelog
 
+## warp 0.2.3
+
+CRAN release: 2026-01-13
+
+- Removed usage of `ATTRIB()` and `SET_ATTRIB()`.
+
 ## warp 0.2.2
 
 CRAN release: 2025-11-14
