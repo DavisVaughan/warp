@@ -96,7 +96,7 @@ static SEXP as_datetime_from_posixct(SEXP x) {
     }
   }
 
-  SET_ATTRIB(out, ATTRIB(x));
+  SHALLOW_DUPLICATE_ATTRIB(out, x);
 
   UNPROTECT(1);
   return out;
