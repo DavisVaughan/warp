@@ -12,13 +12,13 @@
 Source:
 [`DESCRIPTION`](https://github.com/DavisVaughan/warp/blob/main/DESCRIPTION)
 
-Vaughan D (2026). *warp: Group Dates*. R package version 0.2.2.9000,
+Vaughan D (2026). *warp: Group Dates*. R package version 0.2.3.9000,
 <https://github.com/DavisVaughan/warp>.
 
     @Manual{,
       title = {warp: Group Dates},
       author = {Davis Vaughan},
       year = {2026},
-      note = {R package version 0.2.2.9000},
+      note = {R package version 0.2.3.9000},
       url = {https://github.com/DavisVaughan/warp},
     }
